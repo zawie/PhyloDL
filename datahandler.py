@@ -4,9 +4,6 @@ import sys
 from torch.utils.data import Dataset
 trees = ["alpha","beta","charlie"]
 
-#Instructions
-    #To execute generate command from terminal simply type:
-    #python dataHandler.py generate
 def Generate(amount={"train":1000,"test":100,"dev":10}, length=100, m="HKY"):
     """
     Generate data:
