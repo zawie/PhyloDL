@@ -3,7 +3,18 @@ import os
 from torch.utils.data import Dataset
 trees = ["alpha","beta","charlie"]
 
-def hotencode(sequence):
+def Generate(amount={"train":1000,"test":100,"dev":10}, length=100, m="HKY"):
+    """
+    Generate data:
+        amount: dictionary (key=folder, value=n to generate)
+        length: length of each sequence
+        m: type of generation?
+    """
+    for key,n in amount.items():
+        for tree in trees:
+            os.system("seq-gen -m{m} -n{n} -l{l} <trees/{tree}.tre> data/{type}/{tree}.dat".format(m=m,n=n,l=length,tree=tree,type=key))
+
+def _hotencode(sequence):
     """ 
         Hot encodes inputted sequnce
         "ATGC" -> [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
@@ -17,16 +28,6 @@ def hotencode(sequence):
         final.append(code_map[char])
     return final
 
-def generate(amount={"train":1000,"test":100,"dev":10}, m="HKY"):
-    """
-    Generate data:
-        amount: dictionary (key=folder, value=n to generate)
-    m: type of generation?
-    """
-    for key,n in amount.items():
-        for tree in trees:
-            os.system("seq-gen -m{m} -n{n} <trees/{tree}.tre> data/{type}/{tree}.dat".format(m=m,n=n,tree=tree,type=key))
-
 class SequenceDataset(Dataset):
     def __init__(self,folder):
         #Define folder
@@ -37,6 +38,9 @@ class SequenceDataset(Dataset):
             self.partition.append(self._num_entries(tree))
 
     def _getsequences(self,tree,index,doHotencode=True):
+        """
+        Returns the sequences of a certain tree and index
+        """
         file = open("data/{}/{}.dat".format(self.folder,tree),"r")
         startLine = index*5+1
         sequences = []
@@ -47,12 +51,15 @@ class SequenceDataset(Dataset):
                 #Trim excess characters
                 sequence = line[15:-1]
                 if doHotencode:
-                    sequence = hotencode(sequence)
+                    sequence = _hotencode(sequence)
                 sequences.append(sequence)
         file.close()
         return sequences
 
     def __getitem__(self,index):
+        """
+        Gets a certain tree across all three trees (alpha,beta,charlie)
+        """
         for t in range(3):
             partition_size = self.partition[t]
             if index < partition_size:
@@ -65,6 +72,10 @@ class SequenceDataset(Dataset):
                 index -= partition_size
     
     def _num_entries(self,tree):
+        """
+        Counts the number of entries for a given tree
+        (Should always be 1/3 of the total len)
+        """
         file = open("data/{}/{}.dat".format(self.folder,tree),"r")
         lines = len(file.read().split('\n'))
         entries = (lines-1)//5
@@ -72,12 +83,15 @@ class SequenceDataset(Dataset):
         return entries
 
     def __len__(self):
+        """
+        Returns the number of entries in this dataset 
+        """
         size = 0
         for tree in trees:
              size += self._num_entries(tree)
         return size
 
 
-generate(amount={"dev":5,"train":100,"test":10})
+Generate(amount={"dev":5,"train":100,"test":10})
 dataset = SequenceDataset("dev")
 print(dataset[0])
