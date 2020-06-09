@@ -56,8 +56,10 @@ class SequenceDataset(Dataset):
             if diff >= 0 and diff < 4:
                 #Trim excess characters
                 sequence = line[15:-1]
+                #Hot encode
                 if self.doHotencode:
                     sequence = _hotencode(sequence)
+                #Add sequence to list
                 sequences.append(sequence)
         file.close()
         return sequences
@@ -92,10 +94,7 @@ class SequenceDataset(Dataset):
         """
         Returns the number of entries in this dataset 
         """
-        size = 0
-        for tree in trees:
-             size += self._num_entries(tree)
-        return size
+        return sum(self.partition)
 
 # Handler terminal prompt
 if len(sys.argv) > 1 and sys.argv[1] == "generate":
