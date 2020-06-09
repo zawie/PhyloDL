@@ -12,7 +12,8 @@ def Generate(amount={"train":1000,"test":100,"dev":10}, length=100, m="HKY"):
     """
     for key,n in amount.items():
         for tree in trees:
-            os.system("seq-gen -m{m} -n{n} -l{l} <trees/{tree}.tre> data/{type}/{tree}.dat".format(m=m,n=n,l=length,tree=tree,type=key))
+            os.system("seq-gen -m{m} -n{n} -l
+            {l} <trees/{tree}.tre> data/{type}/{tree}.dat".format(m=m,n=n,l=length,tree=tree,type=key))
 
 def _hotencode(sequence):
     """ 
