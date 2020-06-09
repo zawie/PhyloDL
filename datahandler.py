@@ -32,15 +32,16 @@ def _hotencode(sequence):
     return final
 
 class SequenceDataset(Dataset):
-    def __init__(self,folder):
+    def __init__(self,folder,doHotencode=True):
         #Define folder
         self.folder = folder
+        self.doHotencode = doHotencode
         #Define partitions
         self.partition = []
         for tree in trees:
             self.partition.append(self._num_entries(tree))
 
-    def _getsequences(self,tree,index,doHotencode=True):
+    def _getsequences(self,tree,index,):
         """
         Returns the sequences of a certain tree and index
         """
@@ -53,7 +54,7 @@ class SequenceDataset(Dataset):
             if diff >= 0 and diff < 4:
                 #Trim excess characters
                 sequence = line[15:-1]
-                if doHotencode:
+                if self.doHotencode:
                     sequence = _hotencode(sequence)
                 sequences.append(sequence)
         file.close()
