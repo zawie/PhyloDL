@@ -1,8 +1,12 @@
 import torch
 import os
+import sys
 from torch.utils.data import Dataset
 trees = ["alpha","beta","charlie"]
 
+#Instructions
+    #To execute generate command from terminal simply type:
+    #python dataHandler.py generate
 def Generate(amount={"train":1000,"test":100,"dev":10}, length=100, m="HKY"):
     """
     Generate data:
@@ -10,10 +14,11 @@ def Generate(amount={"train":1000,"test":100,"dev":10}, length=100, m="HKY"):
         length: length of each sequence
         m: type of generation?
     """
+    print("Generating...")
     for key,n in amount.items():
         for tree in trees:
-            os.system("seq-gen -m{m} -n{n} -l
-            {l} <trees/{tree}.tre> data/{type}/{tree}.dat".format(m=m,n=n,l=length,tree=tree,type=key))
+            os.system("seq-gen -m{m} -n{n} -l{l} <trees/{tree}.tre> data/{type}/{tree}.dat".format(m=m,n=n,l=length,tree=tree,type=key))
+    print("Done Generating!")
 
 def _hotencode(sequence):
     """ 
@@ -92,7 +97,6 @@ class SequenceDataset(Dataset):
              size += self._num_entries(tree)
         return size
 
-
-Generate(amount={"dev":5,"train":100,"test":10})
-dataset = SequenceDataset("dev")
-print(dataset[0])
+# Handler terminal prompt
+if len(sys.argv) > 1 and sys.argv[1] == "generate":
+    Generate()
