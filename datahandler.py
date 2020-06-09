@@ -4,13 +4,13 @@ import sys
 from torch.utils.data import Dataset
 trees = ["alpha","beta","charlie"]
 
-def Generate(amount={"train":1000,"test":100,"dev":10}, length=100, m="HKY"):
+def Generate(amount={"train":10000,"test":1000,"dev":100}, length=1000, m="HKY"):
     """
     Generate data:
         amount: dictionary (key=folder, value=n to generate)
         length: length of each sequence
         m: type of generation?
-        
+
         NOTE: for any given amount, triple the number of sequences will be generated (one for reach tree type)
     """
     print("Generating...")
