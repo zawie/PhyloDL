@@ -3,22 +3,22 @@ import os
 import sys
 from torch.utils.data import Dataset
 trees = ["alpha","beta","charlie"]
-
-def Generate(amount={"train":10000,"test":1000,"dev":100}, length=1000, m="HKY"):
+default_length = 1000
+default_amount = {"train":10000,"test":1000,"dev":100}
+def Generate(amount=default_amount, length=default_length, m="HKY",TSR=0.5):
     """
     Generate data:
         amount: dictionary (key=folder, value=n to generate)
         length: length of each sequence
-        m: type of generation?
-
+        m: type of generation? (JC69 = Juke's Cantor)
+        TSR: the transition transversion ratio 
         NOTE: for any given amount, triple the number of sequences will be generated (one for reach tree type)
     """
     print("Generating...")
     for key,n in amount.items():
         for tree in trees:
-            os.system("seq-gen -m{m} -n{n} -l{l} <trees/{tree}.tre> data/{type}/{tree}.dat".format(m=m,n=n,l=length,tree=tree,type=key))
+            os.system("seq-gen -m{m} -n{n} -l{l} -t{t} <trees/{tree}.tre> data/{type}/{tree}.dat".format(m=m,n=n,l=length,t=TSR,tree=tree,type=key))
     print("Done Generating!")
-
 def _hotencode(sequence):
     """ 
         Hot encodes inputted sequnce
@@ -96,6 +96,24 @@ class SequenceDataset(Dataset):
         """
         return sum(self.partition)
 
+# Shorthand access
+def train():
+    return SequenceDataset("trian")
+def test():
+    return SequenceDataset("test")
+def dev():
+    return SequenceDataset("dev")
 # Handler terminal prompt
 if len(sys.argv) > 1 and sys.argv[1] == "generate":
-    Generate()
+    length = default_length
+    amount = default_amount.copy()
+    if len(sys.argv) > 2:
+        length = sys.argv[2]
+        if len(sys.argv) > 3:
+            amount["train"] = sys.argv[3]
+            if len(sys.argv) > 4:
+                amount["test"] = sys.argv[4]
+                if len(sys.argv) > 5:
+                    amount["dev"] = sys.argv[5]
+    print("Generating Sequence triplets of length {length} with the following amount:{amount}".format(length=length,amount=amount))
+    Generate(amount=amount,length=length)
