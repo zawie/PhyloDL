@@ -14,4 +14,6 @@ NOTE: For any amount requested, triple the number of sequences will be generated
 ## Accessing Torch Dataset
 To access the dataset simply import the python file, dataHandler, to your project and access a dataset by typing `dataHandler.SequenceDataset(<set>)`, where your set options are `"train"`,`"dev"`, or `"test"`
 
-For quick access you can also simply do: `dataHandler.train()`, `dataHandler.test()`, or `dataHandler.dev()` to get quick access to the datasets.
+For shorthand access you can also simply do: `dataHandler.train()`, `dataHandler.test()`, or `dataHandler.dev()` to get quick access to the datasets.
+
+Moreover, both the long hand and shorthand access methods, each has an optional argument `preprocess` which defaults to true. If preprocess is true, access time will be constant, however it will take extra time to build the dataset. If false, building the dataset will take negligble time, but accessing will take linear time.
