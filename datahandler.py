@@ -34,18 +34,28 @@ def _hotencode(sequence):
     return final
 
 class SequenceDataset(Dataset):
-    def __init__(self,folder,doHotencode=True):
-        #Define folder
+    def __init__(self,folder,doHotencode=True,preprocess=True):
+        #Define constants
         self.folder = folder
         self.doHotencode = doHotencode
+        self.preprocess = preprocess
         #Define partitions
         self.partition = []
         for tree in trees:
             self.partition.append(self._num_entries(tree))
+        #Preprocess
+        if preprocess:
+            print("Preprocessing {}...".format(folder))
+            self.X_data = list()
+            self.Y_data = list()
+            for i in range(len(self.partition)):
+                X,y = self._getsequences(i)
+                self.X_data.append(X)
+                self.Y_data.append(y)
 
-    def _getsequences(self,tree,index,):
+    def _readsequences(self,tree,index):
         """
-        Returns the sequences of a certain tree and index
+        Reads the sequences from a certain tree's file and index
         """
         file = open("data/{}/{}.dat".format(self.folder,tree),"r")
         startLine = index*5+1
@@ -64,20 +74,27 @@ class SequenceDataset(Dataset):
         file.close()
         return sequences
 
-    def __getitem__(self,index):
-        """
-        Gets a certain tree across all three trees (alpha,beta,charlie)
-        """
+    def _getsequences(self,index):
         for t in range(3):
             partition_size = self.partition[t]
             if index < partition_size:
                 #return appropriate data
                 tree = trees[t]
-                sequences = self._getsequences(tree,index)
+                sequences = self._readsequences(tree,index)
                 return sequences,t
             else:
                 #progress to next tree.dat file and reduce index accordingly
                 index -= partition_size
+    
+    def __getitem__(self,index):
+        """
+        Gets a certain tree across all three trees (alpha,beta,charlie)
+        """
+        if self.preprocess:
+            return self.X_data[index],self.Y_data[index]
+        else:
+            return self._getsequences(index)
+    
     
     def _num_entries(self,tree):
         """
@@ -97,12 +114,13 @@ class SequenceDataset(Dataset):
         return sum(self.partition)
 
 # Shorthand access
-def train():
-    return SequenceDataset("trian")
-def test():
-    return SequenceDataset("test")
-def dev():
-    return SequenceDataset("dev")
+def train(preprocess=True):
+    return SequenceDataset("train",preprocess=preprocess)
+def test(preprocess=True):
+    return SequenceDataset("test",preprocess=preprocess)
+def dev(preprocess=True):
+    return SequenceDataset("dev",preprocess=preprocess)
+
 # Handler terminal prompt
 if len(sys.argv) > 1 and sys.argv[1] == "generate":
     length = default_length
