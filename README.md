@@ -1,5 +1,5 @@
 # seq-gen-dataset
-This repo easily convert seq-gen generated to torch datasets and simplifies the generation process. This still heavily relies on properly installing the original seq-gen program, found here: https://snoweye.github.io/phyclust/document/Seq-Gen.v.1.3.2/Seq-Gen.Manual.html
+This repo easily converts seq-gen generated data to torch datasets and simplifies the generation process. This still heavily relies on properly installing the original seq-gen program, found here: https://snoweye.github.io/phyclust/document/Seq-Gen.v.1.3.2/Seq-Gen.Manual.html
 ## Generation
 Simply run `python dataHandler.py generate {sequence length} {amount of training sequence triplets} { amount ... testing ...} {amount ... dev ...}` to generate sequence. Or call the function Generate() within dataHandler.py
 
