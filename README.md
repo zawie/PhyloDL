@@ -7,6 +7,7 @@ This heavily relies on properly installing the original seq-gen program, found h
 This can installed via conda:
 `conda install seq-gen`
 
+This also requires pytorch to be installed.
 ## Generation
 Simply run `python dataHandler.py generate {sequence length} {amount of training sequence triplets} { amount ... testing ...} {amount ... dev ...}` to generate sequence. Or call the function Generate() within dataHandler.py
 
