@@ -60,13 +60,14 @@ class SequenceDataset(Dataset):
         for pos,line in enumerate(file):
             if pos%5 == 0:
                 data.append(list())
+                if pos != 0:
+                    #Conert to tensor
+                    data[pos//5-1] = torch.Tensor(data[pos//5-1])
             else:
                 sequence = line[15:-1]
                 #Hot encode
                 if self.doHotencode:
                     sequence = _hotencode(sequence)
-                #Convert to tensor
-                sequence = torch.Tensor(sequence)
                 #Add sequence to list
                 data[pos//5].append(sequence)
         file.close()
