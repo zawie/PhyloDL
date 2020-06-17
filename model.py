@@ -49,12 +49,8 @@ class ConvNet(nn.Module):
             nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2))
-        self.layer3 = nn.Sequential(
-            nn.Conv2d(64, 128, kernel_size=5, stride=1, padding=2),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
         self.drop_out = nn.Dropout()
-        self.fc1 = nn.Linear(40000, 1000)
+        self.fc1 = nn.Linear(15936, 1000)
         self.relu1 = nn.ReLU()
         self.fc2 = nn.Linear(1000, 64)
         self.relu2 = nn.ReLU()
@@ -64,7 +60,6 @@ class ConvNet(nn.Module):
     def forward(self, x):
         out = self.layer1(x)
         out = self.layer2(out)
-        out = self.layer3(out)
         out = out.reshape(out.size(0), -1)
         out = self.drop_out(out)
         out = self.fc1(out)
@@ -78,14 +73,14 @@ class ConvNet(nn.Module):
 #Setup data
 
 Write("Processing testset... [0/3]")
-testset = dataHandler.test(preprocess=False)
+testset = dataHandler.test(preprocess=True)
 Flush("Processing valset... [1/3]")
-valset = dataHandler.dev(preprocess=False)
+valset = dataHandler.dev(preprocess=True)
 Flush("Processing trainset... [2/3]")
-trainset = dataHandler.train(preprocess=False)
+trainset = dataHandler.train(preprocess=True)
 
 Flush("Creating data loaders... [3/3]")
-train_loader = DataLoader(dataset=trainset, batch_size=16, shuffle=True)
+train_loader = DataLoader(dataset=trainset, batch_size=64, shuffle=True)
 test_loader = DataLoader(dataset=testset, batch_size=1, shuffle=True)
 val_loader = DataLoader(dataset=valset, batch_size=1, shuffle=True)
 Flush("Data processed!")

@@ -4,7 +4,7 @@ import sys
 from torch.utils.data import Dataset
 trees = ["alpha","beta","charlie"]
 default_length = 1000
-default_amount = {"train":100000,"test":10000,"dev":1000}
+default_amount = {"train":10000,"test":1000,"dev":100}
 def Generate(amount=default_amount, length=default_length, m="HKY",TSR=0.5):
     """
     Generate data:
@@ -45,13 +45,32 @@ class SequenceDataset(Dataset):
             self.partition.append(self._num_entries(tree))
         #Preprocess
         if preprocess:
-            print("Preprocessing {}...".format(folder))
+            #print("Preprocessing {}...".format(folder))
             self.X_data = list()
             self.Y_data = list()
-            for i in range(sum(self.partition)):
-                X,y = self._getsequences(i)
-                self.X_data.append(X)
-                self.Y_data.append(y)
+            for t in range(3):
+                tree = trees[t]
+                data = self._readAllSequences(tree)
+                self.X_data.extend(data)
+                self.Y_data.extend([t]*len(data))
+
+    def _readAllSequences(self,tree):
+        file = open("data/{}/{}.dat".format(self.folder,tree),"r")
+        data = []
+        for pos,line in enumerate(file):
+            if pos%5 == 0:
+                data.append(list())
+            else:
+                sequence = line[15:-1]
+                #Hot encode
+                if self.doHotencode:
+                    sequence = _hotencode(sequence)
+                #Convert to tensor
+                sequence = torch.Tensor(sequence)
+                #Add sequence to list
+                data[pos//5].append(sequence)
+        file.close()
+        return data
 
     def _readsequences(self,tree,index):
         """
@@ -71,6 +90,8 @@ class SequenceDataset(Dataset):
                     sequence = _hotencode(sequence)
                 #Add sequence to list
                 sequences.append(sequence)
+            elif pos > startLine + 5:
+                break
         file.close()
         return sequences
 
