@@ -19,6 +19,7 @@ def Generate(amount=default_amount, length=default_length, m="HKY",TSR=0.5):
         for tree in trees:
             os.system("seq-gen -m{m} -n{n} -l{l} -t{t} <trees/{tree}.tre> data/{type}/{tree}.dat".format(m=m,n=n,l=length,t=TSR,tree=tree,type=key))
     print("Done Generating!")
+
 def _hotencode(sequence):
     """ 
         Hot encodes inputted sequnce
@@ -60,9 +61,6 @@ class SequenceDataset(Dataset):
         for pos,line in enumerate(file):
             if pos%5 == 0:
                 data.append(list())
-                if pos != 0:
-                    #Conert to tensor
-                    data[pos//5-1] = torch.Tensor(data[pos//5-1])
             else:
                 sequence = line[15:-1]
                 #Hot encode
@@ -70,6 +68,9 @@ class SequenceDataset(Dataset):
                     sequence = _hotencode(sequence)
                 #Add sequence to list
                 data[pos//5].append(sequence)
+                #Convert to Tensor
+                if (pos+1)%5 == 0: 
+                    data[pos//5] = torch.Tensor(data[pos//5])
         file.close()
         return data
 
