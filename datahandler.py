@@ -4,7 +4,7 @@ import sys
 from torch.utils.data import Dataset
 trees = ["alpha","beta","charlie"]
 default_length = 1000
-default_amount = {"train":10000,"test":1000,"dev":100}
+default_amount = {"train":100000,"test":10000,"dev":1000}
 def Generate(amount=default_amount, length=default_length, m="HKY",TSR=0.5):
     """
     Generate data:
@@ -48,7 +48,7 @@ class SequenceDataset(Dataset):
             print("Preprocessing {}...".format(folder))
             self.X_data = list()
             self.Y_data = list()
-            for i in range(len(self.partition)):
+            for i in range(sum(self.partition)):
                 X,y = self._getsequences(i)
                 self.X_data.append(X)
                 self.Y_data.append(y)
@@ -81,7 +81,7 @@ class SequenceDataset(Dataset):
                 #return appropriate data
                 tree = trees[t]
                 sequences = self._readsequences(tree,index)
-                return sequences,t
+                return torch.Tensor(sequences),t
             else:
                 #progress to next tree.dat file and reduce index accordingly
                 index -= partition_size
