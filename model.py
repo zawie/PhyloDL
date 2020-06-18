@@ -8,41 +8,36 @@ import pickle
 import visdom
 from datetime import datetime
 import numpy as np
+import dnn3
 
 viz = visdom.Visdom(env='main')
 #os.system("visdom")
 
-def Flush(txt):
-    print(" "+txt+(" "*100), end="\r", flush=True)
-
-def Write(txt):
-    print("\n "+txt+(" "*100), end="\r", flush=True)
-
 def Test(loader,name):
-    Write("{} testing...".format(name))
+    print("{} testing...".format(name))
     trials = len(loader)
     successes = 0
     for i in range(trials):
         inputs,label = next(iter(loader))
         output = model(inputs).tolist()
-        a = label[0][0] - 0.5
-        b = output[0][0] - 0.5
-        if (a<0 and b<0) or (a>0 and b>0):
+        label = label.tolist()
+        #Check if max index is same
+        if output.index(max(output)) == label[0]:
             successes +=1
-        Flush("{} Test: {}/{} = {}%".format(name,successes,i+1,int(successes/(i+1)*10000)/100))
+    print("{} Test: {}/{} = {}%".format(name,successes,i+1,int(successes/(trials)*10000)/100))
     return successes/trials
 
 def Save(name):
-    #Write("Saving model...")
+    print("Saving model...")
     torch.save(model.state_dict(), "models/{}".format(name))
-    #Flush("Model saved! [{}]".format(name))
+    print("Model saved! [{}]".format(name))
 
 #Define model
 class ConvNet(nn.Module):
     def __init__(self):
         super(ConvNet, self).__init__()
         self.layer1 = nn.Sequential(
-            nn.Conv2d(4, 32, kernel_size=3, stride=1, padding=2),
+            nn.Conv2d(4, 32, kernel_size=4, stride=1, padding=0),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2))
         self.layer2 = nn.Sequential(
@@ -72,40 +67,41 @@ class ConvNet(nn.Module):
 
 #Setup data
 
-Write("Processing testset... [0/3]")
+print("Processing testset... [1/3]")
 testset = dataHandler.test(preprocess=True)
-Flush("Processing valset... [1/3]")
+print("Processing valset... [2/3]")
 valset = dataHandler.dev(preprocess=True)
-Flush("Processing trainset... [2/3]")
+print("Processing trainset... [3/3]")
 trainset = dataHandler.train(preprocess=True)
 
-Flush("Creating data loaders... [3/3]")
+print("Creating data loaders...")
 train_loader = DataLoader(dataset=trainset, batch_size=64, shuffle=True)
 test_loader = DataLoader(dataset=testset, batch_size=1, shuffle=True)
 val_loader = DataLoader(dataset=valset, batch_size=1, shuffle=True)
-Flush("Data processed!")
+print("Data processed!")
 
 #Get model
-Write("Loading model...")
-model = ConvNet()
-#model.load_state_dict(torch.load('models/alpha'))
-#model.eval()
-Flush("Model loaded!")
+print("Loading model...")
+model = dnn3._Model()
+model.load_state_dict(torch.load('models/alpha'))
+model.eval()
+print("Model loaded!")
 
 # Loss and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.00001)
+criterion = nn.CrossEntropyLoss(reduction='sum')
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-5)
 
 # Train the model
 total_step = len(train_loader)
 loss_list = []
-acc_list = []
-num_epochs = 1000
+num_epochs = 100
+
+success_rate = Test(val_loader,"Validation")
 
 for epoch in range(num_epochs):
     print()
     #Train
-    Write("Training...")
+    print("Training...")
     for i, (images, labels) in enumerate(train_loader):
         # Run the forward pass
         #print("\t\tIMAGE:",images.shape)
@@ -118,16 +114,19 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        viz.line(
-            X=np.array([i+total_step*epoch]),
-            Y=np.array([loss.item()]),
-            win="Loss",
-            name='Line1',
-            update='append',
-        )
-        Flush('Epoch [{}/{}], Batch [{}/{}], Loss: {:.4f}'
-                .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
-    #Dev test
+        if i % 10 == 0:
+            viz.line(
+                X=np.array([i+total_step*epoch]),
+                Y=np.array(sum(loss_list)/10),
+                win="Loss",
+                name='Line1',
+                update='append',
+            )
+            loss_list = list()
+        if i % 100 == 0:
+            print('\tEpoch [{}/{}], Batch [{}/{}], Last Loss: {:.4f}'
+                    .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
+            #Dev test
     success_rate = Test(val_loader,"Validation")
     viz.line(
             X=np.array([epoch]),
@@ -137,8 +136,6 @@ for epoch in range(num_epochs):
             update='append',
         )
     #Save model
-    Save("alpha")
-    #Save loss list
-    pickle.dump(loss_list,open("loss_list.pickle","wb"))
+    Save("beta")
 
 Test(train_loader,"Final")
