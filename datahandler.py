@@ -63,7 +63,7 @@ class SequenceDataset(Dataset):
             if pos%5 == 0:
                 data.append(list())
             else:
-                sequence = line[15:-1]
+                sequence = line[10:-1]
                 #Hot encode
                 if self.doHotencode:
                     sequence = _hotencode(sequence)
@@ -87,7 +87,7 @@ class SequenceDataset(Dataset):
             diff = pos - (startLine)
             if diff >= 0 and diff < 4:
                 #Trim excess characters
-                sequence = line[15:-1]
+                sequence = line[10:-1]
                 #Hot encode
                 if self.doHotencode:
                     sequence = _hotencode(sequence)
@@ -161,3 +161,8 @@ if len(sys.argv) > 1 and sys.argv[1] == "generate":
     Generate(amount=amount,length=length)
 
 #Generate()
+
+val = dev(preprocess=False)
+
+print(val[0])
+print(val[0][0].shape)

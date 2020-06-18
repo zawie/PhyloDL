@@ -50,7 +50,6 @@ class ConvNet(nn.Module):
         self.fc2 = nn.Linear(1000, 64)
         self.relu2 = nn.ReLU()
         self.fc3 = nn.Linear(64, 4)
-        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
         out = self.layer1(x)
@@ -62,17 +61,16 @@ class ConvNet(nn.Module):
         out = self.fc2(out)
         out = self.relu2(out)
         out = self.fc3(out)
-        out = self.sigmoid(out)
         return out
 
 #Setup data
 
 print("Processing testset... [1/3]")
-testset = dataHandler.test(preprocess=True)
+testset = dataHandler.test(preprocess=False)
 print("Processing valset... [2/3]")
-valset = dataHandler.dev(preprocess=True)
+valset = dataHandler.dev(preprocess=False)
 print("Processing trainset... [3/3]")
-trainset = dataHandler.train(preprocess=True)
+trainset = dataHandler.train(preprocess=False)
 
 print("Creating data loaders...")
 train_loader = DataLoader(dataset=trainset, batch_size=64, shuffle=True)
@@ -83,8 +81,8 @@ print("Data processed!")
 #Get model
 print("Loading model...")
 model = dnn3._Model()
-model.load_state_dict(torch.load('models/alpha'))
-model.eval()
+#model.load_state_dict(torch.load('models/alpha'))
+#model.eval()
 print("Model loaded!")
 
 # Loss and optimizer
