@@ -30,7 +30,7 @@ class _Model(torch.nn.Module):
         """Create a neural network model."""
         super().__init__()
         self.conv = torch.nn.Sequential(
-            torch.nn.Conv1d(4, 80, 1),
+            torch.nn.Conv1d(16, 80, 1,groups=4),
             torch.nn.BatchNorm1d(80),
             torch.nn.ReLU(),
             torch.nn.Conv1d(80, 32, 1),
@@ -64,9 +64,8 @@ class _Model(torch.nn.Module):
         torch.Tensor
             The predicted adjacency trees.
         """
-        print("Conv start:",x.shape)
+        x = torch.reshape(x,[x.size()[0],16,1000])
         x = self.conv(x).squeeze(dim=2)
-        print("Conv done:",x.shape)
         return self.classifier(x)
 
 
@@ -85,8 +84,3 @@ class _ResidueModule(torch.nn.Module):
 
     def forward(self, x):
         return x + self.layers(x)
-
-
-if __name__ == '__main__':
-    logbook.StderrHandler(bubble=True).push_application()
-    fire.Fire()

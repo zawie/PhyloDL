@@ -66,11 +66,11 @@ class ConvNet(nn.Module):
 #Setup data
 
 print("Processing testset... [1/3]")
-testset = dataHandler.test(preprocess=False)
+testset = dataHandler.test(preprocess=True)
 print("Processing valset... [2/3]")
-valset = dataHandler.dev(preprocess=False)
+valset = dataHandler.dev(preprocess=True)
 print("Processing trainset... [3/3]")
-trainset = dataHandler.train(preprocess=False)
+trainset = dataHandler.train(preprocess=True)
 
 print("Creating data loaders...")
 train_loader = DataLoader(dataset=trainset, batch_size=64, shuffle=True)
@@ -94,7 +94,7 @@ total_step = len(train_loader)
 loss_list = []
 num_epochs = 100
 
-success_rate = Test(val_loader,"Validation")
+Test(val_loader,"Validation")
 
 for epoch in range(num_epochs):
     print()
@@ -112,10 +112,10 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        if i % 10 == 0:
+        if i % 10 == 0 and i > 0:
             viz.line(
                 X=np.array([i+total_step*epoch]),
-                Y=np.array(sum(loss_list)/10),
+                Y=np.array([sum(loss_list)/10]),
                 win="Loss",
                 name='Line1',
                 update='append',

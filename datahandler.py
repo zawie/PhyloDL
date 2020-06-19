@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 
 trees = ["alpha","beta","charlie"]
 default_length = 1000
-default_amount = {"train":50000,"test":5000,"dev":1000}
+default_amount = {"train":10000,"test":2500,"dev":1000}
 def Generate(amount=default_amount, length=default_length, m="HKY",TSR=0.5):
     """
     Generate data:
@@ -161,8 +161,3 @@ if len(sys.argv) > 1 and sys.argv[1] == "generate":
     Generate(amount=amount,length=length)
 
 #Generate()
-
-val = dev(preprocess=False)
-
-print(val[0])
-print(val[0][0].shape)
