@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 
 trees = ["alpha","beta","charlie"]
 default_length = 250
-default_amount = {"train":100000,"test":10000,"dev":2500}
+default_amount = {"train":10000,"test":1000,"dev":1000}
 def Generate(amount=default_amount, length=default_length, m="HKY",TSR=0.5):
     """
     Generate data:
@@ -160,4 +160,4 @@ if len(sys.argv) > 1 and sys.argv[1] == "generate":
     print("Generating Sequence triplets of length {length} with the following amount:{amount}".format(length=length,amount=amount))
     Generate(amount=amount,length=length)
 
-Generate()
+#Generate()
