@@ -81,12 +81,12 @@ print("Data processed!")
 #Get model
 print("Loading model...")
 model = dnn3._Model()
-#model.load_state_dict(torch.load('models/alpha'))
+#model.load_state_dict(torch.load('models/beta'))
 #model.eval()
 print("Model loaded!")
 
 # Loss and optimizer
-criterion = nn.CrossEntropyLoss(reduction='sum')
+criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-5)
 
 # Train the model
@@ -112,10 +112,10 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        if i % 10 == 0 and i > 0:
+        if i % 10 == 0:
             viz.line(
                 X=np.array([i+total_step*epoch]),
-                Y=np.array([sum(loss_list)/10]),
+                Y=np.array([sum(loss_list)/len(loss_list)]),
                 win="Loss",
                 name='Line1',
                 update='append',
@@ -134,6 +134,6 @@ for epoch in range(num_epochs):
             update='append',
         )
     #Save model
-    Save("beta")
+    Save("alpha")
 
 Test(train_loader,"Final")
