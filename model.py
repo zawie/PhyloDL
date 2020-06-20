@@ -104,6 +104,10 @@ for epoch in range(num_epochs):
         # Run the forward pass
         #print("\t\tIMAGE:",images.shape)
         outputs = model(images)
+        _, predicted = torch.max(outputs.data, 1)
+        print()
+        print(predicted)
+        print(labels)
         #print("\t\tOUTPUT:",outputs.shape)
         #print("\t\tLABELS:",labels.shape)
         loss = criterion(outputs, labels)

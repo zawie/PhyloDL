@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 
 trees = ["alpha","beta","charlie"]
 default_length = 250
-default_amount = {"train":10000,"test":1000,"dev":1000}
+default_amount = {"train":10000,"test":1000,"dev":100}
 def Generate(amount=default_amount, length=default_length, m="HKY",TSR=0.5):
     """
     Generate data:
@@ -17,11 +17,10 @@ def Generate(amount=default_amount, length=default_length, m="HKY",TSR=0.5):
     """
     print("Generating...")
     for key,n in amount.items():
-        for tree in trees:
-            os.system("seq-gen -m{m} -n{n} -l{l} -t{t} <trees/{tree}.tre> data/{type}/{tree}.dat".format(m=m,n=n,l=length,t=TSR,tree=tree,type=key))
+        os.system("seq-gen -m{m} -n{n} -l{l} -t{t} <tree.tre> data/{type}.dat".format(m=m,n=n,l=length,t=TSR,type=key))
     print("Done Generating!")
 
-def _hotencode(sequence):
+def hotencode(sequence):
     """ 
         Hot encodes inputted sequnce
         "ATGC" -> [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
@@ -35,81 +34,66 @@ def _hotencode(sequence):
         final.append(code_map[char])
     return final
 
+def toBeta(alpaSeqeunces):
+    (A,B,C,D) = alpaSeqeunces
+    return [A,D,C,B]
+
+def toGamma(alpaSeqeunces):
+    (A,B,C,D) = alpaSeqeunces
+    return [A,C,B,D]
+
+def permute(sequences):
+    (A,B,C,D) = sequences
+    return [
+        [A,B,C,D],
+        [A,B,D,C],
+        [B,A,C,D],
+        [B,A,D,C],
+        [C,D,A,B],
+        [C,D,B,A],
+        [D,C,A,B],
+        [D,C,B,A]
+    ]
+
+def augment(instance):
+    X = list()
+    y = [0]*8 + [1]*8 + [2]*8
+    X.extend(permute(instance))
+    X.extend(permute(toBeta(instance)))
+    X.extend(permute(toGamma(instance)))
+    return torch.Tensor(X),torch.Tensor(y)
+    
 class SequenceDataset(Dataset):
-    def __init__(self,folder,doHotencode=True,preprocess=True):
+    def __init__(self,folder,preprocess=True):
         #Define constants
         self.folder = folder
-        self.doHotencode = doHotencode
         self.preprocess = preprocess
-        #Define partitions
-        self.partition = []
-        for tree in trees:
-            self.partition.append(self._num_entries(tree))
+        self.instances = self._getAllInstances()
         #Preprocess
         if preprocess:
-            #print("Preprocessing {}...".format(folder))
             self.X_data = list()
             self.Y_data = list()
-            for t in range(3):
-                tree = trees[t]
-                data = self._readAllSequences(tree)
-                self.X_data.extend(data)
-                self.Y_data.extend([t]*len(data))
+            for instance in self.instances:
+                X,y = augment(instance)
+                self.X_data.append(X)
+                self.Y_data.append(y)
 
-    def _readAllSequences(self,tree):
-        file = open("data/{}/{}.dat".format(self.folder,tree),"r")
+    def _getAllInstances(self):
+        file = open("data/{}.dat".format(self.folder),"r")
         data = []
         for pos,line in enumerate(file):
             if pos%5 == 0:
                 data.append(list())
             else:
+                #Trim
                 sequence = line[10:-1]
                 #Hot encode
-                if self.doHotencode:
-                    sequence = _hotencode(sequence)
+                sequence = hotencode(sequence)
                 #Add sequence to list
                 data[pos//5].append(sequence)
-                #Convert to Tensor
-                if (pos+1)%5 == 0: 
-                    data[pos//5] = torch.Tensor(data[pos//5])
         file.close()
         return data
 
-    def _readsequences(self,tree,index):
-        """
-        Reads the sequences from a certain tree's file and index
-        """
-        file = open("data/{}/{}.dat".format(self.folder,tree),"r")
-        startLine = index*5+1
-        sequences = []
-        for pos,line in enumerate(file):
-            #Check if needed line
-            diff = pos - (startLine)
-            if diff >= 0 and diff < 4:
-                #Trim excess characters
-                sequence = line[10:-1]
-                #Hot encode
-                if self.doHotencode:
-                    sequence = _hotencode(sequence)
-                #Add sequence to list
-                sequences.append(sequence)
-            elif pos > startLine + 5:
-                break
-        file.close()
-        return sequences
-
-    def _getsequences(self,index):
-        for t in range(3):
-            partition_size = self.partition[t]
-            if index < partition_size:
-                #return appropriate data
-                tree = trees[t]
-                sequences = self._readsequences(tree,index)
-                return torch.Tensor(sequences),t
-            else:
-                #progress to next tree.dat file and reduce index accordingly
-                index -= partition_size
-    
     def __getitem__(self,index):
         """
         Gets a certain tree across all three trees (alpha,beta,charlie)
@@ -117,25 +101,14 @@ class SequenceDataset(Dataset):
         if self.preprocess:
             return self.X_data[index],self.Y_data[index]
         else:
-            return self._getsequences(index)
-    
-    
-    def _num_entries(self,tree):
-        """
-        Counts the number of entries for a given tree
-        (Should always be 1/3 of the total len)
-        """
-        file = open("data/{}/{}.dat".format(self.folder,tree),"r")
-        lines = len(file.read().split('\n'))
-        entries = (lines-1)//5
-        file.close()
-        return entries
+            X,y = self._augment(self.instances[index])
+            return X,y
 
     def __len__(self):
         """
         Returns the number of entries in this dataset 
         """
-        return sum(self.partition)
+        return len(self.instances)*24
 
 # Shorthand access
 def train(preprocess=True):
@@ -160,4 +133,7 @@ if len(sys.argv) > 1 and sys.argv[1] == "generate":
     print("Generating Sequence triplets of length {length} with the following amount:{amount}".format(length=length,amount=amount))
     Generate(amount=amount,length=length)
 
+val = dev()
+print(len(val))
+print(val[0])
 #Generate()
