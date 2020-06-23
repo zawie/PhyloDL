@@ -1,5 +1,5 @@
 import torch
-import dataHandler
+import datahandler as dataHandler
 from torch.utils.data import DataLoader
 import torch.nn as nn
 import sys
@@ -11,21 +11,49 @@ import numpy as np
 import dnn3
 
 viz = visdom.Visdom(env='main')
-#os.system("visdom")
 
-def Test(loader,name):
+def plot(name,X,Y,window='Main'):
+    viz.line(
+        X=np.array(X),
+        Y=np.array(Y),
+        win=window,
+        name=name,
+        update='append',
+        opts = dict(title=f"Model Data | Sequence Length = {dataHandler.default_length}", xlabel="Epoch", showlegend=True)
+    )
+
+def compare(outputs,labels,doPrint = False):
+    s = 0
+    t = 0
+    _, predicted = torch.max(outputs.data, 1)
+    if doPrint:
+        print("Results:\t{}\nLabels:\t{}\n".format(predicted.tolist(),labels.tolist()))
+    for pair in zip(labels.tolist(),predicted.tolist()):
+        t += 1
+        if pair[0] == pair[1]:
+            s += 1
+    return s,t
+
+def Test(loader,name,criterion):
     print("{} testing...".format(name))
-    trials = len(loader)
+    trials = 0
     successes = 0
-    for i in range(trials):
-        inputs,label = next(iter(loader))
-        output = model(inputs).tolist()
-        label = label.tolist()
-        #Check if max index is same
-        if output.index(max(output)) == label[0]:
-            successes +=1
-    print("{} Test: {}/{} = {}%".format(name,successes,i+1,int(successes/(trials)*10000)/100))
-    return successes/trials
+    l_list = list()
+    for i in range(len(loader)):
+        #Run model
+        inputs,labels = next(iter(loader))
+        inputs,labels = dataHandler.expandBatch(inputs,labels)
+        outputs = model(inputs)
+        #Check accuracy
+        s,t = compare(outputs,labels)
+        successes += s
+        trials += t
+        #Measure loss
+        l_list.append(criterion(outputs, labels).item())
+
+    average_loss = sum(l_list)/len(l_list)
+    print("\t{} Results: {}/{} = {}% | Average loss:{}".format(name,successes,trials,int(successes/(trials)*10000)/100,average_loss))
+    return successes/trials,average_loss
 
 def Save(name):
     print("Saving model...")
@@ -73,7 +101,7 @@ print("Processing trainset... [3/3]")
 trainset = dataHandler.train(preprocess=True)
 
 print("Creating data loaders...")
-train_loader = DataLoader(dataset=trainset, batch_size=64, shuffle=True)
+train_loader = DataLoader(dataset=trainset, batch_size=4, shuffle=True)
 test_loader = DataLoader(dataset=testset, batch_size=1, shuffle=True)
 val_loader = DataLoader(dataset=valset, batch_size=1, shuffle=True)
 print("Data processed!")
@@ -81,62 +109,66 @@ print("Data processed!")
 #Get model
 print("Loading model...")
 model = dnn3._Model()
-#model.load_state_dict(torch.load('models/beta'))
-#model.eval()
+model.load_state_dict(torch.load('models/alpha'))
+model.eval()
 print("Model loaded!")
 
 # Loss and optimizer
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-5)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=1e-5)
 
 # Train the model
 total_step = len(train_loader)
 loss_list = []
+train_s = 0
+train_t = 0
 num_epochs = 100
 
-Test(val_loader,"Validation")
+#Test(val_loader,"Validation")
 
 for epoch in range(num_epochs):
     print()
+    #Dev test
+    success_rate,average_loss = Test(val_loader,"Validation",criterion)
+    plot("Validation Accuracy",[epoch],[success_rate])
+    if epoch > 0:
+        plot("Validation Loss",[epoch],[average_loss])
     #Train
     print("Training...")
-    for i, (images, labels) in enumerate(train_loader):
+    for i, (data, labels) in enumerate(train_loader):
+        data, labels = dataHandler.expandBatch(data,labels)
         # Run the forward pass
-        #print("\t\tIMAGE:",images.shape)
-        outputs = model(images)
-        _, predicted = torch.max(outputs.data, 1)
-        print()
-        print(predicted)
-        print(labels)
-        #print("\t\tOUTPUT:",outputs.shape)
-        #print("\t\tLABELS:",labels.shape)
+        outputs = model(data)
+   
         loss = criterion(outputs, labels)
         loss_list.append(loss.item())
         # Backprop and perform Adam optimisation
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        if i % 10 == 0:
-            viz.line(
-                X=np.array([i+total_step*epoch]),
-                Y=np.array([sum(loss_list)/len(loss_list)]),
-                win="Loss",
-                name='Line1',
-                update='append',
-            )
-            loss_list = list()
+
+        #Log accuracy
+        s,t = compare(outputs,labels)
+        train_s += s
+        train_t += t
+                
+        #Log training loss   
+        if i % 1000 == 0:
+            success_rate,average_loss = Test(val_loader,"Validation",criterion)
+            plot("Validation Accuracy",[epoch + i/total_step],[success_rate])
+            Save("alpha")      
         if i % 100 == 0:
-            print('\tEpoch [{}/{}], Batch [{}/{}], Last Loss: {:.4f}'
-                    .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
-            #Dev test
-    success_rate = Test(val_loader,"Validation")
-    viz.line(
-            X=np.array([epoch]),
-            Y=np.array([success_rate]),
-            win="Validation",
-            name='Line2',
-            update='append',
-        )
+            print('\tEpoch [{}/{}], Batch [{}/{}], Latest Average Loss: {:.4f}'
+                    .format(epoch + 1, num_epochs, i + 1, total_step, sum(loss_list)/len(loss_list)))
+        if i % 100 == 0 and (epoch+i) > 0:
+            plot("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)])
+            loss_list = list()
+
+    #Plot accuracy
+    plot("Training Accuracy",[epoch+1],[train_s/train_t])
+    train_s = 0
+    train_t = 0
+
     #Save model
     Save("alpha")
 

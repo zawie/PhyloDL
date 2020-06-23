@@ -64,7 +64,7 @@ class _Model(torch.nn.Module):
         torch.Tensor
             The predicted adjacency trees.
         """
-        x = torch.reshape(x,[x.size()[0],16,250])
+        x = torch.reshape(x,[x.size()[0],16,-1])
         x = self.conv(x).squeeze(dim=2)
         return self.classifier(x)
 

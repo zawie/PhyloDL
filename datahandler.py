@@ -2,10 +2,11 @@ import torch
 import os
 import sys
 from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
 
-trees = ["alpha","beta","charlie"]
-default_length = 250
-default_amount = {"train":10000,"test":1000,"dev":100}
+default_length = 200
+default_amount = {"train":25000,"test":1,"dev":1000}
+
 def Generate(amount=default_amount, length=default_length, m="HKY",TSR=0.5):
     """
     Generate data:
@@ -17,8 +18,20 @@ def Generate(amount=default_amount, length=default_length, m="HKY",TSR=0.5):
     """
     print("Generating...")
     for key,n in amount.items():
-        os.system("seq-gen -m{m} -n{n} -l{l} -t{t} <tree.tre> data/{type}.dat".format(m=m,n=n,l=length,t=TSR,type=key))
+        os.system("seq-gen -m{m} -n{n} -l{l} <tree.tre> data/{type}.dat".format(m=m,n=n,l=length,type=key))
     print("Done Generating!")
+
+def expandBatch(data,labels):
+    batchsize = data.size()[0]
+    expanded_data = torch.reshape(data,[batchsize*24,4,-1,4])
+    expanded_labels = torch.reshape(labels,[batchsize*24])
+    return expanded_data,expanded_labels
+
+def listToString(lst):
+    st = ""
+    for char in lst:
+        st += char
+    return st
 
 def hotencode(sequence):
     """ 
@@ -34,12 +47,23 @@ def hotencode(sequence):
         final.append(code_map[char])
     return final
 
-def toBeta(alpaSeqeunces):
-    (A,B,C,D) = alpaSeqeunces
+def unhotencode(sequence):
+    code_map = {(1,0,0,0):"A",
+                (0,1,0,0):"T",
+                (0,0,1,0):"G",
+                (0,0,0,1):"C"
+            }
+    final = []
+    for char in sequence:
+        final.append(code_map[tuple(char)])
+    return final
+
+def toBeta(alphaSeqeunces):
+    (A,B,C,D) = alphaSeqeunces
     return [A,D,C,B]
 
-def toGamma(alpaSeqeunces):
-    (A,B,C,D) = alpaSeqeunces
+def toGamma(alphaSeqeunces):
+    (A,B,C,D) = alphaSeqeunces
     return [A,C,B,D]
 
 def permute(sequences):
@@ -57,11 +81,15 @@ def permute(sequences):
 
 def augment(instance):
     X = list()
-    y = [0]*8 + [1]*8 + [2]*8
-    X.extend(permute(instance))
-    X.extend(permute(toBeta(instance)))
-    X.extend(permute(toGamma(instance)))
-    return torch.Tensor(X),torch.Tensor(y)
+    y = list() #alpha + beta + gamma
+    for alpha in permute(instance):
+        y.append(0)
+        X.extend(alpha)
+        y.append(1)
+        X.extend(toBeta(alpha))
+        y.append(2)
+        X.extend(toGamma(alpha))
+    return torch.tensor(X,dtype=torch.float),torch.tensor(y,dtype=torch.long)
     
 class SequenceDataset(Dataset):
     def __init__(self,folder,preprocess=True):
@@ -108,7 +136,7 @@ class SequenceDataset(Dataset):
         """
         Returns the number of entries in this dataset 
         """
-        return len(self.instances)*24
+        return len(self.instances)
 
 # Shorthand access
 def train(preprocess=True):
@@ -133,7 +161,19 @@ if len(sys.argv) > 1 and sys.argv[1] == "generate":
     print("Generating Sequence triplets of length {length} with the following amount:{amount}".format(length=length,amount=amount))
     Generate(amount=amount,length=length)
 
-val = dev()
-print(len(val))
-print(val[0])
-#Generate()
+Generate()
+
+"""loader = DataLoader(dataset=test(), batch_size=1, shuffle=True)
+for i in range(len(loader)):
+    #Run model
+    data,labels = next(iter(loader))
+    data,labels = expandBatch(data,labels)
+    data,labels = data.tolist(),labels.tolist()
+    for i in range(len(labels)):
+        label = labels[i]
+        print(label)
+        for sequence in data[i]:
+            print(listToString(unhotencode(sequence)))
+"""
+
+
