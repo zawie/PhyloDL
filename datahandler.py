@@ -5,10 +5,12 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 import random
 
+#Constants
 TREES = ['alpha','beta','gamma']
-default_length = 200
-default_amount = {"train":2500,"test":1000,"dev":100}
+DEFAULT_SEQUENCE_LENGTH = 200
+DEFAULT_AMOUNT = {"train":2500,"test":1000,"dev":100}
 
+#Tree Alternators
 def WriteRandomTrees(mean,std,amount=100):
     print("Modifying branch length...")
     template_tree = "((A:_,B:_):_,(C:_,D:_):_)"
@@ -22,39 +24,41 @@ def WriteRandomTrees(mean,std,amount=100):
     f = open("tree.tre", "w")
     f.write(tree_str)
     f.close()
-    print(f"Random branched trees generated!")
+    print(f"Random branch lengths written!")
 
-def SetBranchLength(length):
+def SetBranchLengths(lengths):
     print("Modifying branch length...")
     template_tree = "((A:_,B:_):_,(C:_,D:_):_)"
-    new_tree = template_tree.replace("_",str(length))
+    tree = template_tree
+    for _ in range(6):
+        tree = tree.replace("_",lengths.pop(),1)
     f = open("tree.tre", "w")
-    f.write(new_tree)
+    f.write(tree)
     f.close()
-    print(f"Branch length set to {length}!")
+    print(f"Branch lengths written! {lengths}")
 
-def Generate(amount=default_amount, b=.1, l=default_length, m="HKY",TSR=0.5):
+#Generators
+def Generate(amount=DEFAULT_AMOUNT, branchLength=0.1, sequenceLength=DEFAULT_SEQUENCE_LENGTH, model="HKY"):
     """
     Generate data:
         amount: dictionary (key=folder, value=n to generate)
-        length: length of each sequence
-        m: type of generation? (JC69 = Juke's Cantor)
-        TSR: the transition transversion ratio
-        NOTE: for any given amount, triple the number of sequences will be generated (one for reach tree type)
+        sequenceLength: length of each sequence
+        model: type of generation?
     """
     print("Generating...")
-    SetBranchLength(b)
+    SetBranchLengths([branchLength]*6)
     for key,n in amount.items():
-        os.system(f"seq-gen -m{m} -n{n} -l{l} <tree.tre> data/{key}.dat")
+        os.system(f"seq-gen -m{model} -n{n} -l{sequenceLength} <tree.tre> data/{key}.dat")
     print("Done Generating!")
 
-def GenerateRandomBranchLengths(amount=default_amount, l=default_length, std=1,mean=0.5, m="HKY"):
+def GenerateRandomBranchLengths(amount=DEFAULT_AMOUNT, sequenceLength=DEFAULT_SEQUENCE_LENGTH, std=1,mean=0.5, model="HKY"):
     print("Random Generating...")
     for key,n in amount.items():
         WriteRandomTrees(mean,std,amount=n)
-        os.system(f"seq-gen -m{m} -n{1} -l{l} <tree.tre> data/{key}.dat")
+        os.system(f"seq-gen -m{model} -n{1} -l{sequenceLength} <tree.tre> data/{key}.dat")
     print("Done Generating!")
 
+#Sequence modifiers
 def hotencode(sequence):
     """
         Hot encodes inputted sequnce
@@ -70,14 +74,24 @@ def hotencode(sequence):
     return final
 
 def toBeta(alphaSeqeunces):
+    """
+    Transforms a given alpha sequences to a beta tree
+    """
     (A,B,C,D) = alphaSeqeunces
     return [A,D,C,B]
 
 def toGamma(alphaSeqeunces):
+    """
+    Transforms a given alpha sequences to a gamma tree
+    """
     (A,B,C,D) = alphaSeqeunces
     return [A,C,B,D]
 
 def permute(sequences):
+    """
+    Permutes the set of sequences into all possible orders that maintains
+    the same tree class
+    """
     (A,B,C,D) = sequences
     return [
         [A,B,C,D],
@@ -90,7 +104,14 @@ def permute(sequences):
         [D,C,B,A]
     ]
 
+#Readers
 def getInstances(file_path,tree='alpha'):
+    """
+    Reads all seqeunces generated into a python list
+    Inputs: file_path: which seq-gen .dat file should be read from
+            tree: the type of tree that's being read (VERY IMPORTANT)
+    Outputs: A list of lists of hotencoded sequences.
+    """
     file = open(file_path,"r")
     data = []
     for pos,line in enumerate(file):
@@ -114,8 +135,13 @@ def getInstances(file_path,tree='alpha'):
     file.close()
     return data
 
+#Datasets
 class SequenceDataset(Dataset):
     def __init__(self,folder,augment_function,expand_function,preprocess=True):
+        """
+        Initializes the Dataset.
+        This primarily entiles reading the generated sequeences into a python list
+        """
         #Define constants
         self.folder = folder
         self.preprocess = preprocess
@@ -148,6 +174,10 @@ class SequenceDataset(Dataset):
         return len(self.instances)
 
 def PermutedDataset(folder,preprocess=True):
+    """
+    Returns a SequenceDataset that will transform and permute each tree instance
+    This will grow the dataset by 24
+    """
     def _augment(instance):
         X = list()
         y = list() #alpha + beta + gamma
@@ -167,6 +197,10 @@ def PermutedDataset(folder,preprocess=True):
     return SequenceDataset(folder,_augment,_expand,preprocess=preprocess)
 
 def UnpermutedDataset(folder,preprocess=True):
+    """
+    Returns a SequenceDataset that will ONLY transforme ach tree instance
+    This will grow the dataset by 3
+    """
     def _augment(instance):
         X = list()
         y = list()

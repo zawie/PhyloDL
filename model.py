@@ -4,77 +4,130 @@ from torch.utils.data import DataLoader
 import torch.nn as nn
 import sys
 import os
-import pickle
 import visdom
-from datetime import datetime
 import numpy as np
 import dnn3
 
+#Connect to Visdom
 viz = visdom.Visdom(env='main')
 
-def plot(name,X,Y,window='Main',length=dataHandler.default_length):
+def plot(name,X,Y,window='Main',title='Graph',xlabel="Epoch"):
+    """
+    Plots onto a visdom plot
+    """
     viz.line(
         X=np.array(X),
         Y=np.array(Y),
         win=window,
         name=name,
         update='append',
-        opts = dict(title=f"{window} Data | Sequence Length = {length}", xlabel="Epoch", showlegend=True)
+        opts = dict(title=title, xlabel=xlabel, showlegend=True)
     )
 
-def Save(model,name):
-    print("Saving model...")
-    torch.save(model.state_dict(), "models/{}".format(name))
-    print("Model saved! [{}]".format(name))
+def Save(model,name,doPrint=True):
+    """
+    Saves the model to models/name
+    """
+    if doPrint:
+        print("Saving model...")
+    torch.save(model.state_dict(), "binary_models/{}".format(name))
+    if doPrint:
+        print("Model saved! [{}]".format(name))
 
-def Load(model,name):
-    print("Loading model...")
-    model.load_state_dict(torch.load(f'models/{name}'))
+def Load(model,name,doPrint=True):
+    """
+    Loads the model from models/name
+    """
+    #Need to check if model data exists before loading it
+    if doPrint:
+        print("Loading model...")
+    model.load_state_dict(torch.load(f'binary_models/{name}'))
     model.eval()
-    print("Model loaded!")
+    if doPrint:
+        print("Model loaded!")
 
 def compare(outputs,labels,doPrint = False):
+    """
+    Returns the the number of successes and the number of trials.
+    Inputs: outputs from the model
+            labels of what it should be
+    Returns: success (int)
+             trials (int)
+             success_rate (float, 0-1)
+    """
     s = 0
     t = 0
+    #Convert output to guessed labels
     _, predicted = torch.max(outputs.data, 1)
-    if doPrint:
-        print("Results:\t{}\nLabels:\t{}\n".format(predicted.tolist(),labels.tolist()))
-    for pair in zip(labels.tolist(),predicted.tolist()):
+    labels = labels.tolist()
+    predicted = predicted.tolist()
+    for pair in zip(labels,predicted):
         t += 1
         if pair[0] == pair[1]:
             s += 1
-    return s,t
+    if doPrint:
+        accuracy = int(s/t*10000)/100
+        print("Results:\t{predicted}\nLabels:\t{labels}\nAccuracy:\t{s}/{t}={accuracy}%")
+    return s,t,s/t
 
-def Test(student,dataset,name,criterion=None):
-    print("{} testing...".format(name))
-    loader = DataLoader(dataset=dataset, batch_size=1, shuffle=True)
+def Test(model,dataset,name=None,criterion=None):
+    """
+    Runs a test on the dataset given a certain model.
+    Inputs: model - the model to be tested on
+            dataset - the dataset to be tested with
+            name (optional) - what to print, if nothing passed, no print
+            criterion (optional) - criterion to be used to calculate loss
+    Outputs success_rate (float),
+            average_loss (defaults to -1 if no criterion passed)
+
+    """
+    if name:
+        print(f"{name} testing...")
     trials = 0
     successes = 0
-    l_list = list()
-    for i in range(len(loader)):
-        #Run model
-        inputs,labels = next(iter(loader))
+    if criterion:
+        l_list = list()
+    #Run through loader
+    for datapoint in dataset:
+        #Break up datapoount
+        (inputs,labels) = datapoint
+        #Add batch axis & expand
+        inputs.unsqueeze_(0)
+        labels.unsqueeze_(0)
         inputs,labels = dataset.expand(inputs,labels)
-        outputs = student(inputs)
+        #Run model
+        outputs = model(inputs)
         #Check accuracy
-        s,t = compare(outputs,labels)
+        s,t,_ = compare(outputs,labels)
         successes += s
         trials += t
         #Measure loss
         if criterion:
             l_list.append(criterion(outputs, labels).item())
+    #Average loss
     if criterion:
         average_loss = sum(l_list)/len(l_list)
     else:
         average_loss = -1
-    print("\t{} Results: {}/{} = {}% | Average loss:{}".format(name,successes,trials,int(successes/(trials)*10000000)/100000,average_loss))
+    #Print & output
+    if name:
+        accuracy = int(successes/(trials)*10000000)/100000
+        print(f"\t{name} Results: {successes}/{trials} = {accuracy}%\n\tAverage loss:{average_loss}")
     return successes/trials,average_loss
 
 def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
-    print("Creating data loaders...")
+    """
+    Trains a given model
+    Inputs model - the model to be trained
+           trainset - the dataset to be trianed with
+           valet - a validation set
+           num_epochs - number of times to go over trainset
+           name (optional) - what to save/label model as
+           doLoad (optional) - whether or not to load the model
+    """
+    #Create data loaders
     train_loader = DataLoader(dataset=trainset, batch_size=4, shuffle=True)
     test_loader = DataLoader(dataset=testset, batch_size=1, shuffle=True)
-    print("Data processed!")
     #Get model
     if doLoad:
         Load(model,f"{name}")
@@ -89,7 +142,7 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
     for epoch in range(num_epochs):
         print()
         #Dev test
-        success_rate,average_loss = Test(model,valset,"Validation",criterion=criterion)
+        success_rate,average_loss = Test(model,valset,name="Validation",criterion=criterion)
         plot("Validation Accuracy",[epoch],[success_rate],window=name)
         if epoch > 0:
             plot("Validation Loss",[epoch],[average_loss],window=name)
@@ -106,13 +159,13 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
             loss.backward()
             optimizer.step()
             #Log accuracy
-            s,t = compare(outputs,labels)
+            s,t,_ = compare(outputs,labels)
             train_s += s
-            train_t += t    
-            #Long epoch save/log step  
+            train_t += t
+            #Long epoch save/log step
             if total_step > 3000 and i % 1000 == 0:
                 #Log validation mid long epoch
-                success_rate,average_loss = Test(model,valset,"Validation",criterion=criterion)
+                success_rate,average_loss = Test(model,valset,name="Mid-Validation",criterion=criterion)
                 plot("Validation Accuracy",[epoch + i/total_step],[success_rate],window=name)
                 plot("Validation Loss",[epoch],[average_loss],window=name)
                 #Log training accuracy mide long epoch
@@ -120,7 +173,7 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
                 train_s = 0
                 train_t = 0
                 #Save
-                Save(model,f"{name}")            
+                Save(model,f"{name}")
             #Print to terminal
             if i % 100 == 0:
                 print('\tEpoch [{}/{}], Batch [{}/{}], Latest Average Loss: {:.4f}'
@@ -158,7 +211,7 @@ for std in [1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2]:
 
     model = dnn3._Model()
     Train(model,trainset,valset,3,name=f"STD={std}",doLoad=False)
-    accuracy,_ = Test(model,testset,"Test")
+    accuracy,_ = Test(model,testset,name="Test")
     viz.line(
         X=np.array([std]),
         Y=np.array([accuracy]),
