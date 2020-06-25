@@ -12,15 +12,26 @@ import dnn3
 
 viz = visdom.Visdom(env='main')
 
-def plot(name,X,Y,window='Main'):
+def plot(name,X,Y,window='Main',length=dataHandler.default_length):
     viz.line(
         X=np.array(X),
         Y=np.array(Y),
         win=window,
         name=name,
         update='append',
-        opts = dict(title=f"Model Data | Sequence Length = {dataHandler.default_length}", xlabel="Epoch", showlegend=True)
+        opts = dict(title=f"{window} Data | Sequence Length = {length}", xlabel="Epoch", showlegend=True)
     )
+
+def Save(model,name):
+    print("Saving model...")
+    torch.save(model.state_dict(), "models/{}".format(name))
+    print("Model saved! [{}]".format(name))
+
+def Load(model,name):
+    print("Loading model...")
+    model.load_state_dict(torch.load(f'models/{name}'))
+    model.eval()
+    print("Model loaded!")
 
 def compare(outputs,labels,doPrint = False):
     s = 0
@@ -34,142 +45,125 @@ def compare(outputs,labels,doPrint = False):
             s += 1
     return s,t
 
-def Test(loader,name,criterion):
+def Test(student,dataset,name,criterion=None):
     print("{} testing...".format(name))
+    loader = DataLoader(dataset=dataset, batch_size=1, shuffle=True)
     trials = 0
     successes = 0
     l_list = list()
     for i in range(len(loader)):
         #Run model
         inputs,labels = next(iter(loader))
-        inputs,labels = dataHandler.expandBatch(inputs,labels)
-        outputs = model(inputs)
+        inputs,labels = dataset.expand(inputs,labels)
+        outputs = student(inputs)
         #Check accuracy
         s,t = compare(outputs,labels)
         successes += s
         trials += t
         #Measure loss
-        l_list.append(criterion(outputs, labels).item())
-
-    average_loss = sum(l_list)/len(l_list)
-    print("\t{} Results: {}/{} = {}% | Average loss:{}".format(name,successes,trials,int(successes/(trials)*10000)/100,average_loss))
+        if criterion:
+            l_list.append(criterion(outputs, labels).item())
+    if criterion:
+        average_loss = sum(l_list)/len(l_list)
+    else:
+        average_loss = -1
+    print("\t{} Results: {}/{} = {}% | Average loss:{}".format(name,successes,trials,int(successes/(trials)*10000000)/100000,average_loss))
     return successes/trials,average_loss
 
-def Save(name):
-    print("Saving model...")
-    torch.save(model.state_dict(), "models/{}".format(name))
-    print("Model saved! [{}]".format(name))
-
-#Define model
-class ConvNet(nn.Module):
-    def __init__(self):
-        super(ConvNet, self).__init__()
-        self.layer1 = nn.Sequential(
-            nn.Conv2d(4, 32, kernel_size=4, stride=1, padding=0),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
-        self.layer2 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
-        self.drop_out = nn.Dropout()
-        self.fc1 = nn.Linear(15936, 1000)
-        self.relu1 = nn.ReLU()
-        self.fc2 = nn.Linear(1000, 64)
-        self.relu2 = nn.ReLU()
-        self.fc3 = nn.Linear(64, 4)
-
-    def forward(self, x):
-        out = self.layer1(x)
-        out = self.layer2(out)
-        out = out.reshape(out.size(0), -1)
-        out = self.drop_out(out)
-        out = self.fc1(out)
-        out = self.relu1(out)
-        out = self.fc2(out)
-        out = self.relu2(out)
-        out = self.fc3(out)
-        return out
-
-#Setup data
-
-print("Processing testset... [1/3]")
-testset = dataHandler.test(preprocess=True)
-print("Processing valset... [2/3]")
-valset = dataHandler.dev(preprocess=True)
-print("Processing trainset... [3/3]")
-trainset = dataHandler.train(preprocess=True)
-
-print("Creating data loaders...")
-train_loader = DataLoader(dataset=trainset, batch_size=4, shuffle=True)
-test_loader = DataLoader(dataset=testset, batch_size=1, shuffle=True)
-val_loader = DataLoader(dataset=valset, batch_size=1, shuffle=True)
-print("Data processed!")
-
-#Get model
-print("Loading model...")
-model = dnn3._Model()
-model.load_state_dict(torch.load('models/alpha'))
-model.eval()
-print("Model loaded!")
-
-# Loss and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=1e-5)
-
-# Train the model
-total_step = len(train_loader)
-loss_list = []
-train_s = 0
-train_t = 0
-num_epochs = 100
-
-#Test(val_loader,"Validation")
-
-for epoch in range(num_epochs):
-    print()
-    #Dev test
-    success_rate,average_loss = Test(val_loader,"Validation",criterion)
-    plot("Validation Accuracy",[epoch],[success_rate])
-    if epoch > 0:
-        plot("Validation Loss",[epoch],[average_loss])
-    #Train
-    print("Training...")
-    for i, (data, labels) in enumerate(train_loader):
-        data, labels = dataHandler.expandBatch(data,labels)
-        # Run the forward pass
-        outputs = model(data)
-   
-        loss = criterion(outputs, labels)
-        loss_list.append(loss.item())
-        # Backprop and perform Adam optimisation
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        #Log accuracy
-        s,t = compare(outputs,labels)
-        train_s += s
-        train_t += t
-                
-        #Log training loss   
-        if i % 1000 == 0:
-            success_rate,average_loss = Test(val_loader,"Validation",criterion)
-            plot("Validation Accuracy",[epoch + i/total_step],[success_rate])
-            Save("alpha")      
-        if i % 100 == 0:
-            print('\tEpoch [{}/{}], Batch [{}/{}], Latest Average Loss: {:.4f}'
-                    .format(epoch + 1, num_epochs, i + 1, total_step, sum(loss_list)/len(loss_list)))
-        if i % 100 == 0 and (epoch+i) > 0:
-            plot("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)])
-            loss_list = list()
-
-    #Plot accuracy
-    plot("Training Accuracy",[epoch+1],[train_s/train_t])
+def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
+    print("Creating data loaders...")
+    train_loader = DataLoader(dataset=trainset, batch_size=4, shuffle=True)
+    test_loader = DataLoader(dataset=testset, batch_size=1, shuffle=True)
+    print("Data processed!")
+    #Get model
+    if doLoad:
+        Load(model,f"{name}")
+    # Loss and optimizer
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=1e-5)
+    # Train the model
+    total_step = len(train_loader)
+    loss_list = []
     train_s = 0
     train_t = 0
+    for epoch in range(num_epochs):
+        print()
+        #Dev test
+        success_rate,average_loss = Test(model,valset,"Validation",criterion=criterion)
+        plot("Validation Accuracy",[epoch],[success_rate],window=name)
+        if epoch > 0:
+            plot("Validation Loss",[epoch],[average_loss],window=name)
+        #Train
+        print("Training...")
+        for i, (inputs, labels) in enumerate(train_loader):
+            inputs,labels = trainset.expand(inputs,labels)
+            # Run the forward pass
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss_list.append(loss.item())
+            # Backprop and perform Adam optimisation
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            #Log accuracy
+            s,t = compare(outputs,labels)
+            train_s += s
+            train_t += t    
+            #Long epoch save/log step  
+            if total_step > 3000 and i % 1000 == 0:
+                #Log validation mid long epoch
+                success_rate,average_loss = Test(model,valset,"Validation",criterion=criterion)
+                plot("Validation Accuracy",[epoch + i/total_step],[success_rate],window=name)
+                plot("Validation Loss",[epoch],[average_loss],window=name)
+                #Log training accuracy mide long epoch
+                plot("Training Accuracy",[epoch+ + i/total_step],[train_s/train_t],window=name)
+                train_s = 0
+                train_t = 0
+                #Save
+                Save(model,f"{name}")            
+            #Print to terminal
+            if i % 100 == 0:
+                print('\tEpoch [{}/{}], Batch [{}/{}], Latest Average Loss: {:.4f}'
+                        .format(epoch + 1, num_epochs, i + 1, total_step, sum(loss_list)/len(loss_list)))
+            #Plot Training loss
+            if i % 20 == 0 and (epoch+i) > 0:
+                plot("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
+                loss_list = list()
+        #Plot accuracy
+        plot("Training Accuracy",[epoch+1],[train_s/train_t],window=name)
+        train_s = 0
+        train_t = 0
+        #Save model
+        Save(model,f"{name}")
 
-    #Save model
-    Save("alpha")
+"""dataHandler.GenerateRandomBranchLengths()
+print("Processing datasets...")
+testset = dataHandler.UnpermutedDataset("test")
+valset = dataHandler.UnpermutedDataset("dev")
+trainset = dataHandler.PermutedDataset("train")
+print("Datasets Processed")
+model = dnn3._Model()
+Train(model,trainset,valset,10,name=f"Random Lengths",doLoad=False)
+accuracy,_ = Test(model,testset,"Test")"""
 
-Test(train_loader,"Final")
+for std in [1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2]:
+    #Changing branch length and generating
+    dataHandler.GenerateRandomBranchLengths(std=std,mean=0.5)
+    #Setup data
+    print("Processing datasets...")
+    testset = dataHandler.UnpermutedDataset("test")
+    valset = dataHandler.UnpermutedDataset("dev")
+    trainset = dataHandler.PermutedDataset("train")
+    print("Datasets Processed")
+
+    model = dnn3._Model()
+    Train(model,trainset,valset,3,name=f"STD={std}",doLoad=False)
+    accuracy,_ = Test(model,testset,"Test")
+    viz.line(
+        X=np.array([std]),
+        Y=np.array([accuracy]),
+        win="Final",
+        name="Accuracy",
+        update='append',
+        opts = dict(title="Accuracy vs. Standard Deviaton", xlabel="Branch Length", showlegend=False)
+    )
