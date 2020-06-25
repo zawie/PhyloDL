@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """Quartet tree classification
 
 * Model: Convolutional neural network with basic residual connections

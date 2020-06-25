@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """Quartet tree classification
 
 * Model: Convolutional neural network with basic residual connections
@@ -70,7 +68,6 @@ class _Model(torch.nn.Module):
 
 
 class _ResidueModule(torch.nn.Module):
-
     def __init__(self, channel_count):
         super().__init__()
         self.layers = torch.nn.Sequential(

@@ -39,7 +39,7 @@ def Generate(amount=default_amount, b=.1, l=default_length, m="HKY",TSR=0.5):
         amount: dictionary (key=folder, value=n to generate)
         length: length of each sequence
         m: type of generation? (JC69 = Juke's Cantor)
-        TSR: the transition transversion ratio 
+        TSR: the transition transversion ratio
         NOTE: for any given amount, triple the number of sequences will be generated (one for reach tree type)
     """
     print("Generating...")
@@ -56,7 +56,7 @@ def GenerateRandomBranchLengths(amount=default_amount, l=default_length, std=1,m
     print("Done Generating!")
 
 def hotencode(sequence):
-    """ 
+    """
         Hot encodes inputted sequnce
         "ATGC" -> [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
     """
@@ -112,7 +112,7 @@ def getInstances(file_path,tree='alpha'):
                 (A,C,B,D) = data[pos//5]
                 data[pos//5] = [A,B,C,D]
     file.close()
-    return data 
+    return data
 
 class SequenceDataset(Dataset):
     def __init__(self,folder,augment_function,expand_function,preprocess=True):
@@ -140,10 +140,10 @@ class SequenceDataset(Dataset):
         else:
             X,y = self._augment(self.instances[index])
             return X,y
-    
+
     def __len__(self):
         """
-        Returns the number of entries in this dataset 
+        Returns the number of entries in this dataset
         """
         return len(self.instances)
 
@@ -176,33 +176,10 @@ def UnpermutedDataset(folder,preprocess=True):
         X.extend(toBeta(instance))
         y.append(2)
         X.extend(toGamma(instance))
-        return torch.tensor(X,dtype=torch.float),torch.tensor(y,dtype=torch.long)  
+        return torch.tensor(X,dtype=torch.float),torch.tensor(y,dtype=torch.long)
     def _expand(data,labels):
         batchsize = data.size()[0]
         expanded_data = torch.reshape(data,[batchsize*3,4,-1,4])
         expanded_labels = torch.reshape(labels,[batchsize*3])
         return expanded_data,expanded_labels
     return SequenceDataset(folder,_augment,_expand,preprocess=preprocess)
-
-def AlphaDataset(folder,preprocess=True):
-    def _augment(instance):
-        y = None
-        return torch.Tensor(instance,dtype=torch.float),torch.tensor(y,dtype=torch.long) 
-    def _expand(data,labels):
-        return data,labels
-    return SequenceDataset(folder,_augment,_expand,preprocess=preprocess)
-    
-# Handler terminal prompt
-if len(sys.argv) > 1 and sys.argv[1] == "generate":
-    length = default_length
-    amount = default_amount.copy()
-    if len(sys.argv) > 2:
-        length = sys.argv[2]
-        if len(sys.argv) > 3:
-            amount["train"] = sys.argv[3]
-            if len(sys.argv) > 4:
-                amount["test"] = sys.argv[4]
-                if len(sys.argv) > 5:
-                    amount["dev"] = sys.argv[5]
-    print("Generating Sequence triplets of length {length} with the following amount:{amount}".format(length=length,amount=amount))
-    Generate(amount=amount,length=length)
