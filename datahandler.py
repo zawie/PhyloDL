@@ -184,6 +184,14 @@ def UnpermutedDataset(folder,preprocess=True):
         return expanded_data,expanded_labels
     return SequenceDataset(folder,_augment,_expand,preprocess=preprocess)
 
+def AlphaDataset(folder,preprocess=True):
+    def _augment(instance):
+        y = None
+        return torch.Tensor(instance,dtype=torch.float),torch.tensor(y,dtype=torch.long) 
+    def _expand(data,labels):
+        return data,labels
+    return SequenceDataset(folder,_augment,_expand,preprocess=preprocess)
+    
 # Handler terminal prompt
 if len(sys.argv) > 1 and sys.argv[1] == "generate":
     length = default_length
