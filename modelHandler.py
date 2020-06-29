@@ -6,7 +6,6 @@ import sys
 import os
 import visdom
 import numpy as np
-import dnn3
 
 #Connect to Visdom
 viz = visdom.Visdom(env='main')
@@ -163,7 +162,7 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
             train_s += s
             train_t += t
             #Long epoch save/log step
-            if total_step > 3000 and i % 1000 == 0:
+            if i % 200 == 0:
                 #Log validation mid long epoch
                 success_rate,average_loss = Test(model,valset,name="Mid-Validation",criterion=criterion)
                 plot("Validation Accuracy",[epoch + i/total_step],[success_rate],window=name)
@@ -188,35 +187,3 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
         train_t = 0
         #Save model
         Save(model,f"{name}")
-
-dataHandler.GenerateTrees()
-print("Processing datasets...")
-testset = dataHandler.UnpermutedDataset("test")
-valset = dataHandler.UnpermutedDataset("dev")
-trainset = dataHandler.PermutedDataset("train")
-print("Datasets Processed")
-model = dnn3._Model()
-Train(model,trainset,valset,10,name=f"Random Lengths",doLoad=False)
-accuracy,_ = Test(model,testset,"Test")
-
-"""for std in [1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2]:
-    #Changing branch length and generating
-    dataHandler.GenerateRandomBranchLengths(std=std,mean=0.5)
-    #Setup data
-    print("Processing datasets...")
-    testset = dataHandler.UnpermutedDataset("test")
-    valset = dataHandler.UnpermutedDataset("dev")
-    trainset = dataHandler.PermutedDataset("train")
-    print("Datasets Processed")
-
-    model = dnn3._Model()
-    Train(model,trainset,valset,3,name=f"STD={std}",doLoad=False)
-    accuracy,_ = Test(model,testset,name="Test")
-    viz.line(
-        X=np.array([std]),
-        Y=np.array([accuracy]),
-        win="Final",
-        name="Accuracy",
-        update='append',
-        opts = dict(title="Accuracy vs. Standard Deviaton", xlabel="Branch Length", showlegend=False)
-"""
