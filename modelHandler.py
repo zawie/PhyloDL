@@ -10,7 +10,7 @@ import numpy as np
 #Connect to Visdom
 viz = visdom.Visdom(env='main')
 
-def plot(name,X,Y,window='Main',title='Graph',xlabel="Epoch"):
+def plot(name,X,Y,window='Main',xlabel="Epoch"):
     """
     Plots onto a visdom plot
     """
@@ -20,7 +20,7 @@ def plot(name,X,Y,window='Main',title='Graph',xlabel="Epoch"):
         win=window,
         name=name,
         update='append',
-        opts = dict(title=title, xlabel=xlabel, showlegend=True)
+        opts = dict(title=window, xlabel=xlabel, showlegend=True)
     )
 
 def Save(model,name,doPrint=True):
@@ -168,7 +168,9 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
                 plot("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
                 loss_list = list()
                 #Log validation mid long epoch
-                success_rate,average_loss = Test(model,valset,name="Mid-Validation",criterion=criterion)
+                success_rate,average_loss = Test(model,valset,criterion=criterion)
+                print_succes_rate = int(success_rate*10000000)/100000
+                print(f"\tValidation Accuracy: {print_succes_rate}")
                 plot("Validation Accuracy",[epoch + i/total_step],[success_rate],window=name)
                 plot("Validation Loss",[epoch + i/total_step],[average_loss],window=name)
                 #Log training accuracy mide long epoch
@@ -181,6 +183,6 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
                     plot("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
                     loss_list = list()
                 #Mid-Save
-                Save(model,f"{name}")
+                Save(model,f"{name}",doPrint=False)
         #Save model at end of epoch
         Save(model,f"{name}")

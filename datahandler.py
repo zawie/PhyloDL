@@ -22,14 +22,17 @@ def GenerateTrees(amount={"train":2500,"test":1000,"dev":100}, sequenceLength=20
     #Define structures
     template_trees = ["((A:_,B:_):_,(C:_,D:_):_)",
                       "(((A:_,B:_):_,C:_):_,D:_)",
-                      "(A:_,(B:_,(C:_,D:_):_):_)"]
+                      "(A:_,(B:_,(C:_,D:_):_):_)",
+                      "(((A:_,B:_):_,D:_):_,C:_)",
+                      "(B:_,(A:_,(C:_,D:_):_):_)",
+                      ]
     if symmetricOnly:
         template_trees = ["((A:_,B:_):_,(C:_,D:_):_)"]
     #Create as many structures
     for key,n in amount.items():
         tre_str = ""
         for i in range(n):
-            tree = template_trees[i%3]
+            tree = template_trees[i%len(template_trees)]
             for _ in range(6):
                 r = max(0.001,random.gauss(mean,std))
                 tree = tree.replace("_",str(r),1)

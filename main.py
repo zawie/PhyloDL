@@ -3,11 +3,12 @@ import dataHandler
 import dnn3
 
 dataHandler.GenerateTrees()
-print("Processing datasets...")
+
 testset = dataHandler.UnpermutedDataset("test")
 valset = dataHandler.UnpermutedDataset("dev")
-trainset = dataHandler.PermutedDataset("train")
-print("Datasets Processed")
+
+#Unpermuted Train
+trainset = dataHandler.UnpermutedDataset("train")
 model = dnn3._Model()
-modelHandler.Train(model,trainset,valset,10,name="Some Model",doLoad=False)
+modelHandler.Train(model,trainset,valset,24,name="Zawie's Non-permuted ",doLoad=False)
 accuracy,_ = modelHandler.Test(model,testset,"Test")
