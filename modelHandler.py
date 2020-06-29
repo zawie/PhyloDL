@@ -30,7 +30,7 @@ def Save(model,name,doPrint=True):
     """
     if doPrint:
         print("Saving model...")
-    torch.save(model.state_dict(), "binary_models/{}".format(name))
+    torch.save(model.state_dict(), "saved_models/{}".format(name))
     if doPrint:
         print("Model saved! [{}]".format(name))
 
@@ -41,7 +41,7 @@ def Load(model,name,doPrint=True):
     #Need to check if model data exists before loading it
     if doPrint:
         print("Loading model...")
-    model.load_state_dict(torch.load(f'binary_models/{name}'))
+    model.load_state_dict(torch.load(f'saved_models/{name}'))
     model.eval()
     if doPrint:
         print("Model loaded!")
