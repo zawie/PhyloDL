@@ -30,7 +30,6 @@ def GenerateTrees(amount={"train":2500,"test":1000,"dev":100}, sequenceLength=20
         tre_str = ""
         for i in range(n):
             tree = template_trees[i%3]
-            print(tree)
             for _ in range(6):
                 r = max(0.001,random.gauss(mean,std))
                 tree = tree.replace("_",str(r),1)

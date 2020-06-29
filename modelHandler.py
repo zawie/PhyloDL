@@ -126,7 +126,7 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
     """
     #Create data loaders
     train_loader = DataLoader(dataset=trainset, batch_size=4, shuffle=True)
-    test_loader = DataLoader(dataset=testset, batch_size=1, shuffle=True)
+    test_loader = DataLoader(dataset=valset, batch_size=1, shuffle=True)
     #Get model
     if doLoad:
         Load(model,f"{name}")
@@ -182,8 +182,9 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
                 plot("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
                 loss_list = list()
         #Plot accuracy
-        plot("Training Accuracy",[epoch+1],[train_s/train_t],window=name)
-        train_s = 0
-        train_t = 0
+        if train_t > 100:
+            plot("Training Accuracy",[epoch+1],[train_s/train_t],window=name)
+            train_s = 0
+            train_t = 0
         #Save model
         Save(model,f"{name}")
