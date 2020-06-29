@@ -7,56 +7,37 @@ import random
 
 #Constants
 TREES = ['alpha','beta','gamma']
-DEFAULT_SEQUENCE_LENGTH = 200
-DEFAULT_AMOUNT = {"train":2500,"test":1000,"dev":100}
 
-#Tree Alternators
-def WriteRandomTrees(mean,std,amount=100):
-    print("Modifying branch length...")
-    template_tree = "((A:_,B:_):_,(C:_,D:_):_)"
-    tree_str = ""
-    for _ in range(amount):
-        tree = template_tree
-        for _ in range(6):
-            r = max(0.001,random.gauss(mean,std))
-            tree = tree.replace("_",str(r),1)
-        tree_str += tree + ";\n"
+#Helper Function
+def WriteToTre(txt):
     f = open("tree.tre", "w")
-    f.write(tree_str)
+    f.write(txt)
     f.close()
-    print(f"Random branch lengths written!")
 
-def SetBranchLengths(lengths):
-    print("Modifying branch length...")
-    template_tree = "((A:_,B:_):_,(C:_,D:_):_)"
-    tree = template_tree
-    for _ in range(6):
-        tree = tree.replace("_",lengths.pop(),1)
-    f = open("tree.tre", "w")
-    f.write(tree)
-    f.close()
-    print(f"Branch lengths written! {lengths}")
+def seq_gen(file,m="HKY",n=1,l=200):
+        os.system(f"seq-gen -m{m} -n{n} -l{l} <tree.tre> {file}")
 
-#Generators
-def Generate(amount=DEFAULT_AMOUNT, branchLength=0.1, sequenceLength=DEFAULT_SEQUENCE_LENGTH, model="HKY"):
-    """
-    Generate data:
-        amount: dictionary (key=folder, value=n to generate)
-        sequenceLength: length of each sequence
-        model: type of generation?
-    """
-    print("Generating...")
-    SetBranchLengths([branchLength]*6)
+#Generator
+def GenerateTrees(amount={"train":2500,"test":1000,"dev":100}, sequenceLength=200, std=0,mean=0.5, model="HKY", symmetricOnly=False):
+    #Define structures
+    template_trees = ["((A:_,B:_):_,(C:_,D:_):_)",
+                      "(((A:_,B:_):_,C:_):_,D:_)",
+                      "(A:_,(B:_,(C:_,D:_):_):_)"]
+    if symmetricOnly:
+        template_trees = ["((A:_,B:_):_,(C:_,D:_):_)"]
+    #Create as many structures
     for key,n in amount.items():
-        os.system(f"seq-gen -m{model} -n{n} -l{sequenceLength} <tree.tre> data/{key}.dat")
-    print("Done Generating!")
-
-def GenerateRandomBranchLengths(amount=DEFAULT_AMOUNT, sequenceLength=DEFAULT_SEQUENCE_LENGTH, std=1,mean=0.5, model="HKY"):
-    print("Random Generating...")
-    for key,n in amount.items():
-        WriteRandomTrees(mean,std,amount=n)
-        os.system(f"seq-gen -m{model} -n{1} -l{sequenceLength} <tree.tre> data/{key}.dat")
-    print("Done Generating!")
+        tre_str = ""
+        for i in range(n):
+            tree = template_trees[i%3]
+            print(tree)
+            for _ in range(6):
+                r = max(0.001,random.gauss(mean,std))
+                tree = tree.replace("_",str(r),1)
+            tre_str += tree + ";\n"
+        WriteToTre(tre_str)
+        #Generate
+        seq_gen(f"data/{key}.dat",m=model,n=1,l=sequenceLength)
 
 #Sequence modifiers
 def hotencode(sequence):
