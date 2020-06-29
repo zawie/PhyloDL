@@ -2,4 +2,4 @@ data
 models
 __pycache__
 .DS_Store
-.saved_models
+saved_models
