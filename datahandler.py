@@ -15,7 +15,7 @@ def WriteToTre(txt):
     f.close()
 
 def seq_gen(file,m="HKY",n=1,l=200):
-        os.system(f"seq-gen -m{m} -n{n} -l{l} <tree.tre> {file}")
+    os.system(f"seq-gen -m{m} -n{n} -l{l} <tree.tre> {file}")
 
 #Generator
 def GenerateTrees(amount={"train":2500,"test":1000,"dev":100}, sequenceLength=200, std=0,mean=0.5, model="HKY", symmetricOnly=False):
