@@ -162,29 +162,25 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
             train_s += s
             train_t += t
             #Long epoch save/log step
-            if i % 200 == 0:
+            if i % 100 == 0 and i > 0:
+                print(f'\tEpoch [{epoch+1}/{num_epochs}], Batch [{i+1}/{total_step}]')
+                #Plot Training Loss
+                plot("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
+                loss_list = list()
                 #Log validation mid long epoch
                 success_rate,average_loss = Test(model,valset,name="Mid-Validation",criterion=criterion)
                 plot("Validation Accuracy",[epoch + i/total_step],[success_rate],window=name)
-                plot("Validation Loss",[epoch],[average_loss],window=name)
+                plot("Validation Loss",[epoch + i/total_step],[average_loss],window=name)
                 #Log training accuracy mide long epoch
-                plot("Training Accuracy",[epoch+ + i/total_step],[train_s/train_t],window=name)
-                train_s = 0
-                train_t = 0
-                #Save
+                if train_t > 0:
+                    plot("Training Accuracy",[epoch+ + i/total_step],[train_s/train_t],window=name)
+                    train_s = 0
+                    train_t = 0
+                #Plot Training loss
+                if len(loss_list) > 0:
+                    plot("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
+                    loss_list = list()
+                #Mid-Save
                 Save(model,f"{name}")
-            #Print to terminal
-            if i % 100 == 0:
-                print('\tEpoch [{}/{}], Batch [{}/{}], Latest Average Loss: {:.4f}'
-                        .format(epoch + 1, num_epochs, i + 1, total_step, sum(loss_list)/len(loss_list)))
-            #Plot Training loss
-            if i % 20 == 0 and (epoch+i) > 0:
-                plot("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
-                loss_list = list()
-        #Plot accuracy
-        if train_t > 100:
-            plot("Training Accuracy",[epoch+1],[train_s/train_t],window=name)
-            train_s = 0
-            train_t = 0
-        #Save model
+        #Save model at end of epoch
         Save(model,f"{name}")
