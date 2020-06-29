@@ -18,7 +18,7 @@ def seq_gen(file,m="HKY",n=1,l=200):
     os.system(f"seq-gen -m{m} -n{n} -l{l} <tree.tre> {file}")
 
 #Generator
-def GenerateTrees(amount={"train":2500,"test":1000,"dev":100}, sequenceLength=200, std=0,mean=0.5, model="HKY", symmetricOnly=False):
+def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symmetricOnly=False)
     #Define structures
     template_trees = ["((A:_,B:_):_,(C:_,D:_):_)",
                       "(((A:_,B:_):_,C:_):_,D:_)",
@@ -29,18 +29,22 @@ def GenerateTrees(amount={"train":2500,"test":1000,"dev":100}, sequenceLength=20
     if symmetricOnly:
         template_trees = ["((A:_,B:_):_,(C:_,D:_):_)"]
     #Create as many structures
-    for key,n in amount.items():
-        tre_str = ""
-        for i in range(n):
-            tree = template_trees[i%len(template_trees)]
-            for _ in range(6):
-                r = max(0.001,random.gauss(mean,std))
-                tree = tree.replace("_",str(r),1)
-            tre_str += tree + ";\n"
-        WriteToTre(tre_str)
-        #Generate
-        seq_gen(f"data/{key}.dat",m=model,n=1,l=sequenceLength)
+    tre_str = ""
+    for i in range(amount):
+        tree = template_trees[i%len(template_trees)]
+        for _ in range(6):
+            r = max(0.001,random.gauss(mean,std))
+            tree = tree.replace("_",str(r),1)
+        tre_str += tree + ";\n"
+    WriteToTre(tre_str)
+    #Generate
+    seq_gen(f"data/{file_name}.dat",m=model,n=1,l=sequenceLength)
 
+def GenerateAll(train_amount=1000,dev_amount=100,test_amount=0,sequenceLength=200,mean=0.1,std=0,model="HKY",symmetricOnly=False):
+    Generate("train",train_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly)
+    Generate("dev",dev_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly)
+    Generate("test",test_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly)
+    
 #Sequence modifiers
 def hotencode(sequence):
     """
