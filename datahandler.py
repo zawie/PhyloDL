@@ -70,7 +70,7 @@ def toGamma(alphaSeqeunces):
     (A,B,C,D) = alphaSeqeunces
     return [A,C,B,D]
 
-def permute(sequences):
+def symmetricPermute(sequences):
     """
     Permutes the set of sequences into all possible orders that maintains
     the same tree class
@@ -161,6 +161,7 @@ def PermutedDataset(folder,preprocess=True):
     Returns a SequenceDataset that will transform and permute each tree instance
     This will grow the dataset by 24
     """
+    print("ONLY PERMUTES SYMMETRIC CORRECTLY!!!!")
     def _augment(instance):
         X = list()
         y = list() #alpha + beta + gamma
@@ -179,7 +180,7 @@ def PermutedDataset(folder,preprocess=True):
         return expanded_data,expanded_labels
     return SequenceDataset(folder,_augment,_expand,preprocess=preprocess)
 
-def UnpermutedDataset(folder,preprocess=True):
+def NonpermutedDataset(folder,preprocess=True):
     """
     Returns a SequenceDataset that will ONLY transforme ach tree instance
     This will grow the dataset by 3
