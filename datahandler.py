@@ -166,12 +166,10 @@ def PermutedDataset(folder,preprocess=True):
         X = list()
         y = list() #alpha + beta + gamma
         for alpha in permute(instance):
-            y.append(0)
             X.extend(alpha)
-            y.append(1)
             X.extend(toBeta(alpha))
-            y.append(2)
             X.extend(toGamma(alpha))
+            y.extend([0,1,2])
         return torch.tensor(X,dtype=torch.float),torch.tensor(y,dtype=torch.long)
     def _expand(data,labels):
         batchsize = data.size()[0]
