@@ -24,8 +24,8 @@ import dnn3
     modelHandler.plot("Line1",[std],[accuracy],window='Accuracy v. Standard Deviation',xlabel="Standard Deviation")
 """
 
-
 #Accuracy v. Sequence Length Plot
+"""
 for l in [20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200]:
     #Generate Appropriate data
     dataHandler.Generate("train",2500,sequenceLength=l)
@@ -44,3 +44,12 @@ for l in [20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200]:
             break
         old_accuracy = accuracy
     modelHandler.plot("Line1",[std],[accuracy],window='Accuracy v. Sequence Length',xlabel="Sequence Length")
+"""
+
+#GTR Test
+dataHandler.GenerateAll(2500,100,1000,model="GTR",r_matrix=[0.5,0.1,0.5,0.1,0.5,0.1])
+trainset = dataHandler.NonpermutedDataset("train")
+testset = dataHandler.NonpermutedDataset("test")
+valset = dataHandler.NonpermutedDataset("dev")
+model = dnn3._Model()
+modelHandler.Train(model,trainset,valset,10,name=f"GTR Data",doLoad=False)

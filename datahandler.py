@@ -14,11 +14,18 @@ def WriteToTre(txt):
     f.write(txt)
     f.close()
 
-def seq_gen(file,m="HKY",n=1,l=200):
-    os.system(f"seq-gen -m{m} -n{n} -l{l} <tree.tre> {file}")
+def seq_gen(file,m="HKY",n=1,l=200,r=None):
+    if r != None:
+        print(r)
+        r_str = "_, "*(len(r)-1) + "_"
+        for i in range(6):
+            r_str = r_str.replace("_",str(r[i]),1)
+        os.system(f'seq-gen -m{m} -n{n} -l{l} -r{r_str} <tree.tre> {file}')
+    else:
+        os.system(f"seq-gen -m{m} -n{n} -l{l} <tree.tre> {file}")
 
 #Generator
-def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symmetricOnly=False):
+def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symmetricOnly=False,r_matrix=None):
     #Define structures
     template_trees = ["((A:_,B:_):_,(C:_,D:_):_)",
                       "(((A:_,B:_):_,C:_):_,D:_)",
@@ -38,12 +45,12 @@ def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symm
         tre_str += tree + ";\n"
     WriteToTre(tre_str)
     #Generate
-    seq_gen(f"data/{file_name}.dat",m=model,n=1,l=sequenceLength)
+    seq_gen(f"data/{file_name}.dat",m=model,n=1,l=sequenceLength,r=r_matrix)
 
-def GenerateAll(train_amount=1000,dev_amount=100,test_amount=0,sequenceLength=200,mean=0.1,std=0,model="HKY",symmetricOnly=False):
-    Generate("train",train_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly)
-    Generate("dev",dev_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly)
-    Generate("test",test_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly)
+def GenerateAll(train_amount,dev_amount,test_amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symmetricOnly=False,r_matrix=None):
+    Generate("train",train_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
+    Generate("dev",dev_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
+    Generate("test",test_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
 
 #Sequence modifiers
 def hotencode(sequence):
