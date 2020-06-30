@@ -46,10 +46,30 @@ for l in [20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200]:
     modelHandler.plot("Line1",[std],[accuracy],window='Accuracy v. Sequence Length',xlabel="Sequence Length")
 """
 
-#GTR Test
-dataHandler.GenerateAll(2500,100,1000,model="GTR",r_matrix=[0.5,0.1,0.5,0.1,0.5,0.1])
-trainset = dataHandler.NonpermutedDataset("train")
-testset = dataHandler.NonpermutedDataset("test")
-valset = dataHandler.NonpermutedDataset("dev")
-model = dnn3._Model()
-modelHandler.Train(model,trainset,valset,10,name=f"GTR Data",doLoad=False)
+#GTR Test traversion v, transition heatmap
+#Define values to test
+traversion_values = [0,0.2,0.4,0.6,0.8,1]
+transition_values = [0,0.2,0.4,0.6,0.8,1]
+#Create blank heat map
+X = []
+for y in range(len(traversion_values)):
+    X.append(list())
+    for x in range(len(transition_values)):
+        X.append(0)
+#Run a bunch of models to fill heat map
+for y in traversion_values:
+    for x in transition_values:
+        traversion = traversion_values[y]
+        transition = transition_values[x]
+        #Generate Data
+        dataHandler.GenerateAll(2500,0,1000,model="GTR",r_matrix=[traversion,transition]*3)
+        trainset = dataHandler.NonpermutedDataset("train")
+        testset = dataHandler.NonpermutedDataset("test")
+        #Create and train a model
+        model = dnn3._Model()
+        modelHandler.Train(model,trainset,None,3,name=f"GTR Data",doLoad=False)
+        #Get accuracy of model
+        accuracy,_ = modelHandler.Test(model,testset,"Test")
+        X[y][x] = accuracy
+        print(f"Traversion={traversion}, Transition={transition}, Accuracy={accuracy}")
+        plotter.heatmap("GTR Accuracy Heatmap: Traversion (Y-axis) and Transition (X-axis)", X, xlabel=transition_values,ylabel=traversion_values)
