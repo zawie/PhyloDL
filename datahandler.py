@@ -40,7 +40,7 @@ def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symm
     for i in range(amount):
         tree = template_trees[i%len(template_trees)]
         for _ in range(6):
-            r = max(0.001,random.gauss(mean,std))
+            r = max(0.01,random.gauss(mean,std))
             tree = tree.replace("_",str(r),1)
         tre_str += tree + ";\n"
     WriteToTre(tre_str)
@@ -51,6 +51,15 @@ def GenerateAll(train_amount,dev_amount,test_amount,sequenceLength=200,mean=0.1,
     Generate("train",train_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
     Generate("dev",dev_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
     Generate("test",test_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
+
+def GetDatasets(train_amount,dev_amount,test_amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symmetricOnly=False,r_matrix=None):
+    Generate("train",train_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
+    Generate("dev",dev_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
+    Generate("test",test_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
+    trainset = NonpermutedDataset("train")
+    valset = NonpermutedDataset("dev")
+    testset = NonpermutedDataset("test")
+    return trainset,valset,testset
 
 #Sequence modifiers
 def hotencode(sequence):
@@ -198,11 +207,11 @@ def NonpermutedDataset(folder,preprocess=True):
         X = list()
         y = list()
         y.append(0)
-        X.extend(instance)
+        X.append(instance)
         y.append(1)
-        X.extend(toBeta(instance))
+        X.append(toBeta(instance))
         y.append(2)
-        X.extend(toGamma(instance))
+        X.append(toGamma(instance))
         return torch.tensor(X,dtype=torch.float),torch.tensor(y,dtype=torch.long)
     def _expand(data,labels):
         batchsize = data.size()[0]

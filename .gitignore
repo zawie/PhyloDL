@@ -3,3 +3,4 @@ models
 __pycache__
 .DS_Store
 saved_models
+wastebin
