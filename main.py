@@ -48,7 +48,6 @@ for l in [20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200]:
 """
 
 #GTR Test traversion v, transition heatmap
-"""
 #Define values to test
 traversion_values = [0.5,1,1.5,2,2.5,3,3.5,4]
 transition_values = [0.5,1,1.5,2,2.5,3,3.5,4]
@@ -68,11 +67,10 @@ for y in range(len(traversion_values)):
         trainset = dataHandler.NonpermutedDataset("train")
         testset = dataHandler.NonpermutedDataset("test")
         #Create and train a model
-        model = dnn3._Model()
+        model = dnn3NoResNet._Model()
         modelHandler.Train(model,trainset,None,3,name=f"GTR Data:Traversion={traversion}, Transition={transition}",doLoad=False)
         #Get accuracy of model
         accuracy,_ = modelHandler.Test(model,testset,"Test")
         X[y][x] = accuracy
         print(f"Traversion={traversion}, Transition={transition}, Accuracy={accuracy}")
         plotter.heatmap("GTR Accuracy Heatmap: Traversion (Y-axis) and Transition (X-axis)", X, xlabel=transition_values,ylabel=traversion_values)
-"""

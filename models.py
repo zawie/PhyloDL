@@ -20,7 +20,6 @@ import torch.nn
 import torch.optim
 import torch.utils.data
 
-
 class dnn3NoResNet(torch.nn.Module):
     """A neural network model to predict phylogenetic trees."""
 
@@ -99,8 +98,6 @@ class dnn3(torch.nn.Module):
         x = torch.reshape(x,[x.size()[0],16,-1])
         x = self.conv(x).squeeze(dim=2)
         return self.classifier(x)
-
-
 class _ResidueModule(torch.nn.Module):
     def __init__(self, channel_count):
         super().__init__()
