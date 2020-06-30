@@ -21,7 +21,41 @@ import torch.optim
 import torch.utils.data
 
 
-class _Model(torch.nn.Module):
+class dnn3NoResNet(torch.nn.Module):
+    """A neural network model to predict phylogenetic trees."""
+
+    def __init__(self):
+        """Create a neural network model."""
+        super().__init__()
+        self.conv = torch.nn.Sequential(
+            torch.nn.Conv1d(80, 80, 1, groups=20),
+            torch.nn.BatchNorm1d(80),
+            torch.nn.ReLU(),
+            torch.nn.Conv1d(80, 32, 1),
+            torch.nn.BatchNorm1d(32),
+            torch.nn.ReLU(),
+            torch.nn.AdaptiveAvgPool1d(1),
+        )
+        self.classifier = torch.nn.Linear(32, 3)
+
+    def forward(self, x):
+        """Predict phylogenetic trees for the given sequences.
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            One-hot encoded sequences.
+
+        Returns
+        -------
+        torch.Tensor
+            The predicted adjacency trees.
+        """
+        x = torch.reshape(x,[x.size()[0],16,-1])
+        x = self.conv(x).squeeze(dim=2)
+        return self.classifier(x)
+
+class dnn3(torch.nn.Module):
     """A neural network model to predict phylogenetic trees."""
 
     def __init__(self):

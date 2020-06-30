@@ -1,6 +1,6 @@
 import modelHandler
 import dataHandler
-import dnn3
+import models
 import plotter
 
 """
