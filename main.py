@@ -57,6 +57,8 @@ for y in range(len(traversion_values)):
     X.append(list())
     for x in range(len(transition_values)):
         X[y].append(0)
+plotter.heatmap("GTR Accuracy Heatmap: Traversion (Y-axis) and Transition (X-axis)", X, xlabel=transition_values,ylabel=traversion_values)
+
 #Run a bunch of models to fill heat map
 for y in range(len(traversion_values)):
     for x in range(len(transition_values)):
@@ -67,7 +69,7 @@ for y in range(len(traversion_values)):
         trainset = dataHandler.NonpermutedDataset("train")
         testset = dataHandler.NonpermutedDataset("test")
         #Create and train a model
-        model = dnn3NoResNet._Model()
+        model = models.dnn3NoRes()
         modelHandler.Train(model,trainset,None,3,name=f"GTR Data:Traversion={traversion}, Transition={transition}",doLoad=False)
         #Get accuracy of model
         accuracy,_ = modelHandler.Test(model,testset,"Test")

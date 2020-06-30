@@ -14,27 +14,28 @@ import pathlib
 import pickle
 import random
 
+import torch
 import numpy
 import torch.autograd
 import torch.nn
 import torch.optim
 import torch.utils.data
 
-class dnn3NoResNet(torch.nn.Module):
+class dnn3NoRes(torch.nn.Module):
     """A neural network model to predict phylogenetic trees."""
 
     def __init__(self):
         """Create a neural network model."""
         super().__init__()
         self.conv = torch.nn.Sequential(
-            torch.nn.Conv1d(80, 80, 1, groups=20),
-            torch.nn.BatchNorm1d(80),
-            torch.nn.ReLU(),
-            torch.nn.Conv1d(80, 32, 1),
-            torch.nn.BatchNorm1d(32),
-            torch.nn.ReLU(),
-            torch.nn.AdaptiveAvgPool1d(1),
-        )
+            torch.nn.Conv1d(16, 80, 1,groups=4),
+            torch.nn.BatchNorm1d(80),
+            torch.nn.ReLU(),
+            torch.nn.Conv1d(80, 32, 1),
+            torch.nn.BatchNorm1d(32),
+            torch.nn.ReLU(),
+            torch.nn.AdaptiveAvgPool1d(1),
+        )
         self.classifier = torch.nn.Linear(32, 3)
 
     def forward(self, x):
