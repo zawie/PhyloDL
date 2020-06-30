@@ -3,9 +3,10 @@ import dataHandler
 import models
 import plotter
 
-"""
+
 #Accuracy v. Standard Deviation Plot
-for std in [0,.05,.1,.15,.2,.25,.3,.35,.4,.45,.5,.55,.6,.65,.7,.75,.8,.9,.95,1]:
+models = [models.dnn3,models.dnn3NoRes]
+for std in [0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1]:
     #Generate Appropriate data
     dataHandler.Generate("train",2500,mean=0.5,std=std)
     dataHandler.Generate("test",1000,mean=0.5,std=std)
@@ -14,16 +15,22 @@ for std in [0,.05,.1,.15,.2,.25,.3,.35,.4,.45,.5,.55,.6,.65,.7,.75,.8,.9,.95,1]:
     testset = dataHandler.NonpermutedDataset("test")
     valset = dataHandler.NonpermutedDataset("dev")
     #Train model
-    model = dnn3._Model()
-    old_accuracy = None
-    for i in range(5):
-        modelHandler.Train(model,trainset,valset,3,name=f"Standard Deviation = {std}",doLoad=False)
+    for M in range(2):
+        #Chose model
+        model = models[M]()
+        modelname = "model"
+        if M == 0:
+            modelname = "dnn3"
+        else:
+            modelname = "dnn3NoRes"
+        #Train
+        modelHandler.Train(model,trainset,valset,5,name=f"{modelname} | Standard Deviation = {std}",doLoad=False)
+        #Get Accuracy
         accuracy,_ = modelHandler.Test(model,testset,"Test")
-        if accuracy - old_accuracy < .01:
-            break
-        old_accuracy = accuracy
-    modelHandler.plot("Line1",[std],[accuracy],window='Accuracy v. Standard Deviation',xlabel="Standard Deviation")
-"""
+        #Plot Accuracy
+
+        modelHandler.plot(modelname,[std],[accuracy],window='Accuracy v. Standard Deviation',xlabel="Standard Deviation")
+
 
 #Accuracy v. Sequence Length Plot
 """
@@ -48,6 +55,7 @@ for l in [20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200]:
 """
 
 #GTR Test traversion v, transition heatmap
+"""
 #Define values to test
 traversion_values = [0.5,1,1.5,2,2.5,3,3.5,4]
 transition_values = [0.5,1,1.5,2,2.5,3,3.5,4]
@@ -76,3 +84,4 @@ for y in range(len(traversion_values)):
         X[y][x] = accuracy
         print(f"Traversion={traversion}, Transition={transition}, Accuracy={accuracy}")
         plotter.heatmap("GTR Accuracy Heatmap: Traversion (Y-axis) and Transition (X-axis)", X, xlabel=transition_values,ylabel=traversion_values)
+"""
