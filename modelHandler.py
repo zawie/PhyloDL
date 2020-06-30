@@ -171,7 +171,7 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
                 if valset:
                     success_rate,average_loss = Test(model,valset,criterion=criterion)
                     print_succes_rate = int(success_rate*10000000)/100000
-                    print(f"\tValidation Accuracy: {print_succes_rate}")
+                    print(f"\tValidation Accuracy: {print_succes_rate}%")
                     plot("Validation Accuracy",[epoch + i/total_step],[success_rate],window=name)
                     plot("Validation Loss",[epoch + i/total_step],[average_loss],window=name)
                 #Log training accuracy mide long epoch
