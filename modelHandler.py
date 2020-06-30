@@ -126,7 +126,6 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
     """
     #Create data loaders
     train_loader = DataLoader(dataset=trainset, batch_size=4, shuffle=True)
-    test_loader = DataLoader(dataset=valset, batch_size=1, shuffle=True)
     #Get model
     if doLoad:
         Load(model,f"{name}")
@@ -141,10 +140,11 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
     for epoch in range(num_epochs):
         print()
         #Dev test
-        success_rate,average_loss = Test(model,valset,name="Validation",criterion=criterion)
-        plot("Validation Accuracy",[epoch],[success_rate],window=name)
-        if epoch > 0:
-            plot("Validation Loss",[epoch],[average_loss],window=name)
+        if valset:
+            success_rate,average_loss = Test(model,valset,name="Validation",criterion=criterion)
+            plot("Validation Accuracy",[epoch],[success_rate],window=name)
+            if epoch > 0:
+                plot("Validation Loss",[epoch],[average_loss],window=name)
         #Train
         print("Training...")
         for i, (inputs, labels) in enumerate(train_loader):
@@ -168,11 +168,12 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
                 plot("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
                 loss_list = list()
                 #Log validation mid long epoch
-                success_rate,average_loss = Test(model,valset,criterion=criterion)
-                print_succes_rate = int(success_rate*10000000)/100000
-                print(f"\tValidation Accuracy: {print_succes_rate}")
-                plot("Validation Accuracy",[epoch + i/total_step],[success_rate],window=name)
-                plot("Validation Loss",[epoch + i/total_step],[average_loss],window=name)
+                if valset:
+                    success_rate,average_loss = Test(model,valset,criterion=criterion)
+                    print_succes_rate = int(success_rate*10000000)/100000
+                    print(f"\tValidation Accuracy: {print_succes_rate}")
+                    plot("Validation Accuracy",[epoch + i/total_step],[success_rate],window=name)
+                    plot("Validation Loss",[epoch + i/total_step],[average_loss],window=name)
                 #Log training accuracy mide long epoch
                 if train_t > 0:
                     plot("Training Accuracy",[epoch+ + i/total_step],[train_s/train_t],window=name)
