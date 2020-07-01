@@ -4,10 +4,10 @@ import sys
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 import random
+import dendropy
 
 #Constants
 TREES = ['alpha','beta','gamma']
-
 #Helper Function
 def WriteToTre(txt):
     f = open("tree.tre", "w")
@@ -24,9 +24,7 @@ def seq_gen(file,m="HKY",n=1,l=200,r=None):
     else:
         os.system(f"seq-gen -m{m} -n{n} -l{l} <tree.tre> {file}")
 
-#Generator
-def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symmetricOnly=False,r_matrix=None):
-    #Define structures
+def UniformTreeConstructor(amount):
     template_trees = ["((A:_,B:_):_,(C:_,D:_):_)",
                       "(((A:_,B:_):_,C:_):_,D:_)",
                       "(A:_,(B:_,(C:_,D:_):_):_)",
@@ -44,6 +42,20 @@ def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symm
             tree = tree.replace("_",str(r),1)
         tre_str += tree + ";\n"
     WriteToTre(tre_str)
+
+def PureKingmanTreeConstructor(amount):
+    TaxonNamespace = dendropy.TaxonNamespace(["A","B","C","D"])
+    tree_str = ""
+    for i in range(amount):
+        tree = dendropy.simulate.treesim.pure_kingman_tree(TaxonNamespace,1)
+        tree_str += str(tree) + ";\n"
+    WriteToTre(tre_str)
+
+print(PureKingmanTreeConstructor(10))
+#Generator
+def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,TreeConstructor=UniformTreeConstructor):
+    #Define structures
+    TreeConstructor(amount)
     #Generate
     seq_gen(f"data/{file_name}.dat",m=model,n=1,l=sequenceLength,r=r_matrix)
 
@@ -108,33 +120,30 @@ def symmetricPermute(sequences):
     ]
 
 #Readers
-def getInstances(file_path,tree='alpha'):
+def getInstances(file_path):
     """
     Reads all seqeunces generated into a python list
     Inputs: file_path: which seq-gen .dat file should be read from
-            tree: the type of tree that's being read (VERY IMPORTANT)
     Outputs: A list of lists of hotencoded sequences.
     """
     file = open(file_path,"r")
     data = []
+    taxaDict = dict()
     for pos,line in enumerate(file):
         if pos%5 == 0:
+            taxaDict = dict()
             data.append(list())
         else:
             #Trim
+            taxaChar = line[0]
             sequence = line[10:-1]
             #Hot encode
             sequence = hotencode(sequence)
-            #Add sequence to list
-            data[pos//5].append(sequence)
+            #Add sequence to dict
+            taxaDict[taxaChar] = sequence
         if (pos+1)%5==0:
-            #refactor
-            if tree == "beta":
-                (A,D,C,B) = data[pos//5]
-                data[pos//5] = [A,B,C,D]
-            elif tree == 'gamma':
-                (A,C,B,D) = data[pos//5]
-                data[pos//5] = [A,B,C,D]
+            data[pos//5] = [taxaDict['A'],taxaDict['B'],taxaDict['C'],taxaDict['D']]
+            taxaDict = dict()
     file.close()
     return data
 
