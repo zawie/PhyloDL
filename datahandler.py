@@ -13,6 +13,7 @@ def WriteToTre(txt):
     f = open("tree.tre", "w")
     f.write(txt)
     f.close()
+
 def seq_gen(file,m="HKY",n=1,l=200,r=None):
     if r != None:
         print(r)
@@ -45,10 +46,12 @@ def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symm
     WriteToTre(tre_str)
     #Generate
     seq_gen(f"data/{file_name}.dat",m=model,n=1,l=sequenceLength,r=r_matrix)
+
 def GenerateAll(train_amount,dev_amount,test_amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symmetricOnly=False,r_matrix=None):
     Generate("train",train_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
     Generate("dev",dev_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
     Generate("test",test_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
+
 def GetDatasets(train_amount,dev_amount,test_amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symmetricOnly=False,r_matrix=None):
     Generate("train",train_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
     Generate("dev",dev_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
@@ -72,18 +75,21 @@ def hotencode(sequence):
     for char in sequence:
         final.append(code_map[char])
     return final
+
 def toBeta(alphaSeqeunces):
     """
     Transforms a given alpha sequences to a beta tree
     """
     (A,B,C,D) = alphaSeqeunces
     return [A,D,C,B]
+
 def toGamma(alphaSeqeunces):
     """
     Transforms a given alpha sequences to a gamma tree
     """
     (A,B,C,D) = alphaSeqeunces
     return [A,C,B,D]
+
 def symmetricPermute(sequences):
     """
     Permutes the set of sequences into all possible orders that maintains
@@ -169,6 +175,7 @@ class SequenceDataset(Dataset):
         Returns the number of entries in this dataset
         """
         return len(self.instances)
+
 def PermutedDataset(folder,preprocess=True):
     """
     Returns a SequenceDataset that will transform and permute each tree instance
@@ -190,6 +197,7 @@ def PermutedDataset(folder,preprocess=True):
         expanded_labels = torch.reshape(labels,[batchsize*24])
         return expanded_data,expanded_labels
     return SequenceDataset(folder,_augment,_expand,preprocess=preprocess)
+
 def NonpermutedDataset(folder,preprocess=True):
     """
     Returns a SequenceDataset that will ONLY transforme ach tree instance
