@@ -3,55 +3,63 @@ import dataHandler
 import models
 import plotter
 
+#Pop Count
+modelDict = {"CovNet dnn3":models.dnn3NoRes, "ResNet dnn3":models.dnn3}
+for p in [1,2,4,8,16,32,64,128]:
+    #Generate Data
+    data_amounts = {"train":10000,"dev":100,"test":10000}
+    datasets = dataHandler.GenerateDatasets(data_amounts,TreeConstructor=dataHandler.PureKingmanTreeConstructor,pop_size=p)
+    for key,modelTemplate in modelDict.items():
+        #Create and train model
+        model = modelTemplate()
+        modelHandler.Train(model,datasets["train"],datasets['dev'],3,name=f"Model = {key} | Pop Size = {p}",doLoad=False)
+        #Get accuracy of model
+        accuracy,_ = modelHandler.Test(model,datasets["test"],"Test")
+        plotter.line(key,[p],[accuracy],window='Accuracy v. Pop Size',xlabel="Pure Kingman Pop Size")
+
+
+
+
+
+
+
+
+
 
 #Accuracy v. Standard Deviation Plot
-models = [models.dnn3,models.dnn3NoRes]
-for std in [0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1]:
-    #Generate Appropriate data
-    dataHandler.Generate("train",2500,mean=0.5,std=std)
-    dataHandler.Generate("test",1000,mean=0.5,std=std)
-    dataHandler.Generate("dev",100,mean=0.5,std=std)
-    trainset = dataHandler.NonpermutedDataset("train")
-    testset = dataHandler.NonpermutedDataset("test")
-    valset = dataHandler.NonpermutedDataset("dev")
-    #Train model
-    for M in range(2):
-        #Chose model
-        model = models[M]()
-        modelname = "model"
-        if M == 0:
-            modelname = "dnn3"
-        else:
-            modelname = "dnn3NoRes"
-        #Train
-        modelHandler.Train(model,trainset,valset,5,name=f"{modelname} | Standard Deviation = {std}",doLoad=False)
-        #Get Accuracy
-        accuracy,_ = modelHandler.Test(model,testset,"Test")
-        #Plot Accuracy
-
-        modelHandler.plot(modelname,[std],[accuracy],window='Accuracy v. Standard Deviation',xlabel="Standard Deviation")
-
-
-#Accuracy v. Sequence Length Plot
 """
-for l in [20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200]:
-    #Generate Appropriate data
-    dataHandler.Generate("train",2500,sequenceLength=l)
-    dataHandler.Generate("test",1000,sequenceLength=l)
-    dataHandler.Generate("dev",100,sequenceLength=l)
-    trainset = dataHandler.NonpermutedDataset("train")
-    testset = dataHandler.NonpermutedDataset("test")
-    valset = dataHandler.NonpermutedDataset("dev")
-    #Train model
-    model = dnn3._Model()
-    old_accuracy = None
-    for i in range(5):
-        modelHandler.Train(model,trainset,valset,3,name=f"Sequence Length = {l}",doLoad=False)
+#GTR Test traversion v, transition heatmap
+#Define values to test
+std_values = list(range(21))
+std_values = [x/10 for x in std_values]
+mean_values = list(range(21))
+mean_values = [x/10 for x in mean_values]
+
+#Create blank heat map
+X = []
+for y in range(len(std_values)):
+    X.append(list())
+    for x in range(len(mean_values)):
+        X[y].append(0)
+plotter.heatmap("Accuracy Heatmap: Standard Deviation (Y-axis) and Mean (X-axis)", X, xlabel=mean_values,ylabel=std_values)
+
+#Run a bunch of models to fill heat map
+for y in range(len(std_values)):
+    for x in range(len(mean_values)):
+        std = std_values[y]
+        mean = mean_values[x]
+        #Generate Data
+        dataHandler.GenerateAll(2500,0,5000,model="HKY",std=std,mean=mean)
+        trainset = dataHandler.NonpermutedDataset("train")
+        testset = dataHandler.NonpermutedDataset("test")
+        #Create and train a model
+        model = models.dnn3NoRes()
+        modelHandler.Train(model,trainset,None,3,name=f"STD={std} | Mean = {mean}",doLoad=False)
+        #Get accuracy of model
         accuracy,_ = modelHandler.Test(model,testset,"Test")
-        if accuracy - old_accuracy < .01 or accuracy >= .99:
-            break
-        old_accuracy = accuracy
-    modelHandler.plot("Line1",[std],[accuracy],window='Accuracy v. Sequence Length',xlabel="Sequence Length")
+        X[y][x] = accuracy
+        print(f"Mean={mean}, STD={std}, Accuracy={accuracy}")
+        plotter.heatmap("GTR Accuracy Heatmap: Traversion (Y-axis) and Transition (X-axis)", X, xlabel=mean_values,ylabel=std_values)
 """
 
 #GTR Test traversion v, transition heatmap

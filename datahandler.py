@@ -5,6 +5,7 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 import random
 import dendropy
+import treeClassifier
 
 #Constants
 TREES = ['alpha','beta','gamma']
@@ -24,15 +25,15 @@ def seq_gen(file,m="HKY",n=1,l=200,r=None):
     else:
         os.system(f"seq-gen -m{m} -n{n} -l{l} <tree.tre> {file}")
 
-def UniformTreeConstructor(amount):
+def UniformTreeConstructor(amount,mean=0.1,std=0):
     template_trees = ["((A:_,B:_):_,(C:_,D:_):_)",
                       "(((A:_,B:_):_,C:_):_,D:_)",
                       "(A:_,(B:_,(C:_,D:_):_):_)",
                       "(((A:_,B:_):_,D:_):_,C:_)",
                       "(B:_,(A:_,(C:_,D:_):_):_)",
                       ]
-    if symmetricOnly:
-        template_trees = ["((A:_,B:_):_,(C:_,D:_):_)"]
+    """if symmetricOnly:
+        template_trees = ["((A:_,B:_):_,(C:_,D:_):_)"]"""
     #Create as many structures
     tre_str = ""
     for i in range(amount):
@@ -43,35 +44,38 @@ def UniformTreeConstructor(amount):
         tre_str += tree + ";\n"
     WriteToTre(tre_str)
 
-def PureKingmanTreeConstructor(amount):
+def PureKingmanTreeConstructor(amount,pop_size=1):
     TaxonNamespace = dendropy.TaxonNamespace(["A","B","C","D"])
-    tree_str = ""
-    for i in range(amount):
-        tree = dendropy.simulate.treesim.pure_kingman_tree(TaxonNamespace,1)
-        tree_str += str(tree) + ";\n"
+    #Gemerate trees
+    trees = []
+    while len(trees) < amount:
+        tree = dendropy.simulate.treesim.pure_kingman_tree(TaxonNamespace,pop_size)
+        treeClass = treeClassifier.getClass(str(tree))
+        if treeClass == 0:
+            trees.append(tree)
+    #Create string
+    tre_str = ""
+    for tree in trees:
+        tre_str += str(tree) + ";\n"
     WriteToTre(tre_str)
 
-print(PureKingmanTreeConstructor(10))
+PureKingmanTreeConstructor(10)
 #Generator
-def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,TreeConstructor=UniformTreeConstructor):
+def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,TreeConstructor=PureKingmanTreeConstructor,pop_size=1):
     #Define structures
-    TreeConstructor(amount)
+    if TreeConstructor == PureKingmanTreeConstructor:
+        TreeConstructor(amount,pop_size=pop_size)
+    else:
+        TreeConstructor(amount,mean=mean,std=std)
     #Generate
     seq_gen(f"data/{file_name}.dat",m=model,n=1,l=sequenceLength,r=r_matrix)
 
-def GenerateAll(train_amount,dev_amount,test_amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symmetricOnly=False,r_matrix=None):
-    Generate("train",train_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
-    Generate("dev",dev_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
-    Generate("test",test_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
-
-def GetDatasets(train_amount,dev_amount,test_amount,sequenceLength=200,mean=0.1,std=0,model="HKY",symmetricOnly=False,r_matrix=None):
-    Generate("train",train_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
-    Generate("dev",dev_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
-    Generate("test",test_amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,symmetricOnly=symmetricOnly,r_matrix=r_matrix)
-    trainset = NonpermutedDataset("train")
-    valset = NonpermutedDataset("dev")
-    testset = NonpermutedDataset("test")
-    return trainset,valset,testset
+def GenerateDatasets(amount_dictionary,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,TreeConstructor=PureKingmanTreeConstructor,pop_size=1):
+    dataset_dictionary = dict()
+    for key,amount in amount_dictionary.items():
+        Generate(key,amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,r_matrix=r_matrix,TreeConstructor=TreeConstructor,pop_size=pop_size)
+        dataset_dictionary[key] = NonpermutedDataset(key)
+    return dataset_dictionary
 
 #Sequence modifiers
 def hotencode(sequence):
