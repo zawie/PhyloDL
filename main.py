@@ -6,19 +6,19 @@ import plotter
 
 #ML Accuracies
 amount = 100
-datas = {"Pure Kingman JC":["JC"],
-         "Luay's Pure Kingman GTR":["GTR",[]],
-         "Angiosperm Pure Kingman GTR":["GTR",[]],}
+datas = {"Pure Kingman JC":{'m':"JC"},
+         "Luay's Pure Kingman GTR":{'m':"GTR",'r':[],'f':[]},
+         "Angiosperm Pure Kingman GTR":{'m':"GTR",'r':[],'f':[]}
+         }
 results = {}
 for name,settings in datas.items():
     #Generate data
     dataset = None
-    m = settings[0]
+    m = settings['m']
     if m == 'JC':
         dataset = dataHandler.GenerateDatasets({name:amount})[0]
     else:
-        r = settings[1]
-        dataset = dataHandler.GenerateDatasets({name:amount},model=m,r_matrix=r)[0]
+        dataset = dataHandler.GenerateDatasets({name:amount},model=m,r_matrix=settings['r'],f_matrix=settings['f'])[0]
     #Get ML Accuracy
     accuracy = MLHandler.runML(name,dataset)
     results[name] = accuracy
