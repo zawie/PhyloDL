@@ -28,6 +28,8 @@ def runML(name,dataset):
     """
     Runs ML on file
     """
+    successes = 0
+    trials = 0
     #creates working directory
     os.mkdir(ML_PATH)
     #make file paths
@@ -65,16 +67,27 @@ def runML(name,dataset):
             treeClass = treeClassifier.getClass(line)
             final_f.write(f'({label},{treeClass})\t {line}')
 
+            #log succes/trial
+            trials += 1
+            if label == treeClass:
+                successes += 1
             #removes files
             suffixes = ["mldist","log","iqtree","ckp.gz","bionj","treefile"]
             for suffix in suffixes:
                 os.remove(f"{WRITE_FILE_PATH}.{suffix}")
+
+    #Calculate accuracy
+    accuracy = successes/trials
+    str_accuracy = str(int(accuracy*100*1000)/1000)+"%"
+    final_f.write(f'\nAccuracy = {str_accuracy}')
     #Close final file
     final_f.close()
     #remove unnecessary directory and file
     os.remove(WRITE_FILE_PATH)
     os.rmdir(ML_PATH)
-
+    #Return success rate
+    return accuracy
 #Run program
 dataset = dataHandler.NonpermutedDataset("dev")
-runML("dev",dataset)
+accuracy = runML("dev",dataset)
+print(accuracy)
