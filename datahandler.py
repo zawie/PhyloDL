@@ -15,9 +15,17 @@ def WriteToTre(txt):
     f.write(txt)
     f.close()
 
-def seq_gen(file,m="HKY",n=1,l=200,r=None):
-    if r != None:
-        print(r)
+def seq_gen(file,m="HKY",n=1,l=200,r=None,f=None):
+    if r!=None and f!=None:
+        r_str = "_, "*(len(r)-1) + "_"
+        f_str = "_, "*(len(f)-1) + "_"
+        for i in range(6):
+            r_str = r_str.replace("_",str(r[i]),1)
+        for j in range(4):
+            f_str = f_str.replace("_",str(f[j]),1)
+        #print(f"\n\n\n\n\n\n\n\n\n-r{r_str}\n-f{f_str}\n\n\n\n\n\n\n\n")
+        os.system(f'seq-gen -m{m} -n{n} -l{l} -r{r_str} -f{f_str} <tree.tre> {file}')
+    elif r != None:
         r_str = "_, "*(len(r)-1) + "_"
         for i in range(6):
             r_str = r_str.replace("_",str(r[i]),1)
@@ -61,19 +69,19 @@ def PureKingmanTreeConstructor(amount,pop_size=1):
 
 PureKingmanTreeConstructor(10)
 #Generator
-def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,TreeConstructor=PureKingmanTreeConstructor,pop_size=1):
+def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,f_matrix=None,TreeConstructor=PureKingmanTreeConstructor,pop_size=1):
     #Define structures
     if TreeConstructor == PureKingmanTreeConstructor:
         TreeConstructor(amount,pop_size=pop_size)
     else:
         TreeConstructor(amount,mean=mean,std=std)
     #Generate
-    seq_gen(f"data/{file_name}.dat",m=model,n=1,l=sequenceLength,r=r_matrix)
+    seq_gen(f"data/{file_name}.dat",m=model,n=1,l=sequenceLength,r=r_matrix,f=f_matrix)
 
-def GenerateDatasets(amount_dictionary,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,TreeConstructor=PureKingmanTreeConstructor,pop_size=1):
+def GenerateDatasets(amount_dictionary,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,f_matrix=None,TreeConstructor=PureKingmanTreeConstructor,pop_size=1):
     dataset_dictionary = dict()
     for key,amount in amount_dictionary.items():
-        Generate(key,amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,r_matrix=r_matrix,TreeConstructor=TreeConstructor,pop_size=pop_size)
+        Generate(key,amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,r_matrix=r_matrix,f_matrix=f_matrix,TreeConstructor=TreeConstructor,pop_size=pop_size)
         dataset_dictionary[key] = NonpermutedDataset(key)
     return dataset_dictionary
 
