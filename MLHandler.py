@@ -46,35 +46,38 @@ def runML(name,dataset):
     for i, (inputs, labels) in enumerate(loader):
         #expand data
         inputs, labels = dataset.expand(inputs, labels)
+        j = -1
         for (sequences,label) in zip(inputs,labels):
-            sequenceLength = sequences.size()[1]
-            #Write to temp file
-            write_f = open(WRITE_FILE_PATH, "w") #Clear file
-            write_f = open(WRITE_FILE_PATH, "a") #Set to append mode
-            write_f.write(f" 4 {sequenceLength}\n") #Writeheader
-            for j in range(4):
-                sequence = unhotencode(sequences[j])
-                taxaChar = ["A","B","C","D"][j]
-                write_f.write(f"{taxaChar}         {sequence}\n")
-            write_f.close()
+            j += 1
+            if j % 3 == 0:
+                sequenceLength = sequences.size()[1]
+                #Write to temp file
+                write_f = open(WRITE_FILE_PATH, "w") #Clear file
+                write_f = open(WRITE_FILE_PATH, "a") #Set to append mode
+                write_f.write(f" 4 {sequenceLength}\n") #Writeheader
+                for j in range(4):
+                    sequence = unhotencode(sequences[j])
+                    taxaChar = ["A","B","C","D"][j]
+                    write_f.write(f"{taxaChar}         {sequence}\n")
+                write_f.close()
 
-            #Run ML
-            os.system(IQTREE_PATH + " -s " + WRITE_FILE_PATH + " -m JC")
+                #Run ML
+                os.system(IQTREE_PATH + " -s " + WRITE_FILE_PATH + " -m JC")
 
-            #Access ML Output
-            ML_data = open(WRITE_FILE_PATH + ".treefile", "r")
-            line = ML_data.read()
-            treeClass = treeClassifier.getClass(line)
-            final_f.write(f'({label},{treeClass})\t {line}')
+                #Access ML Output
+                ML_data = open(WRITE_FILE_PATH + ".treefile", "r")
+                line = ML_data.read()
+                treeClass = treeClassifier.getClass(line)
+                final_f.write(f'({label},{treeClass})\t {line}')
 
-            #log succes/trial
-            trials += 1
-            if label == treeClass:
-                successes += 1
-            #removes files
-            suffixes = ["mldist","log","iqtree","ckp.gz","bionj","treefile"]
-            for suffix in suffixes:
-                os.remove(f"{WRITE_FILE_PATH}.{suffix}")
+                #log succes/trial
+                trials += 1
+                if label == treeClass:
+                    successes += 1
+                #removes files
+                suffixes = ["mldist","log","iqtree","ckp.gz","bionj","treefile"]
+                for suffix in suffixes:
+                    os.remove(f"{WRITE_FILE_PATH}.{suffix}")
 
     #Calculate accuracy
     accuracy = successes/trials
