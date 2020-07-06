@@ -5,20 +5,21 @@ import models
 import plotter
 
 #ML Accuracies
-amount = 100
-datas = {"Pure Kingman JC":{'m':"JC"},
-         "Luay's Pure Kingman GTR":{'m':"GTR",'r':[],'f':[]},
-         "Angiosperm Pure Kingman GTR":{'m':"GTR",'r':[],'f':[]}
+amount = 1000
+
+datas = {"Luay":{'m':"GTR",'r':[0.2173,0.9798,0.2575,0.1038,1,0.2070],'f':[0.2112,0.2888,0.2896,0.2104]},
+         "Angiosperm":{'m':"GTR",'r':[1.61,3.82,0.27,1.56,4.99,1],'f':[0.34,0.15,0.18,0.33]},
+         "Simple":{'m':"JC"}
          }
-results = {}
+results = {} #{'Luay': 0.799, 'Angiosperm': 0.8153333333333334, 'Simple': 0.7496666666666667}
 for name,settings in datas.items():
     #Generate data
     dataset = None
     m = settings['m']
     if m == 'JC':
-        dataset = dataHandler.GenerateDatasets({name:amount})[0]
+        dataset = dataHandler.GenerateDatasets({name:amount})[name]
     else:
-        dataset = dataHandler.GenerateDatasets({name:amount},model=m,r_matrix=settings['r'],f_matrix=settings['f'])[0]
+        dataset = dataHandler.GenerateDatasets({name:amount},model=m,r_matrix=settings['r'],f_matrix=settings['f'])[name]
     #Get ML Accuracy
     accuracy = MLHandler.runML(name,dataset)
     results[name] = accuracy
