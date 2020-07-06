@@ -20,11 +20,6 @@ def getDeepestPair(tree,open_threshold=2):
             open_count += 1
     return set((A,B))
 
-def areSame(tree0,tree1):
-    p0 = getDeepestPair(tree0)
-    p1 = getDeepestPair(tree1)
-    return p0 == p1
-
 def getClass(tree):
     #Double parathesis
     for open_threshold in [2,3]:
