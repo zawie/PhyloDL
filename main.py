@@ -1,9 +1,32 @@
 import modelHandler
 import dataHandler
+import MLHandler
 import models
 import plotter
 
-#Pop Count
+#ML Accuracies
+amount = 100
+datas = {"Pure Kingman JC":["JC"],
+         "Luay's Pure Kingman GTR":["GTR",[]],
+         "Angiosperm Pure Kingman GTR":["GTR",[]],}
+results = {}
+for name,settings in datas.items():
+    #Generate data
+    dataset = None
+    m = settings[0]
+    if m == 'JC':
+        dataset = dataHandler.GenerateDatasets({name:amount})[0]
+    else:
+        r = settings[1]
+        dataset = dataHandler.GenerateDatasets({name:amount},model=m,r_matrix=r)[0]
+    #Get ML Accuracy
+    accuracy = MLHandler.runML(name,dataset)
+    results[name] = accuracy
+print(results)
+
+
+#Pop Count Test
+"""
 pop_sizes = [x/4 for x in list(range(1,100))]
 for p in pop_sizes:
     #Generate Data
@@ -15,15 +38,7 @@ for p in pop_sizes:
     #Get accuracy of model
     accuracy,_ = modelHandler.Test(model,datasets["test"],"Test")
     plotter.line("NoRes dnn3",[p],[accuracy],window='Accuracy v. Pop Size',xlabel="Pure Kingman Pop Size")
-
-
-
-
-
-
-
-
-
+"""
 
 #Accuracy v. Standard Deviation Plot
 """
