@@ -88,6 +88,8 @@ def runML(name,dataset):
     #Return success rate
     return accuracy
 #Run program
+"""
 dataset = dataHandler.NonpermutedDataset("dev")
 accuracy = runML("dev",dataset)
 print(accuracy)
+"""
