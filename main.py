@@ -11,7 +11,9 @@ datas = {"Luay":{'m':"GTR",'r':[0.2173,0.9798,0.2575,0.1038,1,0.2070],'f':[0.211
          "Angiosperm":{'m':"GTR",'r':[1.61,3.82,0.27,1.56,4.99,1],'f':[0.34,0.15,0.18,0.33]},
          "Simple":{'m':"JC"}
          }
-results = {} #{'Luay': 0.799, 'Angiosperm': 0.8153333333333334, 'Simple': 0.7496666666666667}
+results = {}
+#{'Luay': 0.799, 'Angiosperm': 0.8153333333333334, 'Simple': 0.7496666666666667}
+#{'Luay': 0.778, 'Angiosperm': 0.8, 'Simple': 0.7336666666666667}
 for name,settings in datas.items():
     #Generate data
     dataset = None
