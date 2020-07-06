@@ -4,18 +4,17 @@ import models
 import plotter
 
 #Pop Count
-modelDict = {"CovNet dnn3":models.dnn3NoRes, "ResNet dnn3":models.dnn3}
-for p in [1,2,4,8,16,32,64,128]:
+pop_sizes = [x/4 for x in list(range(1,100))]
+for p in pop_sizes:
     #Generate Data
-    data_amounts = {"train":10000,"dev":100,"test":10000}
+    data_amounts = {"train":5000,"dev":100,"test":10000}
     datasets = dataHandler.GenerateDatasets(data_amounts,TreeConstructor=dataHandler.PureKingmanTreeConstructor,pop_size=p)
-    for key,modelTemplate in modelDict.items():
-        #Create and train model
-        model = modelTemplate()
-        modelHandler.Train(model,datasets["train"],datasets['dev'],3,name=f"Model = {key} | Pop Size = {p}",doLoad=False)
-        #Get accuracy of model
-        accuracy,_ = modelHandler.Test(model,datasets["test"],"Test")
-        plotter.line(key,[p],[accuracy],window='Accuracy v. Pop Size',xlabel="Pure Kingman Pop Size")
+    #Create and train model
+    model = models.dnn3NoRes()
+    modelHandler.Train(model,datasets["train"],datasets['dev'],5,name=f"Pop Size = {p}",doLoad=False)
+    #Get accuracy of model
+    accuracy,_ = modelHandler.Test(model,datasets["test"],"Test")
+    plotter.line("NoRes dnn3",[p],[accuracy],window='Accuracy v. Pop Size',xlabel="Pure Kingman Pop Size")
 
 
 
