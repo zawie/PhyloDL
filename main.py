@@ -5,8 +5,6 @@ import models
 import plotter
 
 #ML Accuracies
-amount = 1000
-
 datas = {"Luay":{'m':"GTR",'r':[0.2173,0.9798,0.2575,0.1038,1,0.2070],'f':[0.2112,0.2888,0.2896,0.2104]},
          "Angiosperm":{'m':"GTR",'r':[1.61,3.82,0.27,1.56,4.99,1],'f':[0.34,0.15,0.18,0.33]},
          "Simple":{'m':"JC"}
@@ -14,17 +12,34 @@ datas = {"Luay":{'m':"GTR",'r':[0.2173,0.9798,0.2575,0.1038,1,0.2070],'f':[0.211
 results = {}
 #{'Luay': 0.799, 'Angiosperm': 0.8153333333333334, 'Simple': 0.7496666666666667}
 #{'Luay': 0.778, 'Angiosperm': 0.8, 'Simple': 0.7336666666666667}
+
+#Sequence Length 1000
+#{'Luay': {'ML': 0.862, 'Model': 0.9713333333333334}, 'Angiosperm': {'ML': 0.926, 'Model': 0.974}, 'Simple': {'ML': 0.797, 'Model': 0.9773333333333334}}
+
+#Sequence Length 200
+#{'Luay': {'ML': 0.798, 'Model': 0.9523333333333334}, 'Angiosperm': {'ML': 0.813, 'Model': 0.9406666666666667}, 'Simple': {'ML': 0.741, 'Model': 0.9536666666666667}}
+
+#Sequence Length 500
+#{'Luay': {'ML': 0.828, 'Model': 0.9566666666666667}, 'Angiosperm': {'ML': 0.872, 'Model': 0.9576666666666667}, 'Simple': {'ML': 0.776, 'Model': 0.9613333333333334}}
+
 for name,settings in datas.items():
     #Generate data
-    dataset = None
+    datasets = None
+    data_amounts = {"train":5000,"dev":100,"test":1000}
     m = settings['m']
     if m == 'JC':
-        dataset = dataHandler.GenerateDatasets({name:amount})[name]
+        datasets = dataHandler.GenerateDatasets(data_amounts,sequenceLength=500)
     else:
-        dataset = dataHandler.GenerateDatasets({name:amount},model=m,r_matrix=settings['r'],f_matrix=settings['f'])[name]
+        datasets = dataHandler.GenerateDatasets(data_amounts,sequenceLength=500,model=m,r_matrix=settings['r'],f_matrix=settings['f'])
+    print(datasets)
+    #Train model
+    model = models.dnn3NoRes()
+    modelHandler.Train(model,datasets["train"],datasets['dev'],5,name=f"{name}",doLoad=False)
+    model_accuracy,_ = modelHandler.Test(model,datasets["test"],"Test")
     #Get ML Accuracy
-    accuracy = MLHandler.runML(name,dataset)
-    results[name] = accuracy
+    ML_accuracy = MLHandler.runML(name,datasets['test'])
+    results[name] = {"ML":ML_accuracy,"Model":model_accuracy}
+    print(results)
 print(results)
 
 

@@ -62,7 +62,7 @@ def runML(name,dataset):
                 write_f.close()
 
                 #Run ML
-                os.system(IQTREE_PATH + " -s " + WRITE_FILE_PATH + " -m GTR")
+                os.system(IQTREE_PATH + " -s " + WRITE_FILE_PATH + " -m JC")
 
                 #Access ML Output
                 ML_data = open(WRITE_FILE_PATH + ".treefile", "r")
