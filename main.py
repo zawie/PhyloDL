@@ -16,26 +16,33 @@ results = {}
 #Sequence Length 1000
 #{'Luay': {'ML': 0.862, 'Model': 0.9713333333333334}, 'Angiosperm': {'ML': 0.926, 'Model': 0.974}, 'Simple': {'ML': 0.797, 'Model': 0.9773333333333334}}
 
-#Sequence Length 200
+#Sequence Length 200pyt
 #{'Luay': {'ML': 0.798, 'Model': 0.9523333333333334}, 'Angiosperm': {'ML': 0.813, 'Model': 0.9406666666666667}, 'Simple': {'ML': 0.741, 'Model': 0.9536666666666667}}
 
 #Sequence Length 500
 #{'Luay': {'ML': 0.828, 'Model': 0.9566666666666667}, 'Angiosperm': {'ML': 0.872, 'Model': 0.9576666666666667}, 'Simple': {'ML': 0.776, 'Model': 0.9613333333333334}}
 
+#Sl = 1000; bl min 0.1 JC
+#{'Luay': {'ML': 0.884, 'Model': 0}, 'Angiosperm': {'ML': 0.945, 'Model': 0}, 'Simple': {'ML': 0.793, 'Model': 0}}
+
+#Sl = 1000; bl min 0.1 GTR
+#{'Luay': {'ML': 0.886, 'Model': 0}, 'Angiosperm': {'ML': 0.909, 'Model': 0}, 'Simple': {'ML': 0.788, 'Model': 0}}
+sequenceLength = 200
 for name,settings in datas.items():
     #Generate data
     datasets = None
-    data_amounts = {"train":5000,"dev":100,"test":1000}
+    data_amounts = {"train":0,"dev":0,"test":200}
     m = settings['m']
     if m == 'JC':
-        datasets = dataHandler.GenerateDatasets(data_amounts,sequenceLength=500)
+        datasets = dataHandler.GenerateDatasets(data_amounts,sequenceLength=sequenceLength)
     else:
-        datasets = dataHandler.GenerateDatasets(data_amounts,sequenceLength=500,model=m,r_matrix=settings['r'],f_matrix=settings['f'])
+        datasets = dataHandler.GenerateDatasets(data_amounts,sequenceLength=sequenceLength,model=m,r_matrix=settings['r'],f_matrix=settings['f'])
     print(datasets)
     #Train model
-    model = models.dnn3NoRes()
+    model_accuracy = 0
+    """model = models.dnn3NoRes()
     modelHandler.Train(model,datasets["train"],datasets['dev'],5,name=f"{name}",doLoad=False)
-    model_accuracy,_ = modelHandler.Test(model,datasets["test"],"Test")
+    model_accuracy,_ = modelHandler.Test(model,datasets["test"],"Test")"""
     #Get ML Accuracy
     ML_accuracy = MLHandler.runML(name,datasets['test'])
     results[name] = {"ML":ML_accuracy,"Model":model_accuracy}

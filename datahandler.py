@@ -52,15 +52,23 @@ def UniformTreeConstructor(amount,mean=0.1,std=0):
         tre_str += tree + ";\n"
     WriteToTre(tre_str)
 
-def PureKingmanTreeConstructor(amount,pop_size=1):
+def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0.3,maximum=1):
     TaxonNamespace = dendropy.TaxonNamespace(["A","B","C","D"])
     #Gemerate trees
     trees = []
     while len(trees) < amount:
         tree = dendropy.simulate.treesim.pure_kingman_tree(TaxonNamespace,pop_size)
         treeClass = treeClassifier.getClass(str(tree))
+        #Only add alphas
         if treeClass == 0:
-            trees.append(tree)
+            #Remove if tree has too short branch Length
+            invalid = False
+            for edge in tree.edges():
+                if (edge.length < minimum and edge.length > 0) or (edge.length > maximum):
+                    invalid = True
+                    break
+            if not invalid:
+                trees.append(tree)
     #Create string
     tre_str = ""
     for tree in trees:
@@ -68,6 +76,7 @@ def PureKingmanTreeConstructor(amount,pop_size=1):
     WriteToTre(tre_str)
 
 PureKingmanTreeConstructor(10)
+
 #Generator
 def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,f_matrix=None,TreeConstructor=PureKingmanTreeConstructor,pop_size=1):
     #Define structures
