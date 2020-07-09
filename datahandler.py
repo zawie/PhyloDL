@@ -216,11 +216,9 @@ class MergedSequenceDataset(Dataset):
     def __init__(self,data0,data1):
         """
         """
-        assert(data0.expand_function == data1.expand_function)
-        assert(data0._augment == data1._augment)
-        assert(data0.preprocess and data1.preprocess)
-        self.expand = data0.expand_function
-        self.expand = data0._augment
+        #assert(data0.expand == data1.expand)
+        #assert(data0.preprocess and data1.preprocess)
+        self.expand = data0.expand
         self.X_data = data0.X_data + data1.X_data
         self.Y_data = data0.Y_data + data1.Y_data
 
@@ -228,19 +226,19 @@ class MergedSequenceDataset(Dataset):
         """
         Gets a certain tree across all three trees (alpha,beta,charlie)
         """
-        X,y = self._augment(self.instances[index])
-        return X,y
+        return self.X_data[index],self.Y_data[index]
 
     def __len__(self):
         """
         Returns the number of entries in this dataset
         """
         return len(self.X_data)
+
     def __add__(self, other):
-    """
-    Merges to datasets
-    """
-    return MergedSequenceDataset(self,other)
+        """
+        Merges to datasets
+        """
+        return MergedSequenceDataset(self,other)
 
 def NonpermutedDataset(folder,preprocess=True):
     """
