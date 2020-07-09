@@ -31,7 +31,7 @@ sequenceLength = 200
 for name,settings in datas.items():
     #Generate data
     datasets = None
-    data_amounts = {"train":0,"dev":0,"test":200}
+    data_amounts = {"train":50000,"dev":100,"test":1000}
     m = settings['m']
     if m == 'JC':
         datasets = dataHandler.GenerateDatasets(data_amounts,sequenceLength=sequenceLength)
@@ -39,10 +39,9 @@ for name,settings in datas.items():
         datasets = dataHandler.GenerateDatasets(data_amounts,sequenceLength=sequenceLength,model=m,r_matrix=settings['r'],f_matrix=settings['f'])
     print(datasets)
     #Train model
-    model_accuracy = 0
-    """model = models.dnn3NoRes()
+    model = models.dnn3NoRes()
     modelHandler.Train(model,datasets["train"],datasets['dev'],5,name=f"{name}",doLoad=False)
-    model_accuracy,_ = modelHandler.Test(model,datasets["test"],"Test")"""
+    model_accuracy,_ = modelHandler.Test(model,datasets["test"],"Test")
     #Get ML Accuracy
     ML_accuracy = MLHandler.runML(name,datasets['test'])
     results[name] = {"ML":ML_accuracy,"Model":model_accuracy}
