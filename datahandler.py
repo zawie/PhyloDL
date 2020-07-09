@@ -52,7 +52,7 @@ def UniformTreeConstructor(amount,mean=0.1,std=0):
         tre_str += tree + ";\n"
     WriteToTre(tre_str)
 
-def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0.3,maximum=1):
+def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0.1,maximum=1):
     TaxonNamespace = dendropy.TaxonNamespace(["A","B","C","D"])
     #Gemerate trees
     trees = []
@@ -206,27 +206,30 @@ class SequenceDataset(Dataset):
         """
         return len(self.instances)
 
-def PermutedDataset(folder,preprocess=True):
-    """
-    Returns a SequenceDataset that will transform and permute each tree instance
-    This will grow the dataset by 24
-    """
-    print("ONLY PERMUTES SYMMETRIC CORRECTLY!!!!")
-    def _augment(instance):
-        X = list()
-        y = list() #alpha + beta + gamma
-        for alpha in permute(instance):
-            X.extend(alpha)
-            X.extend(toBeta(alpha))
-            X.extend(toGamma(alpha))
-            y.extend([0,1,2])
-        return torch.tensor(X,dtype=torch.float),torch.tensor(y,dtype=torch.long)
-    def _expand(data,labels):
-        batchsize = data.size()[0]
-        expanded_data = torch.reshape(data,[batchsize*24,4,-1,4])
-        expanded_labels = torch.reshape(labels,[batchsize*24])
-        return expanded_data,expanded_labels
-    return SequenceDataset(folder,_augment,_expand,preprocess=preprocess)
+class MergedSequenceDataset(Dataset):
+    def __init__(self,data0,data1):
+        """
+        """
+        assert(data0.expand_function == data1.expand_function)
+        assert(data0._augment == data1._augment)
+        assert(data0.preprocess and data1.preprocess)
+        self.expand = data0.expand_function
+        self.expand = data0._augment
+        self.X_data = data0.X_data + data1.X_data
+        self.Y_data = data0.Y_data + data1.Y_data
+
+    def __getitem__(self,index):
+        """
+        Gets a certain tree across all three trees (alpha,beta,charlie)
+        """
+        X,y = self._augment(self.instances[index])
+        return X,y
+
+    def __len__(self):
+        """
+        Returns the number of entries in this dataset
+        """
+        return len(self.X_data)
 
 def NonpermutedDataset(folder,preprocess=True):
     """
@@ -249,3 +252,25 @@ def NonpermutedDataset(folder,preprocess=True):
         expanded_labels = torch.reshape(labels,[batchsize*3])
         return expanded_data,expanded_labels
     return SequenceDataset(folder,_augment,_expand,preprocess=preprocess)
+
+# def PermutedDataset(folder,preprocess=True):
+#     """
+#     Returns a SequenceDataset that will transform and permute each tree instance
+#     This will grow the dataset by 24
+#     """
+#     print("ONLY PERMUTES SYMMETRIC CORRECTLY!!!!")
+#     def _augment(instance):
+#         X = list()
+#         y = list() #alpha + beta + gamma
+#         for alpha in permute(instance):
+#             X.extend(alpha)
+#             X.extend(toBeta(alpha))
+#             X.extend(toGamma(alpha))
+#             y.extend([0,1,2])
+#         return torch.tensor(X,dtype=torch.float),torch.tensor(y,dtype=torch.long)
+#     def _expand(data,labels):
+#         batchsize = data.size()[0]
+#         expanded_data = torch.reshape(data,[batchsize*24,4,-1,4])
+#         expanded_labels = torch.reshape(labels,[batchsize*24])
+#         return expanded_data,expanded_labels
+#     return SequenceDataset(folder,_augment,_expand,preprocess=preprocess)
