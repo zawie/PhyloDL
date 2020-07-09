@@ -75,8 +75,6 @@ def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0.1,maximum=1):
         tre_str += str(tree) + ";\n"
     WriteToTre(tre_str)
 
-PureKingmanTreeConstructor(10)
-
 #Generator
 def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,f_matrix=None,TreeConstructor=PureKingmanTreeConstructor,pop_size=1):
     #Define structures
