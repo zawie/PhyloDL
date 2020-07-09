@@ -206,6 +206,12 @@ class SequenceDataset(Dataset):
         """
         return len(self.instances)
 
+    def __add__(self, other):
+        """
+        Merges to datasets
+        """
+        return MergedSequenceDataset(self,other)
+
 class MergedSequenceDataset(Dataset):
     def __init__(self,data0,data1):
         """
@@ -230,6 +236,11 @@ class MergedSequenceDataset(Dataset):
         Returns the number of entries in this dataset
         """
         return len(self.X_data)
+    def __add__(self, other):
+    """
+    Merges to datasets
+    """
+    return MergedSequenceDataset(self,other)
 
 def NonpermutedDataset(folder,preprocess=True):
     """
