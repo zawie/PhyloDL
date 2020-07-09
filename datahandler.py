@@ -16,6 +16,15 @@ def WriteToTre(txt):
     f.close()
 
 def seq_gen(file,m="HKY",n=1,l=200,r=None,f=None):
+    """
+    Makes an os.system seq gen call
+    file: file name to write to
+    m: Model to generate under
+    n: Number of sets of sequences to Generate
+    l: Sequence length
+    r: r_matrix
+    f: f_matrix
+    """
     if r!=None and f!=None:
         r_str = "_, "*(len(r)-1) + "_"
         f_str = "_, "*(len(f)-1) + "_"
@@ -34,14 +43,15 @@ def seq_gen(file,m="HKY",n=1,l=200,r=None,f=None):
         os.system(f"seq-gen -m{m} -n{n} -l{l} <tree.tre> {file}")
 
 def UniformTreeConstructor(amount,mean=0.1,std=0):
+    """
+    Generated all 5 tree families uniformilay
+    """
     template_trees = ["((A:_,B:_):_,(C:_,D:_):_)",
                       "(((A:_,B:_):_,C:_):_,D:_)",
                       "(A:_,(B:_,(C:_,D:_):_):_)",
                       "(((A:_,B:_):_,D:_):_,C:_)",
                       "(B:_,(A:_,(C:_,D:_):_):_)",
                       ]
-    """if symmetricOnly:
-        template_trees = ["((A:_,B:_):_,(C:_,D:_):_)"]"""
     #Create as many structures
     tre_str = ""
     for i in range(amount):
@@ -53,6 +63,15 @@ def UniformTreeConstructor(amount,mean=0.1,std=0):
     WriteToTre(tre_str)
 
 def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0.1,maximum=1):
+    """
+    Generates trees under the unconstrained Kingman’s coalescent process.
+    amount: amount of trees to Create
+    pop_size: some parameter of dendropy's pure_kingman_tree function
+    minimum: minimum tolerable branch length
+    maximum: maximum tolerable branch length
+
+    Writes to the .tre file
+    """
     TaxonNamespace = dendropy.TaxonNamespace(["A","B","C","D"])
     #Gemerate trees
     trees = []
@@ -77,6 +96,9 @@ def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0.1,maximum=1):
 
 #Generator
 def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,f_matrix=None,TreeConstructor=PureKingmanTreeConstructor,pop_size=1):
+    """
+    Creates tree structures & generates sequences based off of htem
+    """
     #Define structures
     if TreeConstructor == PureKingmanTreeConstructor:
         TreeConstructor(amount,pop_size=pop_size)
@@ -86,6 +108,9 @@ def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",r_ma
     seq_gen(f"data/{file_name}.dat",m=model,n=1,l=sequenceLength,r=r_matrix,f=f_matrix)
 
 def GenerateDatasets(amount_dictionary,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,f_matrix=None,TreeConstructor=PureKingmanTreeConstructor,pop_size=1):
+    """
+    Creates tree structures, generates sequences, returns dataset, for each key in amount_dictionary
+    """
     dataset_dictionary = dict()
     for key,amount in amount_dictionary.items():
         Generate(key,amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,r_matrix=r_matrix,f_matrix=f_matrix,TreeConstructor=TreeConstructor,pop_size=pop_size)
