@@ -7,8 +7,8 @@ import dataHandler
 import numpy as np
 from torch.utils.data import DataLoader
 
-IQTREE_PATH = "executables/iqtree-1.6.12-MacOSX/bin/iqtree"
-RAXML_PATH = "executables/raxmlHPC-AVX-v8/raxml"
+IQTREE_PATH = "executables/iqtree"
+RAXML_PATH = "executables/raxml"
 ML_PATH = "WORKING_DIRECTORY" #directory name and write write files to
 
 def unhotencode(sequence):
