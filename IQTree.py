@@ -7,7 +7,8 @@ import dataHandler
 import numpy as np
 from torch.utils.data import DataLoader
 
-IQTREE_PATH = "/Users/Adam/Desktop/iqtree-1.6.12-MacOSX/bin/iqtree "
+IQTREE_PATH = "executables/iqtree-1.6.12-MacOSX/bin/iqtree"
+RAXML_PATH = "executables/raxmlHPC-AVX-v8/raxml"
 ML_PATH = "ML_WORKING_DIRECTORY" #directory name and write write files to
 
 def unhotencode(sequence):
@@ -24,7 +25,7 @@ def unhotencode(sequence):
         final += (code_map[tuple(char.tolist())])
     return final
 
-def runML(name,dataset):
+def run(name,dataset,cmd):
     """
     Runs ML on file
     """
@@ -62,7 +63,8 @@ def runML(name,dataset):
                 write_f.close()
 
                 #Run ML
-                os.system(IQTREE_PATH + " -s " + WRITE_FILE_PATH + " -m TEST")
+                #os.system(IQTREE_PATH + " -s " + WRITE_FILE_PATH + " -m TEST")
+                cmd(WRITE_FILE_PATH)
 
                 #Access ML Output
                 ML_data = open(WRITE_FILE_PATH + ".treefile", "r")
@@ -90,6 +92,16 @@ def runML(name,dataset):
     os.rmdir(ML_PATH)
     #Return success rate
     return accuracy
+
+
+def runML(name,dataset):
+    cmd = lambda path: os.system(IQTREE_PATH + " -s " + WRITE_FILE_PATH + " -m TEST")
+    run(name,dataset, cmd)
+
+def runHC(name,dataset):
+    cmd = lambda path: os.system(RAXML_PATH + " -s " + WRITE_FILE_PATH + " -m TEST")
+    run(name,dataset, cmd)
+
 #Run program
 """
 dataset = dataHandler.NonpermutedDataset("dev")
