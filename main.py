@@ -1,6 +1,6 @@
 import modelHandler
 import dataHandler
-import MLHandler
+import IQTree
 import models
 import plotter
 
@@ -33,7 +33,7 @@ model = models.dnn3NoRes()
 modelHandler.Train(model,mergedData["train"],None,5,name="Merged Data",doLoad=False)
 model_accuracy,_ = modelHandler.Test(model,mergedData["test"],"Test")
 #Get ML Accuracy
-ML_accuracy = MLHandler.runML(name,mergedData['test'])
+ML_accuracy = IQTree.runML(name,mergedData['test'])
 simplify = lambda x: int(x*100*1000)/1000
 print(f"ML Accuracy:{simplify(ML_accuracy)}%\tModel Accuracy:{simplify(model_accuracy)}%")
 
