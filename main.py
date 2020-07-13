@@ -1,12 +1,12 @@
 import modelHandler
 import dataHandler
-import IQTree
+import IQRAX
 import models
 import plotter
 
 #Settings
 sequenceLength = 200
-data_amounts = {"train":5000,"dev":20,"test":1000}
+data_amounts = {"train":100,"dev":20,"test":100}
 mergedData = {}
 datas = {"Luay":{'m':"GTR",'r':[0.2173,0.9798,0.2575,0.1038,1,0.2070],'f':[0.2112,0.2888,0.2896,0.2104]},
          "Angiosperm":{'m':"GTR",'r':[1.61,3.82,0.27,1.56,4.99,1],'f':[0.34,0.15,0.18,0.33]},
@@ -29,13 +29,18 @@ for name,settings in datas.items():
             mergedData[key] = dataset
 
 #Train Model
+"""
 model = models.dnn3NoRes()
 modelHandler.Train(model,mergedData["train"],None,5,name="Merged Data",doLoad=False)
 model_accuracy,_ = modelHandler.Test(model,mergedData["test"],"Test")
+"""
 #Get ML Accuracy
-ML_accuracy = IQTree.runML(name,mergedData['test'])
-simplify = lambda x: int(x*100*1000)/1000
-print(f"ML Accuracy:{simplify(ML_accuracy)}%\tModel Accuracy:{simplify(model_accuracy)}%")
+simplify = lambda x: int(x*100*1000)/100
+print("\n\n\n\n\n\nDOING ML\n\n\n\n\n\n")
+ML_accuracy = simplify(IQRAX.runML(name,mergedData['test']))
+print("\n\n\n\n\n\nDOING HC\n\n\n\n\n\n")
+HC_accuracy = simplify(IQRAX.runHC(name,mergedData['test']))
+print(f"Accurcies\n\tML:{ML_accuracy}\n\tHC:{HC_accuracy}")
 
 #Pop Count Test
 """

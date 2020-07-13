@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 
 IQTREE_PATH = "executables/iqtree-1.6.12-MacOSX/bin/iqtree"
 RAXML_PATH = "executables/raxmlHPC-AVX-v8/raxml"
-ML_PATH = "ML_WORKING_DIRECTORY" #directory name and write write files to
+ML_PATH = "WORKING_DIRECTORY" #directory name and write write files to
 
 def unhotencode(sequence):
     """
@@ -95,11 +95,11 @@ def run(name,dataset,cmd):
 
 
 def runML(name,dataset):
-    cmd = lambda path: os.system(IQTREE_PATH + " -s " + WRITE_FILE_PATH + " -m TEST")
+    cmd = lambda path: os.system(IQTREE_PATH + " -s " + path + " -m TEST -nt AUTO")
     run(name,dataset, cmd)
 
 def runHC(name,dataset):
-    cmd = lambda path: os.system(RAXML_PATH + " -s " + WRITE_FILE_PATH + " -m TEST")
+    cmd = lambda path: os.system(RAXML_PATH + " -s " + path + " -m TEST")
     run(name,dataset, cmd)
 
 #Run program
