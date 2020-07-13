@@ -35,11 +35,11 @@ modelHandler.Train(model,mergedData["train"],None,5,name="Merged Data",doLoad=Fa
 model_accuracy,_ = modelHandler.Test(model,mergedData["test"],"Test")
 """
 #Get ML Accuracy
-simplify = lambda x: int(x*100*1000)/100
-print("\n\n\n\n\n\nDOING ML\n\n\n\n\n\n")
-ML_accuracy = simplify(IQRAX.runML(name,mergedData['test']))
+simplify = lambda x: int(x*100*1000)/1000
 print("\n\n\n\n\n\nDOING HC\n\n\n\n\n\n")
 HC_accuracy = simplify(IQRAX.runHC(name,mergedData['test']))
+print("\n\n\n\n\n\nDOING ML\n\n\n\n\n\n")
+ML_accuracy = simplify(IQRAX.runML(name,mergedData['test']))
 print(f"Accurcies\n\tML:{ML_accuracy}\n\tHC:{HC_accuracy}")
 
 #Pop Count Test

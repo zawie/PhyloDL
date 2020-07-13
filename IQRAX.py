@@ -62,13 +62,8 @@ def run(name,dataset,cmd):
                     write_f.write(f"{taxaChar}         {sequence}\n")
                 write_f.close()
 
-                #Run ML
-                #os.system(IQTREE_PATH + " -s " + WRITE_FILE_PATH + " -m TEST")
-                cmd(WRITE_FILE_PATH)
-
-                #Access ML Output
-                ML_data = open(WRITE_FILE_PATH + ".treefile", "r")
-                line = ML_data.read()
+                #Run Test
+                line = cmd(WRITE_FILE_PATH)
                 treeClass = treeClassifier.getClass(line)
                 final_f.write(f'({label},{treeClass})\t {line}')
 
@@ -76,10 +71,6 @@ def run(name,dataset,cmd):
                 trials += 1
                 if label == treeClass:
                     successes += 1
-                #removes files
-                suffixes = ["mldist","log","iqtree","ckp.gz","bionj","treefile"]
-                for suffix in suffixes:
-                    os.remove(f"{WRITE_FILE_PATH}.{suffix}")
 
     #Calculate accuracy
     accuracy = successes/trials
@@ -95,12 +86,35 @@ def run(name,dataset,cmd):
 
 
 def runML(name,dataset):
-    cmd = lambda path: os.system(IQTREE_PATH + " -s " + path + " -m TEST -nt AUTO")
-    run(name,dataset, cmd)
+    cmd = lambda path: os.system(f"{IQTREE_PATH} -s {path} -m GTR")
+    def ML(WRITE_FILE_PATH):
+        #Run os
+        os.system(f"{IQTREE_PATH} -s {WRITE_FILE_PATH} -m GTR")
+        #Read tree prediction
+        ML_data = open(WRITE_FILE_PATH + ".treefile", "r")
+        line = ML_data.read()
+        #Delete files
+        suffixes = ["mldist","log","iqtree","ckp.gz","bionj","treefile"]
+        for suffix in suffixes:
+            os.remove(f"{WRITE_FILE_PATH}.{suffix}")
+        #Return line (string)
+        return line
+    return run(name,dataset, ML)
 
 def runHC(name,dataset):
-    cmd = lambda path: os.system(RAXML_PATH + " -s " + path + " -m TEST")
-    run(name,dataset, cmd)
+    def HC(WRITE_FILE_PATH):
+        #Run os
+        os.system(f"{RAXML_PATH} -s {WRITE_FILE_PATH} -m GTRCAT -T 2 -n {name} -p 69")
+        #Read tree prediction
+        HC_data = open(f"RAxML_result.{name}", "r")
+        line = HC_data.read()
+        #Delete files
+        suffixes = ["info","log","parsimonyTree","result","bestTree"]
+        for suffix in suffixes:
+            os.remove(f"RAxML_{suffix}.{name}")
+        #return line
+        return line
+    return run(name,dataset, HC)
 
 #Run program
 """
