@@ -1,6 +1,6 @@
 #input an output of seq-gen
 #return a ML file modeled on every set of quartet trees
-
+import shutil
 import os
 import treeClassifier
 import dataHandler
@@ -56,7 +56,6 @@ def run(name,dataset,cmd):
                 trials += 1
                 if label == treeClass:
                     successes += 1
-
     #Calculate accuracy
     accuracy = successes/trials
     str_accuracy = str(int(accuracy*100*1000)/1000)+"%"
@@ -65,12 +64,12 @@ def run(name,dataset,cmd):
     final_f.close()
     #remove unnecessary directory and file
     os.remove(WRITE_FILE_PATH)
-    os.rmdir(ML_PATH)
+    shutil.rmtree(ML_PATH)
     #Return success rate
     return accuracy
 
 
-def runML(name,dataset):
+def runIQTREE(name,dataset):
     cmd = lambda path: os.system(f"{IQTREE_PATH} -s {path} -m GTR")
     def ML(WRITE_FILE_PATH):
         #Run os
@@ -86,7 +85,7 @@ def runML(name,dataset):
         return line
     return run(name,dataset, ML)
 
-def runHC(name,dataset):
+def runRAxML(name,dataset):
     def HC(WRITE_FILE_PATH):
         #Run os
         os.system(f"{RAXML_PATH} -s {WRITE_FILE_PATH} -m GTRCAT -T 2 -n {name} -p 69")
