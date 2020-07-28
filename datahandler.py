@@ -8,8 +8,6 @@ import dendropy
 import treeClassifier
 import hotEncoder
 
-#Constants
-TREES = ['alpha','beta','gamma']
 #Helper Function
 def WriteToTre(txt):
     f = open("tree.tre", "w")
@@ -42,26 +40,6 @@ def seq_gen(file,m="HKY",n=1,l=200,r=None,f=None):
         os.system(f'seq-gen -m{m} -n{n} -l{l} -r{r_str} <tree.tre> {file}')
     else:
         os.system(f"seq-gen -m{m} -n{n} -l{l} <tree.tre> {file}")
-
-def UniformTreeConstructor(amount,mean=0.1,std=0):
-    """
-    Generated all 5 tree families uniformilay
-    """
-    template_trees = ["((A:_,B:_):_,(C:_,D:_):_)",
-                      "(((A:_,B:_):_,C:_):_,D:_)",
-                      "(A:_,(B:_,(C:_,D:_):_):_)",
-                      "(((A:_,B:_):_,D:_):_,C:_)",
-                      "(B:_,(A:_,(C:_,D:_):_):_)",
-                      ]
-    #Create as many structures
-    tre_str = ""
-    for i in range(amount):
-        tree = template_trees[i%len(template_trees)]
-        for _ in range(6):
-            r = max(0.01,random.gauss(mean,std))
-            tree = tree.replace("_",str(r),1)
-        tre_str += tree + ";\n"
-    WriteToTre(tre_str)
 
 def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0.1,maximum=1):
     """
@@ -96,25 +74,22 @@ def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0.1,maximum=1):
     WriteToTre(tre_str)
 
 #Generator
-def Generate(file_name,amount,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,f_matrix=None,TreeConstructor=PureKingmanTreeConstructor,pop_size=1):
+def Generate(file_name,amount,sequenceLength=200,model="HKY",r_matrix=None,f_matrix=None,pop_size=1):
     """
     Creates tree structures & generates sequences based off of htem
     """
     #Define structures
-    if TreeConstructor == PureKingmanTreeConstructor:
-        TreeConstructor(amount,pop_size=pop_size)
-    else:
-        TreeConstructor(amount,mean=mean,std=std)
+    PureKingmanTreeConstructor(amount,pop_size=pop_size)
     #Generate
     seq_gen(f"data/{file_name}.dat",m=model,n=1,l=sequenceLength,r=r_matrix,f=f_matrix)
 
-def GenerateDatasets(amount_dictionary,sequenceLength=200,mean=0.1,std=0,model="HKY",r_matrix=None,f_matrix=None,TreeConstructor=PureKingmanTreeConstructor,pop_size=1):
+def GenerateDatasets(amount_dictionary,sequenceLength=200,model="HKY",r_matrix=None,f_matrix=None,pop_size=1):
     """
     Creates tree structures, generates sequences, returns dataset, for each key in amount_dictionary
     """
     dataset_dictionary = dict()
     for key,amount in amount_dictionary.items():
-        Generate(key,amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,r_matrix=r_matrix,f_matrix=f_matrix,TreeConstructor=TreeConstructor,pop_size=pop_size)
+        Generate(key,amount,sequenceLength=sequenceLength,mean=mean,std=std,model=model,r_matrix=r_matrix,f_matrix=f_matrix,pop_size=pop_size)
         dataset_dictionary[key] = NonpermutedDataset(key)
     return dataset_dictionary
 
@@ -132,23 +107,6 @@ def toGamma(alphaSeqeunces):
     """
     (A,B,C,D) = alphaSeqeunces
     return [A,C,B,D]
-
-def symmetricPermute(sequences):
-    """
-    Permutes the set of sequences into all possible orders that maintains
-    the same tree class
-    """
-    (A,B,C,D) = sequences
-    return [
-        [A,B,C,D],
-        [A,B,D,C],
-        [B,A,C,D],
-        [B,A,D,C],
-        [C,D,A,B],
-        [C,D,B,A],
-        [D,C,A,B],
-        [D,C,B,A]
-    ]
 
 #Readers
 def getInstances(file_path):
