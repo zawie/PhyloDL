@@ -186,5 +186,5 @@ def TrainAndTest(model,datasets,num_epochs,name="Model",doLoad=False,doPlot=True
     #Train model
     Train(model,datasets['train'],valset,num_epochs,name=name,doLoad=doLoad,doPlot=doPlot)
     #Do test & return accuracy
-    accuracy,_ = Test(model,datasets['test'],set,name=f'{name} Testing')
+    accuracy,_ = Test(model,datasets['test'],name=f'{name} Testing')
     return accuracy
