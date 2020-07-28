@@ -97,7 +97,7 @@ def getSequenceSets(file_path):
     """
     Reads all seqeunces generated into a python list
     Inputs: file_path: which seq-gen .dat file should be read from
-    Outputs: A list of lists of hotencoded sequences.
+    Outputs: A list of tensors of hotencoded sequences.
     """
     file = open(file_path,"r")
     data = []
@@ -115,7 +115,11 @@ def getSequenceSets(file_path):
             #Add sequence to dict
             taxaDict[taxaChar] = sequence
         if (pos+1)%5==0:
-            data[pos//5] = [taxaDict['A'],taxaDict['B'],taxaDict['C'],taxaDict['D']]
+            #Store into data
+            properOrder = [taxaDict['A'],taxaDict['B'],taxaDict['C'],taxaDict['D']]
+            tensor = torch.tensor(properOrder,dtype=torch.float)
+            data[pos//5] = tensor
+            #Clear dict
             taxaDict = dict()
     file.close()
     return data
@@ -124,13 +128,15 @@ def getTreeLabels(file_path):
     """
     Gets all the labels of a given .tre file, in order of appearence
     Inputs: file_path: the .tre file to extract classes from
-    Outputs: A list of tree lavels
+    Outputs: A list of tree tensors
     """
+
     file = open(file_path,"r")
     labels = []
     for pos,line in enumerate(file):
         treeClass = treeClassifier.getClass(line)
-        labels.append(treeClass)
+        treeClassTensor = torch.tensor(treeClass,dtype=torch.long)
+        labels.append(treeClassTensor)
     file.close()
     return labels
 
