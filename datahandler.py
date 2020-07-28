@@ -69,7 +69,6 @@ def PureKingmanTreeConstructor(tre_path,amount,pop_size=1,minimum=0.1,maximum=1)
     tre_str = ""
     for tree in trees:
         tre_str += str(tree) + ";\n"
-    return tre_str
     #Write to tre file
     with open(tre_path, "w") as f:
         f.write(tre_str)
