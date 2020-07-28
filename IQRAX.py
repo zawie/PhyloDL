@@ -5,25 +5,12 @@ import os
 import treeClassifier
 import dataHandler
 import numpy as np
+import hotEncoder
 from torch.utils.data import DataLoader
 
 IQTREE_PATH = "executables/iqtree"
 RAXML_PATH = "executables/raxml"
 ML_PATH = "WORKING_DIRECTORY" #directory name and write write files to
-
-def unhotencode(sequence):
-    """
-        Hot encodes inputted sequnce
-        "ATGC" -> [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
-    """
-    code_map = {(1,0,0,0):"A",
-                (0,1,0,0):"T",
-                (0,0,1,0):"G",
-                (0,0,0,1):"C"}
-    final = ""
-    for char in sequence:
-        final += (code_map[tuple(char.tolist())])
-    return final
 
 def run(name,dataset,cmd):
     """
@@ -57,7 +44,7 @@ def run(name,dataset,cmd):
                 write_f = open(WRITE_FILE_PATH, "a") #Set to append mode
                 write_f.write(f" 4 {sequenceLength}\n") #Writeheader
                 for j in range(4):
-                    sequence = unhotencode(sequences[j])
+                    sequence = hotEncoder.decode(sequences[j])
                     taxaChar = ["A","B","C","D"][j]
                     write_f.write(f"{taxaChar}         {sequence}\n")
                 write_f.close()

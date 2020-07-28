@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 import random
 import dendropy
 import treeClassifier
+import hotEncoder
 
 #Constants
 TREES = ['alpha','beta','gamma']
@@ -118,20 +119,6 @@ def GenerateDatasets(amount_dictionary,sequenceLength=200,mean=0.1,std=0,model="
     return dataset_dictionary
 
 #Sequence modifiers
-def hotencode(sequence):
-    """
-        Hot encodes inputted sequnce
-        "ATGC" -> [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
-    """
-    code_map = {"A":[1,0,0,0],
-                "T":[0,1,0,0],
-                "G":[0,0,1,0],
-                "C":[0,0,0,1]}
-    final = []
-    for char in sequence:
-        final.append(code_map[char])
-    return final
-
 def toBeta(alphaSeqeunces):
     """
     Transforms a given alpha sequences to a beta tree
@@ -182,7 +169,7 @@ def getInstances(file_path):
             taxaChar = line[0]
             sequence = line[10:-1]
             #Hot encode
-            sequence = hotencode(sequence)
+            sequence = hotEncoder.encode(sequence)
             #Add sequence to dict
             taxaDict[taxaChar] = sequence
         if (pos+1)%5==0:
