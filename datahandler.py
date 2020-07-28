@@ -80,6 +80,9 @@ def GenerateDatasets(amount_dictionary,sequenceLength=200,model="HKY",r_matrix=N
     """
     dataset_dictionary = dict()
     for folderName,amount in amount_dictionary.items():
+        #Check if directory needs to be created & create it
+        if not os.path.exists(f"data/{folderName}"):
+            os.mkdir(f"data/{folderName}")
         #Generate
         ##Define structures
         PureKingmanTreeConstructor(getTrePath(folderName),amount,pop_size=pop_size)
