@@ -177,3 +177,14 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False,doPlot=True
 
         #Save model at end of epoch
         Save(model,f"{name}")
+
+def TrainAndTest(model,datasets,num_epochs,name="Model",doLoad=False,doPlot=True):
+    #Fetch val set if it exists
+    valset = None
+    if 'dev' in datasets:
+        valset = datasets['dev']
+    #Train model
+    Train(model,datasets['train'],valset,num_epochs,name=name,doLoad=doLoad,doPlot=doPlot)
+    #Do test & return accuracy
+    accuracy,_ = Test(model,datasets['test'],set,name=f'{name} Testing')
+    return accuracy
