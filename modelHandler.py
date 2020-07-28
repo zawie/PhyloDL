@@ -76,6 +76,7 @@ def Test(model,dataset,name=None,criterion=None):
         #Add batch axis
         inputs.unsqueeze_(0)
         labels.unsqueeze_(0)
+        labels = torch.reshape(labels,[-1])
         #Run model
         outputs = model(inputs)
         #Check accuracy
