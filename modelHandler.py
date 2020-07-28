@@ -145,15 +145,15 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
             train_t += t
             #Long epoch save/log step
             if i % 100 == 0 and i > 0:
-                print(f'\tEpoch [{epoch+1}/{num_epochs}], Batch [{i+1}/{total_step}]')
                 #Plot Training Loss
                 plotter.line("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
                 loss_list = list()
                 #Log validation mid long epoch
+                val_results = None
                 if valset:
                     success_rate,average_loss = Test(model,valset,criterion=criterion)
                     print_succes_rate = int(success_rate*10000000)/100000
-                    print(f"\tValidation Accuracy: {print_succes_rate}%")
+                    val_results = f"\tValidation Accuracy: {print_succes_rate}%"
                     plotter.line("Validation Accuracy",[epoch + i/total_step],[success_rate],window=name)
                     plotter.line("Validation Loss",[epoch + i/total_step],[average_loss],window=name)
                 #Log training accuracy mide long epoch
@@ -167,5 +167,8 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
                     loss_list = list()
                 #Mid-Save
                 Save(model,f"{name}",doPrint=False)
+                #Print
+                print(f'\tEpoch [{epoch+1}/{num_epochs}], Batch [{i+1}/{total_step}], {val_results}')
+
         #Save model at end of epoch
         Save(model,f"{name}")
