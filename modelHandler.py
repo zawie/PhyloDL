@@ -97,7 +97,7 @@ def Test(model,dataset,name=None,criterion=None):
         print(f"\t{name} Results: {successes}/{trials} = {accuracy}%\n\tAverage loss:{average_loss}")
     return successes/trials,average_loss
 
-def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
+def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False,doPlot=True):
     """
     Trains a given model
     Inputs model - the model to be trained
@@ -125,9 +125,10 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
         #Dev test
         if valset:
             success_rate,average_loss = Test(model,valset,name="Validation",criterion=criterion)
-            plotter.line("Validation Accuracy",[epoch],[success_rate],window=name)
-            if epoch > 0:
-                plotter.line("Validation Loss",[epoch],[average_loss],window=name)
+            if doPlot:
+                plotter.line("Validation Accuracy",[epoch],[success_rate],window=name)
+                if epoch > 0:
+                    plotter.line("Validation Loss",[epoch],[average_loss],window=name)
         #Train
         print("Training...")
         for i, (inputs, labels) in enumerate(train_loader):
@@ -146,7 +147,8 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
             #Long epoch save/log step
             if i % 100 == 0 and i > 0:
                 #Plot Training Loss
-                plotter.line("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
+                if doPlot:
+                    plotter.line("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
                 loss_list = list()
                 #Log validation mid long epoch
                 val_results = None
@@ -154,16 +156,19 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
                     success_rate,average_loss = Test(model,valset,criterion=criterion)
                     print_succes_rate = int(success_rate*10000000)/100000
                     val_results = f"\tValidation Accuracy: {print_succes_rate}%"
-                    plotter.line("Validation Accuracy",[epoch + i/total_step],[success_rate],window=name)
-                    plotter.line("Validation Loss",[epoch + i/total_step],[average_loss],window=name)
+                    if doPlot:
+                        plotter.line("Validation Accuracy",[epoch + i/total_step],[success_rate],window=name)
+                        plotter.line("Validation Loss",[epoch + i/total_step],[average_loss],window=name)
                 #Log training accuracy mide long epoch
                 if train_t > 0:
-                    plotter.line("Training Accuracy",[epoch+ + i/total_step],[train_s/train_t],window=name)
+                    if doPlot:
+                        plotter.line("Training Accuracy",[epoch+ + i/total_step],[train_s/train_t],window=name)
                     train_s = 0
                     train_t = 0
                 #Plot Training loss
                 if len(loss_list) > 0:
-                    plotter.line("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
+                    if doPlot:
+                        plotter.line("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
                     loss_list = list()
                 #Mid-Save
                 Save(model,f"{name}",doPrint=False)
