@@ -57,17 +57,14 @@ def PureKingmanTreeConstructor(tre_path,amount,pop_size=1,minimum=0.1,maximum=1)
     trees = []
     while len(trees) < amount:
         tree = dendropy.simulate.treesim.pure_kingman_tree(TaxonNamespace,pop_size)
-        treeClass = treeClassifier.getClass(str(tree))
-        #Only add alphas
-        if treeClass == 0:
-            #Remove if tree has too short branch Length
-            invalid = False
-            for edge in tree.edges():
-                if (edge.length < minimum and edge.length > 0) or (edge.length > maximum):
-                    invalid = True
-                    break
-            if not invalid:
-                trees.append(tree)
+        #Remove if tree has too short branch Length
+        invalid = False
+        for edge in tree.edges():
+            if (edge.length < minimum and edge.length > 0) or (edge.length > maximum):
+                invalid = True
+                break
+        if not invalid:
+            trees.append(tree)
     #Create string
     tre_str = ""
     for tree in trees:
