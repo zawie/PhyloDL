@@ -73,10 +73,9 @@ def Test(model,dataset,name=None,criterion=None):
     for datapoint in dataset:
         #Break up datapoount
         (inputs,labels) = datapoint
-        #Add batch axis & expand
+        #Add batch axis
         inputs.unsqueeze_(0)
         labels.unsqueeze_(0)
-        inputs,labels = dataset.expand(inputs,labels)
         #Run model
         outputs = model(inputs)
         #Check accuracy
@@ -131,7 +130,6 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False):
         #Train
         print("Training...")
         for i, (inputs, labels) in enumerate(train_loader):
-            inputs,labels = trainset.expand(inputs,labels)
             # Run the forward pass
             outputs = model(inputs)
             loss = criterion(outputs, labels)

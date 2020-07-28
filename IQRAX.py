@@ -32,8 +32,6 @@ def run(name,dataset,cmd):
     loader = DataLoader(dataset=dataset, batch_size=1, shuffle=False)
     #Iterate through dataloader
     for i, (inputs, labels) in enumerate(loader):
-        #expand data
-        inputs, labels = dataset.expand(inputs, labels)
         j = -1
         for (sequences,label) in zip(inputs,labels):
             j += 1
