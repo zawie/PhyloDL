@@ -120,6 +120,20 @@ def getSequenceSets(file_path):
     file.close()
     return data
 
+def getTreeLabels(file_path):
+    """
+    Gets all the labels of a given .tre file, in order of appearence
+    Inputs: file_path: the .tre file to extract classes from
+    Outputs: A list of tree lavels
+    """
+    file = open(file_path,"r")
+    labels = []
+    for pos,line in enumerate(file):
+        treeClass = treeClassifier.getClass(line)
+        labels.append(treeClass)
+    file.close()
+    return labels
+
 #Datasets
 class SequenceDataset(Dataset):
     def __init__(self,folderName):
