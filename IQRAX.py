@@ -100,10 +100,3 @@ def runHC(name,dataset):
         #return line
         return line
     return run(name,dataset, HC)
-
-#Run program
-"""
-dataset = dataHandler.NonpermutedDataset("dev")
-accuracy = runML("dev",dataset)
-print(accuracy)
-"""
