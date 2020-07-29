@@ -16,14 +16,13 @@ for sL in [20]:
 
     #ML Tests
     testset = datasets['test']
-    dataset_name = "Simple"
-    results['IQTREE'] = runIQTREE(dataset_name,testset)
-    results['RAxML (Inference)'] = runRAxML(dataset_name,testset)
+    results['IQTREE'] = runIQTREE(testset)
+    results['RAxML (Inference)'] = runRAxML(testset)
     results['RAxML (Classification)'] = 0
 
     #DL Models Train & Testing
-    results['ResNet']  = TrainAndTest(dnn3(),datasets,NUM_EPOCHS,f"ResNet: sequenceLength={sL}",doPlot=False)
-    results['ConvNet']  = TrainAndTest(dnn3NoRes(),datasets,NUM_EPOCHS,f"ConvNet: sequenceLength={sL}",doPlot=False)
+    results['ResNet (dnn3)']  = TrainAndTest(dnn3(),datasets,NUM_EPOCHS,f"ResNet: sequenceLength={sL}",doPlot=False)
+    results['ConvNet (dnn3)']  = TrainAndTest(dnn3NoRes(),datasets,NUM_EPOCHS,f"ConvNet: sequenceLength={sL}",doPlot=False)
 
     #Print and plot results
     print(f"Accuracies for sequenceLength={sL}")

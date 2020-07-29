@@ -12,7 +12,7 @@ IQTREE_PATH = "executables/iqtree"
 RAXML_PATH = "executables/raxml"
 ML_PATH = "WORKING_DIRECTORY" #directory name and write write files to
 
-def run(name,dataset,cmd):
+def run(dataset,cmd,name=None):
     """
     Runs ML on file
     """
@@ -24,10 +24,11 @@ def run(name,dataset,cmd):
     WRITE_FILE = "/removable_file.dat"
     WRITE_FILE_PATH = ML_PATH + WRITE_FILE
     write_f = open(WRITE_FILE_PATH, "x")
-    final_path = f'ML_results/{name}_results.txt'
-    final_f = open(final_path, "w")
-    final_f = open(final_path, "a")
-    final_f.write('(Label,Guess)\t<NewickTree>\n')
+    if name:
+        final_path = f'ML_results/{name}_results.txt'
+        final_f = open(final_path, "w")
+        final_f = open(final_path, "a")
+        final_f.write('(Label,Guess)\t<NewickTree>\n')
     #Create loader
     loader = DataLoader(dataset=dataset, batch_size=1, shuffle=False)
     #Iterate through dataloader
@@ -50,7 +51,8 @@ def run(name,dataset,cmd):
                 #Run Test
                 line = cmd(WRITE_FILE_PATH)
                 treeClass = treeClassifier.getClass(line)
-                final_f.write(f'({label},{treeClass})\t {line}')
+                if name:
+                    final_f.write(f'({label},{treeClass})\t {line}')
 
                 #log succes/trial
                 trials += 1
@@ -58,10 +60,10 @@ def run(name,dataset,cmd):
                     successes += 1
     #Calculate accuracy
     accuracy = successes/trials
-    str_accuracy = str(int(accuracy*100*1000)/1000)+"%"
-    final_f.write(f'\nAccuracy = {str_accuracy}')
-    #Close final file
-    final_f.close()
+    if name:
+        str_accuracy = str(int(accuracy*100*1000)/1000)+"%"
+        final_f.write(f'\nAccuracy = {str_accuracy}')
+        final_f.close()
     #remove unnecessary directory and file
     os.remove(WRITE_FILE_PATH)
     shutil.rmtree(ML_PATH)
@@ -69,7 +71,7 @@ def run(name,dataset,cmd):
     return accuracy
 
 
-def runIQTREE(name,dataset):
+def runIQTREE(dataset,name=None):
     cmd = lambda path: os.system(f"{IQTREE_PATH} -s {path} -m GTR")
     def ML(WRITE_FILE_PATH):
         #Run os
@@ -83,9 +85,9 @@ def runIQTREE(name,dataset):
             os.remove(f"{WRITE_FILE_PATH}.{suffix}")
         #Return line (string)
         return line
-    return run(name,dataset, ML)
+    return run(dataset,ML,name=name)
 
-def runRAxML(name,dataset):
+def runRAxML(dataset,name=None):
     def HC(WRITE_FILE_PATH):
         #Run os
         os.system(f"{RAXML_PATH} -s {WRITE_FILE_PATH} -m GTRCAT -T 2 -n {name} -p 69")
@@ -98,4 +100,4 @@ def runRAxML(name,dataset):
             os.remove(f"RAxML_{suffix}.{name}")
         #return line
         return line
-    return run(name,dataset, HC)
+    return run(dataset,HC,name=name)
