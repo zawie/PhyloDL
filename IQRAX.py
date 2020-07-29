@@ -2,6 +2,7 @@
 #return a ML file modeled on every set of quartet trees
 import shutil
 import os
+import re
 import treeClassifier
 import dataHandler
 import numpy as np
@@ -49,15 +50,20 @@ def run(dataset,cmd,name=None):
                 write_f.close()
 
                 #Run Test
-                line = cmd(WRITE_FILE_PATH)
-                treeClass = treeClassifier.getClass(line)
-                if name:
-                    final_f.write(f'({label},{treeClass})\t {line}')
+                try:
+                    line = cmd(WRITE_FILE_PATH)
+                    treeClass = treeClassifier.getClass(line)
+                    if name:
+                        final_f.write(f'({label},{treeClass})\t {line}')
+                    #log succes/trial
+                    trials += 1
+                    if label == treeClass:
+                        successes += 1
+                except:
+                    print("Oops! Something went wrong...")
+                    #Sometimes ML fails when two sequences are identical
+                    #So this is a nice save for now...
 
-                #log succes/trial
-                trials += 1
-                if label == treeClass:
-                    successes += 1
     #Calculate accuracy
     accuracy = successes/trials
     if name:
@@ -98,6 +104,39 @@ def runRAxML(dataset,name=None):
         suffixes = ["info","log","parsimonyTree","result","bestTree"]
         for suffix in suffixes:
             os.remove(f"RAxML_{suffix}.{name}")
+        #return line
+        return line
+    return run(dataset,HC,name=name)
+
+def runRAxMLClassification(dataset,name=None):
+    def doRegex(txt):
+        regex = r" Tree #\d, final logLikelihood\: ([-+]?\d*\.\d+|\d+)"
+        matches = re.finditer(regex, txt, re.MULTILINE)
+        groups = []
+        for matchNum, match in enumerate(matches, start=1):
+            for groupNum in range(0, len(match.groups())):
+                groupNum = groupNum + 1
+                group = match.group(groupNum)
+                groups.append(float(group))
+        return groups
+
+    def HC(WRITE_FILE_PATH):
+        #Run os
+        os.system(f"raxml-ng --evaluate --msa {WRITE_FILE_PATH} --tree topologies.newick --model JC --threads 1")
+        #Read tree prediction
+        matches = []
+        txt = open("WORKING_DIRECTORY/removable_file.dat.raxml.log", "r").read()
+        matches = doRegex(txt)
+        index = matches.index(max(matches))
+        line = None
+        for position,l in enumerate(open("topologies.newick")):
+            if position == index:
+                line = l
+                break
+        #Delete files
+        suffixes = ["bestModel","bestTree","log","mlTrees","rba","startTree"]
+        for suffix in suffixes:
+            os.remove(f"{WRITE_FILE_PATH}.raxml.{suffix}")
         #return line
         return line
     return run(dataset,HC,name=name)

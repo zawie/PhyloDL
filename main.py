@@ -2,7 +2,7 @@
 from modelHandler import TrainAndTest
 from dataHandler import GenerateDatasets
 from models import dnn3,dnn3NoRes
-from IQRAX import runRAxML,runIQTREE
+from IQRAX import runRAxML,runIQTREE,runRAxMLClassification
 from plotter import line
 
 #Run Sequence Length vs. Accuracy Test
@@ -18,7 +18,7 @@ for sL in [20]:
     testset = datasets['test']
     results['IQTREE'] = runIQTREE(testset)
     results['RAxML (Inference)'] = runRAxML(testset)
-    results['RAxML (Classification)'] = 0
+    results['RAxML (Classification)'] = runRAxMLClassification(testset)
 
     #DL Models Train & Testing
     results['ResNet (dnn3)']  = TrainAndTest(dnn3(),datasets,NUM_EPOCHS,f"ResNet: sequenceLength={sL}",doPlot=False)
