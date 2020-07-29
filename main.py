@@ -10,7 +10,7 @@ import time
 TIME_STAMP = time.time()
 
 #Generate Random GTR models:
-evoCount = 5
+evoCount = 10
 GTR_MODELS = []
 GTR_MODEL_TXT = f"results/frequencies{TIME_STAMP}.txt"
 for i in range(evoCount):
@@ -35,7 +35,7 @@ for sL in [20,40,80.160,320,640,1280,2560]:
     results = dict()
 
     #Generate Data
-    amounts = {"train":10,"test":10,"dev":1}
+    amounts = {"train":1000,"test":100}
     datasets = GenerateMergedGTRDatasets(amounts,GTR_MODELS,sequenceLength=sL)
 
     #ML Tests
