@@ -113,6 +113,9 @@ def runRAxML(dataset):
             os.remove(f"RAxML_{suffix}.{stamp}")
         #return line
         return line
+    for fname in os.listdir("."):
+        if fname.startswith("RAxML_info"):
+            os.remove(fname)
     return run(dataset,HC,name=name)
 
 def runRAxMLClassification(dataset):
