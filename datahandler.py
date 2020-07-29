@@ -107,12 +107,15 @@ def seq_gen(folderName,m="HKY",n=1,l=200,r=None,f=None):
     TRE_FILE = getTrePath(folderName)
     DAT_FILE = getDatPath(folderName)
     if r!=None and f!=None:
-        r_str = "_, "*(len(r)-1) + "_"
-        f_str = "_, "*(len(f)-1) + "_"
-        for i in range(6):
-            r_str = r_str.replace("_",str(r[i]),1)
-        for j in range(4):
-            f_str = f_str.replace("_",str(f[j]),1)
+        r_str = r
+        f_str = f
+        if type(r) != type(str()):
+            r_str = "_, "*(len(r)-1) + "_"
+            f_str = "_, "*(len(f)-1) + "_"
+            for i in range(6):
+                r_str = r_str.replace("_",str(r[i]),1)
+            for j in range(4):
+                f_str = f_str.replace("_",str(f[j]),1)
         #print(f"\n\n\n\n\n\n\n\n\n-r{r_str}\n-f{f_str}\n\n\n\n\n\n\n\n")
         os.system(f'seq-gen -m{m} -n{n} -l{l} -r{r_str} -f{f_str} <{TRE_FILE}> {DAT_FILE}')
     elif r != None:
@@ -171,3 +174,18 @@ def GenerateDatasets(amount_dictionary,sequenceLength=200,model="HKY",r_matrix=N
         #Generate and save dataset
         dataset_dictionary[folderName] = SequenceDataset(folderName)
     return dataset_dictionary
+
+def GenerateMergedGTRDatasets(amount_dictionary,models,sequenceLength=200,pop_size=1):
+    merged_dicionary = dict()
+    for i in range(len(models)):
+        #Extrace frequencies from model
+        (base_freq,rate_mx) = models[i]
+        #Generate datasets
+        dataset_dictionary = GenerateDatasets(amount_dictionary,sequenceLength=sequenceLength,model="GTR",r_matrix=rate_mx,f_matrix=base_freq,pop_size=pop_size)
+        for name,dataset in dataset_dictionary.items():
+            #Default dictioanry, more or less
+            if i > 0:
+                merged_dicionary[name] += dataset
+            else:
+                merged_dicionary[name] = dataset
+    return merged_dicionary
