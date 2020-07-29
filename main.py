@@ -1,24 +1,35 @@
 #Import necessary functions
 from modelHandler import TrainAndTest
-from dataHandler import GenerateDatasets
+from dataHandler import GenerateDatasets,GenerateMergedGTRDatasets
 from models import dnn3,dnn3NoRes
 from IQRAX import runRAxML,runIQTREE,runRAxMLClassification
 from plotter import line
+from evomodels import GTR as getRandomGTRValues
+
+#Generate Random GTR models:
+evoCount = 5
+GTR_MODELS = []
+for i in range(evoCount):
+    _,base_freq,_,rate_mx = getRandomGTRValues()
+    print(f"\nRandom GTR Model ({i+1}/{evoCount}):\n\tBase Frequency:{base_freq}\n\tRate Matrix:{rate_mx}\n")
+    GTR_MODELS.append((base_freq,rate_mx))
+    # TODO: Write models to a .txt
 
 #Run Sequence Length vs. Accuracy Test
 NUM_EPOCHS = 3
-for sL in [20]:
+for sL in [20,40,80.160,320,640,1280,2560]:
     #Define results dictionary
     results = dict()
 
     #Generate Data
-    datasets = GenerateDatasets({"train":1000,"test":100,"dev":10},sequenceLength=sL)
+    amounts = {"train":10,"test":10,"dev":1}
+    datasets = GenerateMergedGTRDatasets(amounts,GTR_MODELS,sequenceLength=sL)
 
     #ML Tests
     testset = datasets['test']
-    results['IQTREE'] = runIQTREE(testset)
-    results['RAxML (Inference)'] = runRAxML(testset)
     results['RAxML (Classification)'] = runRAxMLClassification(testset)
+    results['RAxML (Inference)'] = runRAxML(testset)
+    results['IQTREE'] = runIQTREE(testset)
 
     #DL Models Train & Testing
     results['ResNet (dnn3)']  = TrainAndTest(dnn3(),datasets,NUM_EPOCHS,f"ResNet: sequenceLength={sL}",doPlot=False)
@@ -32,5 +43,4 @@ for sL in [20]:
         #Plot result
         line(name,[sL],[accuracy],window='Sequence Length vs. Accuracy',xlabel="Sequence Length")
 
-    #Save results to CSV
-    # TODO: Actually implement this
+    # TODO: Save results to a .csv

@@ -8,10 +8,14 @@ import dataHandler
 import numpy as np
 import hotEncoder
 from torch.utils.data import DataLoader
+import time
 
 IQTREE_PATH = "executables/iqtree"
 RAXML_PATH = "executables/raxml"
 ML_PATH = "WORKING_DIRECTORY" #directory name and write write files to
+
+if os.path.exists(ML_PATH):
+    shutil.rmtree(ML_PATH)
 
 def run(dataset,cmd,name=None):
     """
@@ -59,25 +63,26 @@ def run(dataset,cmd,name=None):
                     trials += 1
                     if label == treeClass:
                         successes += 1
-                except:
-                    print("Oops! Something went wrong...")
+                except Exception as e:
+                    print(f"Oops! Something went wrong...\n\t{str(e)}")
                     #Sometimes ML fails when two sequences are identical
                     #So this is a nice save for now...
 
+    #remove unnecessary directory and file
+    os.remove(WRITE_FILE_PATH)
+    shutil.rmtree(ML_PATH)
     #Calculate accuracy
     accuracy = successes/trials
     if name:
         str_accuracy = str(int(accuracy*100*1000)/1000)+"%"
         final_f.write(f'\nAccuracy = {str_accuracy}')
         final_f.close()
-    #remove unnecessary directory and file
-    os.remove(WRITE_FILE_PATH)
-    shutil.rmtree(ML_PATH)
     #Return success rate
     return accuracy
 
 
-def runIQTREE(dataset,name=None):
+def runIQTREE(dataset):
+    name = 'IQTREE Inference'
     cmd = lambda path: os.system(f"{IQTREE_PATH} -s {path} -m GTR")
     def ML(WRITE_FILE_PATH):
         #Run os
@@ -93,22 +98,25 @@ def runIQTREE(dataset,name=None):
         return line
     return run(dataset,ML,name=name)
 
-def runRAxML(dataset,name=None):
+def runRAxML(dataset):
+    name = 'RAxML Inference'
     def HC(WRITE_FILE_PATH):
         #Run os
-        os.system(f"{RAXML_PATH} -s {WRITE_FILE_PATH} -m GTRCAT -T 2 -n {name} -p 69")
+        stamp = time.time()*1000000000
+        os.system(f"{RAXML_PATH} -s {WRITE_FILE_PATH} -m GTRCAT -T 2 -n {stamp} -p 69")
         #Read tree prediction
-        HC_data = open(f"RAxML_result.{name}", "r")
+        HC_data = open(f"RAxML_result.{stamp}", "r")
         line = HC_data.read()
         #Delete files
         suffixes = ["info","log","parsimonyTree","result","bestTree"]
         for suffix in suffixes:
-            os.remove(f"RAxML_{suffix}.{name}")
+            os.remove(f"RAxML_{suffix}.{stamp}")
         #return line
         return line
     return run(dataset,HC,name=name)
 
-def runRAxMLClassification(dataset,name=None):
+def runRAxMLClassification(dataset):
+    name = 'RAxML Classification'
     def doRegex(txt):
         regex = r" Tree #\d, final logLikelihood\: ([-+]?\d*\.\d+|\d+)"
         matches = re.finditer(regex, txt, re.MULTILINE)
