@@ -5,15 +5,28 @@ from models import dnn3,dnn3NoRes
 from IQRAX import runRAxML,runIQTREE,runRAxMLClassification
 from plotter import line
 from evomodels import GTR as getRandomGTRValues
+from csv import writer
+import time
+TIME_STAMP = time.time()
 
 #Generate Random GTR models:
 evoCount = 5
 GTR_MODELS = []
+GTR_MODEL_TXT = f"results/frequencies{TIME_STAMP}.txt"
 for i in range(evoCount):
     _,base_freq,_,rate_mx = getRandomGTRValues()
     print(f"\nRandom GTR Model ({i+1}/{evoCount}):\n\tBase Frequency:{base_freq}\n\tRate Matrix:{rate_mx}\n")
     GTR_MODELS.append((base_freq,rate_mx))
-    # TODO: Write models to a .txt
+    #Write to a txt
+    with open(GTR_MODEL_TXT, 'a') as file_obj:
+        file_obj.write(f"\nRandom GTR Model ({i+1}/{evoCount}):\n\tBase Frequency:{base_freq}\n\tRate Matrix:{rate_mx}\n")
+
+#Geneate a CSV file to save accuries:
+CSV_FILE_PATH = f"results/accuracies{TIME_STAMP}.csv"
+with open(CSV_FILE_PATH, 'w+', newline='') as write_obj:
+    csv_writer = writer(write_obj)
+    row = ['ResNet (dnn3','ConvNet (dnn3)','RAxML (Classification)','RAxML (Inference)','IQTREE']
+    csv_writer.writerow(row)
 
 #Run Sequence Length vs. Accuracy Test
 NUM_EPOCHS = 3
@@ -43,4 +56,9 @@ for sL in [20,40,80.160,320,640,1280,2560]:
         #Plot result
         line(name,[sL],[accuracy],window='Sequence Length vs. Accuracy',xlabel="Sequence Length")
 
-    # TODO: Save results to a .csv
+    #Save results to a .csv
+    with open(CSV_FILE_PATH, 'a+', newline='') as write_obj:
+        csv_writer = writer(write_obj)
+        r = results
+        row = [r['ResNet (dnn3)'],r['ConvNet (dnn3)'],r['RAxML (Classification)'],r['RAxML (Inference)'],r['IQTREE']]
+        csv_writer.writerow(row)
