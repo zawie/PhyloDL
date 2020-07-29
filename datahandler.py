@@ -12,85 +12,6 @@ import hotEncoder
 getDatPath = lambda folderName: f'data/{folderName}/sequences.dat'
 getTrePath = lambda folderName: f'data/{folderName}/trees.tre'
 
-#Helper Function
-def seq_gen(folderName,m="HKY",n=1,l=200,r=None,f=None):
-    """
-    Makes an os.system seq gen call
-    file: file name to write to
-    m: Model to generate under
-    n: Number of sets of sequences to Generate
-    l: Sequence length
-    r: r_matrix
-    f: f_matrix
-    """
-    TRE_FILE = getTrePath(folderName)
-    DAT_FILE = getDatPath(folderName)
-    if r!=None and f!=None:
-        r_str = "_, "*(len(r)-1) + "_"
-        f_str = "_, "*(len(f)-1) + "_"
-        for i in range(6):
-            r_str = r_str.replace("_",str(r[i]),1)
-        for j in range(4):
-            f_str = f_str.replace("_",str(f[j]),1)
-        #print(f"\n\n\n\n\n\n\n\n\n-r{r_str}\n-f{f_str}\n\n\n\n\n\n\n\n")
-        os.system(f'seq-gen -m{m} -n{n} -l{l} -r{r_str} -f{f_str} <{TRE_FILE}> {DAT_FILE}')
-    elif r != None:
-        r_str = "_, "*(len(r)-1) + "_"
-        for i in range(6):
-            r_str = r_str.replace("_",str(r[i]),1)
-        os.system(f'seq-gen -m{m} -n{n} -l{l} -r{r_str} <{TRE_FILE}> {DAT_FILE}')
-    else:
-        os.system(f"seq-gen -m{m} -n{n} -l{l} <{TRE_FILE}> {DAT_FILE}")
-
-def PureKingmanTreeConstructor(tre_path,amount,pop_size=1,minimum=0.1,maximum=1):
-    """
-    Generates trees under the unconstrained Kingman’s coalescent process.
-    amount: amount of trees to Create
-    pop_size: some parameter of dendropy's pure_kingman_tree function
-    minimum: minimum tolerable branch length
-    maximum: maximum tolerable branch length
-
-    Write to a .tre file
-    """
-    TaxonNamespace = dendropy.TaxonNamespace(["A","B","C","D"])
-    #Gemerate trees
-    trees = []
-    while len(trees) < amount:
-        tree = dendropy.simulate.treesim.pure_kingman_tree(TaxonNamespace,pop_size)
-        #Remove if tree has too short branch Length
-        invalid = False
-        for edge in tree.edges():
-            if (edge.length < minimum and edge.length > 0) or (edge.length > maximum):
-                invalid = True
-                break
-        if not invalid:
-            trees.append(tree)
-    #Create string
-    tre_str = ""
-    for tree in trees:
-        tre_str += str(tree) + ";\n"
-    #Write to tre file
-    with open(tre_path, "w") as f:
-        f.write(tre_str)
-
-def GenerateDatasets(amount_dictionary,sequenceLength=200,model="HKY",r_matrix=None,f_matrix=None,pop_size=1):
-    """
-    Creates tree structures, generates sequences, returns dataset, for each key in amount_dictionary
-    """
-    dataset_dictionary = dict()
-    for folderName,amount in amount_dictionary.items():
-        #Check if directory needs to be created & create it
-        if not os.path.exists(f"data/{folderName}"):
-            os.mkdir(f"data/{folderName}")
-        #Generate
-        ##Define structures
-        PureKingmanTreeConstructor(getTrePath(folderName),amount,pop_size=pop_size)
-        ##Call seq-gen
-        seq_gen(folderName,m=model,n=1,l=sequenceLength,r=r_matrix,f=f_matrix)
-        #Generate and save dataset
-        dataset_dictionary[folderName] = SequenceDataset(folderName)
-    return dataset_dictionary
-
 #Readers
 def getSequenceSets(file_path):
     """
@@ -171,3 +92,82 @@ class SequenceDataset(Dataset):
         self.X_data += other.X_data
         self.Y_data += other.Y_data
         return self
+
+#Helper Function
+def seq_gen(folderName,m="HKY",n=1,l=200,r=None,f=None):
+    """
+    Makes an os.system seq gen call
+    file: file name to write to
+    m: Model to generate under
+    n: Number of sets of sequences to Generate
+    l: Sequence length
+    r: r_matrix
+    f: f_matrix
+    """
+    TRE_FILE = getTrePath(folderName)
+    DAT_FILE = getDatPath(folderName)
+    if r!=None and f!=None:
+        r_str = "_, "*(len(r)-1) + "_"
+        f_str = "_, "*(len(f)-1) + "_"
+        for i in range(6):
+            r_str = r_str.replace("_",str(r[i]),1)
+        for j in range(4):
+            f_str = f_str.replace("_",str(f[j]),1)
+        #print(f"\n\n\n\n\n\n\n\n\n-r{r_str}\n-f{f_str}\n\n\n\n\n\n\n\n")
+        os.system(f'seq-gen -m{m} -n{n} -l{l} -r{r_str} -f{f_str} <{TRE_FILE}> {DAT_FILE}')
+    elif r != None:
+        r_str = "_, "*(len(r)-1) + "_"
+        for i in range(6):
+            r_str = r_str.replace("_",str(r[i]),1)
+        os.system(f'seq-gen -m{m} -n{n} -l{l} -r{r_str} <{TRE_FILE}> {DAT_FILE}')
+    else:
+        os.system(f"seq-gen -m{m} -n{n} -l{l} <{TRE_FILE}> {DAT_FILE}")
+
+def PureKingmanTreeConstructor(tre_path,amount,pop_size=1,minimum=0.1,maximum=1):
+    """
+    Generates trees under the unconstrained Kingman’s coalescent process.
+    amount: amount of trees to Create
+    pop_size: some parameter of dendropy's pure_kingman_tree function
+    minimum: minimum tolerable branch length
+    maximum: maximum tolerable branch length
+
+    Write to a .tre file
+    """
+    TaxonNamespace = dendropy.TaxonNamespace(["A","B","C","D"])
+    #Gemerate trees
+    trees = []
+    while len(trees) < amount:
+        tree = dendropy.simulate.treesim.pure_kingman_tree(TaxonNamespace,pop_size)
+        #Remove if tree has too short branch Length
+        invalid = False
+        for edge in tree.edges():
+            if (edge.length < minimum and edge.length > 0) or (edge.length > maximum):
+                invalid = True
+                break
+        if not invalid:
+            trees.append(tree)
+    #Create string
+    tre_str = ""
+    for tree in trees:
+        tre_str += str(tree) + ";\n"
+    #Write to tre file
+    with open(tre_path, "w") as f:
+        f.write(tre_str)
+
+def GenerateDatasets(amount_dictionary,sequenceLength=200,model="HKY",r_matrix=None,f_matrix=None,pop_size=1):
+    """
+    Creates tree structures, generates sequences, returns dataset, for each key in amount_dictionary
+    """
+    dataset_dictionary = dict()
+    for folderName,amount in amount_dictionary.items():
+        #Check if directory needs to be created & create it
+        if not os.path.exists(f"data/{folderName}"):
+            os.mkdir(f"data/{folderName}")
+        #Generate
+        ##Define structures
+        PureKingmanTreeConstructor(getTrePath(folderName),amount,pop_size=pop_size)
+        ##Call seq-gen
+        seq_gen(folderName,m=model,n=1,l=sequenceLength,r=r_matrix,f=f_matrix)
+        #Generate and save dataset
+        dataset_dictionary[folderName] = SequenceDataset(folderName)
+    return dataset_dictionary
