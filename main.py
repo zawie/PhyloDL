@@ -10,7 +10,7 @@ import time
 TIME_STAMP = time.time()
 
 #Generate Random GTR models:
-evoCount = 10
+evoCount = 1
 GTR_MODELS = []
 GTR_MODEL_TXT = f"results/frequencies{TIME_STAMP}.txt"
 for i in range(evoCount):
@@ -29,13 +29,13 @@ with open(CSV_FILE_PATH, 'w+', newline='') as write_obj:
     csv_writer.writerow(row)
 
 #Run Sequence Length vs. Accuracy Test
-NUM_EPOCHS = 3
+NUM_EPOCHS = 5
 for sL in [20,40,80.160,320,640,1280,2560]:
     #Define results dictionary
     results = dict()
 
     #Generate Data
-    amounts = {"train":1000,"test":100}
+    amounts = {"train":10000,"test":100}
     datasets = GenerateMergedGTRDatasets(amounts,GTR_MODELS,sequenceLength=sL)
 
     #ML Tests
