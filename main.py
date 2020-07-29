@@ -36,7 +36,7 @@ with open(CSV_FILE_PATH, 'w+', newline='') as write_obj:
 
 #Run Sequence Length vs. Accuracy Test
 NUM_EPOCHS = 5
-for sL in [20,40,80.160,320,640,1280,2560]:
+for sL in [20,40,80,160,320,640,1280,2560]:
     #Define results dictionary
     results = dict()
 
