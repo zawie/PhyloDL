@@ -189,3 +189,21 @@ def GenerateMergedGTRDatasets(amount_dictionary,models,sequenceLength=200,pop_si
             else:
                 merged_dicionary[name] = dataset
     return merged_dicionary
+
+def GenerateMergedSpecificDatasets(amount_dictionary,model_dictionary,sequenceLength=200,pop_size=1):
+    mergedData = {}
+    #Create and merge all data
+    for name,settings in model_dictionary.items():
+        #Generate data
+        datasets = None
+        m = settings['m']
+        if m == 'JC':
+            datasets = GenerateDatasets(amount_dictionary,sequenceLength=sequenceLength)
+        else:
+            datasets = GenerateDatasets(amount_dictionary,sequenceLength=sequenceLength,model=m,r_matrix=settings['r'],f_matrix=settings['f'])
+        for key, dataset in datasets.items():
+            if key in mergedData:
+                mergedData[key] += dataset
+            else:
+                mergedData[key] = dataset
+    return mergedData

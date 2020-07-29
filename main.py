@@ -1,6 +1,6 @@
 #Import necessary functions
 from modelHandler import TrainAndTest
-from dataHandler import GenerateDatasets,GenerateMergedGTRDatasets
+from dataHandler import GenerateDatasets,GenerateMergedGTRDatasets,GenerateMergedSpecificDatasets
 from models import dnn3,dnn3NoRes
 from IQRAX import runRAxML,runIQTREE,runRAxMLClassification
 from plotter import line
@@ -10,7 +10,7 @@ import time
 TIME_STAMP = time.time()
 
 #Generate Random GTR models:
-evoCount = 1
+"""evoCount = 1
 GTR_MODELS = []
 GTR_MODEL_TXT = f"results/frequencies{TIME_STAMP}.txt"
 for i in range(evoCount):
@@ -20,7 +20,13 @@ for i in range(evoCount):
     #Write to a txt
     with open(GTR_MODEL_TXT, 'a') as file_obj:
         file_obj.write(f"\nRandom GTR Model ({i+1}/{evoCount}):\n\tBase Frequency:{base_freq}\n\tRate Matrix:{rate_mx}\n")
+"""
 
+#Define specific models
+SPECIFIC_MODELS = {"Luay":{'m':"GTR",'r':[0.2173,0.9798,0.2575,0.1038,1,0.2070],'f':[0.2112,0.2888,0.2896,0.2104]},
+         "Angiosperm":{'m':"GTR",'r':[1.61,3.82,0.27,1.56,4.99,1],'f':[0.34,0.15,0.18,0.33]},
+         "Simple":{'m':"JC"}
+        }
 #Geneate a CSV file to save accuries:
 CSV_FILE_PATH = f"results/accuracies{TIME_STAMP}.csv"
 with open(CSV_FILE_PATH, 'w+', newline='') as write_obj:
@@ -36,7 +42,8 @@ for sL in [20,40,80.160,320,640,1280,2560]:
 
     #Generate Data
     amounts = {"train":10000,"test":100}
-    datasets = GenerateMergedGTRDatasets(amounts,GTR_MODELS,sequenceLength=sL)
+    datasets = GenerateMergedSpecificDatasets(amounts,SPECIFIC_MODELS,sequenceLength=sL)
+    #datasets = GenerateMergedGTRDatasets(amounts,GTR_MODELS,sequenceLength=sL)
 
     #ML Tests
     testset = datasets['test']
