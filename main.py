@@ -56,8 +56,8 @@ for sL in [20,40,80,160,320,640,1280,2560]:
 
     #DL Models Train & Testing
     resnet = dnn3NoRes()
-    results['ResNet (dnn3)']  = TrainAndTest(resnet,datasets,NUM_EPOCHS,f"ResNet: sequenceLength={sL} | {SUBTITLE}",doPlot=True)
     convnet = dnn3()
+    results['ResNet (dnn3)']  = TrainAndTest(resnet,datasets,NUM_EPOCHS,f"ResNet: sequenceLength={sL} | {SUBTITLE}",doPlot=True)
     results['ConvNet (dnn3)']  = TrainAndTest(convnet,datasets,NUM_EPOCHS,f"ConvNet: sequenceLength={sL} | {SUBTITLE}",doPlot=True)
     print(results)
 

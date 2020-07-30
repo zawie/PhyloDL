@@ -7,6 +7,7 @@ import random
 import dendropy
 import treeClassifier
 import hotEncoder
+from transformations import transformSequences
 
 #File path lambdas
 getDatPath = lambda folderName: f'data/{folderName}/sequences.dat'
@@ -62,15 +63,24 @@ def getTreeLabels(file_path):
 
 #Datasets
 class SequenceDataset(Dataset):
-    def __init__(self,folderName):
+    def __init__(self,folderName,doTransform=True):
         """
         Initializes the Dataset.
         This primarily entiles reading the generated sequeences into a python list
         """
         #Define constants
         self.folders = [folderName]
-        self.X_data = getSequenceSets(getDatPath(folderName))
-        self.Y_data = getTreeLabels(getTrePath(folderName))
+        sequenceSets = getSequenceSets(getDatPath(folderName))
+        treeLabels =  getTreeLabels(getTrePath(folderName))
+        if doTransform:
+            self.X_data = list()
+            self.Y_data = list()
+            for (sequences,label) in zip(sequenceSets,treeLabels):
+                self.X_data.extend(transformSequences(sequences,labels))
+                self.Y_data.extend([0,1,2])
+        else:
+            self.X_data = sequenceSets
+            self.Y_data = treeLabels
 
     def __getitem__(self,index):
         """
