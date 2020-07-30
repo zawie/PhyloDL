@@ -38,35 +38,32 @@ def run(dataset,cmd,name=None):
     loader = DataLoader(dataset=dataset, batch_size=1, shuffle=False)
     #Iterate through dataloader
     for i, (inputs, labels) in enumerate(loader):
-        j = -1
         for (sequences,label) in zip(inputs,labels):
-            j += 1
-            if j % 3 == 0:
-                sequenceLength = sequences.size()[1]
-                #Write to temp file
-                write_f = open(WRITE_FILE_PATH, "w") #Clear file
-                write_f = open(WRITE_FILE_PATH, "a") #Set to append mode
-                write_f.write(f" 4 {sequenceLength}\n") #Writeheader
-                for j in range(4):
-                    sequence = hotEncoder.decode(sequences[j])
-                    taxaChar = ["A","B","C","D"][j]
-                    write_f.write(f"{taxaChar}         {sequence}\n")
-                write_f.close()
+            sequenceLength = sequences.size()[1]
+            #Write to temp file
+            write_f = open(WRITE_FILE_PATH, "w") #Clear file
+            write_f = open(WRITE_FILE_PATH, "a") #Set to append mode
+            write_f.write(f" 4 {sequenceLength}\n") #Writeheader
+            for j in range(4):
+                sequence = hotEncoder.decode(sequences[j])
+                taxaChar = ["A","B","C","D"][j]
+                write_f.write(f"{taxaChar}         {sequence}\n")
+            write_f.close()
 
-                #Run Test
-                try:
-                    line = cmd(WRITE_FILE_PATH)
-                    treeClass = treeClassifier.getClass(line)
-                    if name:
-                        final_f.write(f'({label},{treeClass})\t {line}')
-                    #log succes/trial
-                    trials += 1
-                    if label == treeClass:
-                        successes += 1
-                except Exception as e:
-                    print(f"Oops! Something went wrong...\n\t{str(e)}")
-                    #Sometimes ML fails when two sequences are identical
-                    #So this is a nice save for now...
+            #Run Test
+            try:
+                line = cmd(WRITE_FILE_PATH)
+                treeClass = treeClassifier.getClass(line)
+                if name:
+                    final_f.write(f'({label},{treeClass})\t {line}')
+                #log succes/trial
+                trials += 1
+                if label == treeClass:
+                    successes += 1
+            except Exception as e:
+                print(f"Oops! Something went wrong...\n\t{str(e)}")
+                #Sometimes ML fails when two sequences are identical
+                #So this is a nice save for now...
 
     #remove unnecessary directory and file
     os.remove(WRITE_FILE_PATH)
