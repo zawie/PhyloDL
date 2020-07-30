@@ -23,5 +23,5 @@ def decode(sequence):
                 (0,0,0,1):"C"}
     final = ""
     for char in sequence:
-        final += (code_map[tuple(char.tolist())])
+        final += code_map[tuple(char.tolist())]
     return final
