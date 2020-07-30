@@ -23,9 +23,9 @@ for i in range(evoCount):
 """
 
 #Define specific models
-SPECIFIC_MODELS = {"Luay":{'m':"GTR",'r':[0.2173,0.9798,0.2575,0.1038,1,0.2070],'f':[0.2112,0.2888,0.2896,0.2104]},
+SPECIFIC_MODELS = {#"Luay":{'m':"GTR",'r':[0.2173,0.9798,0.2575,0.1038,1,0.2070],'f':[0.2112,0.2888,0.2896,0.2104]},
          "Angiosperm":{'m':"GTR",'r':[1.61,3.82,0.27,1.56,4.99,1],'f':[0.34,0.15,0.18,0.33]},
-         "Simple":{'m':"JC"}
+         #"Simple":{'m':"JC"}
         }
 #Geneate a CSV file to save accuries:
 CSV_FILE_PATH = f"results/accuracies{TIME_STAMP}.csv"
@@ -35,13 +35,15 @@ with open(CSV_FILE_PATH, 'w+', newline='') as write_obj:
     csv_writer.writerow(row)
 
 #Run Sequence Length vs. Accuracy Test
-NUM_EPOCHS = 5
+NUM_EPOCHS = 4
+amounts = {"train":25000,"test":2500}
+
+SUBTITLE = f"epochs={NUM_EPOCHS},amounts={amounts},simulation=Angiosperm"
 for sL in [20,40,80,160,320,640,1280,2560]:
     #Define results dictionary
     results = dict()
 
     #Generate Data
-    amounts = {"train":10000,"test":100}
     datasets = GenerateMergedSpecificDatasets(amounts,SPECIFIC_MODELS,sequenceLength=sL)
     #datasets = GenerateMergedGTRDatasets(amounts,GTR_MODELS,sequenceLength=sL)
 
@@ -50,10 +52,14 @@ for sL in [20,40,80,160,320,640,1280,2560]:
     results['RAxML (Classification)'] = runRAxMLClassification(testset)
     results['RAxML (Inference)'] = runRAxML(testset)
     results['IQTREE'] = runIQTREE(testset)
+    print(results)
 
     #DL Models Train & Testing
-    results['ResNet (dnn3)']  = TrainAndTest(dnn3(),datasets,NUM_EPOCHS,f"ResNet: sequenceLength={sL}",doPlot=False)
-    results['ConvNet (dnn3)']  = TrainAndTest(dnn3NoRes(),datasets,NUM_EPOCHS,f"ConvNet: sequenceLength={sL}",doPlot=False)
+    resnet = dnn3NoRes()
+    results['ResNet (dnn3)']  = TrainAndTest(resnet,datasets,NUM_EPOCHS,f"ResNet: sequenceLength={sL} | {SUBTITLE}",doPlot=True)
+    convnet = dnn3()
+    results['ConvNet (dnn3)']  = TrainAndTest(convnet,datasets,NUM_EPOCHS,f"ConvNet: sequenceLength={sL} | {SUBTITLE}",doPlot=True)
+    print(results)
 
     #Print and plot results
     print(f"Accuracies for sequenceLength={sL}")
@@ -61,7 +67,7 @@ for sL in [20,40,80,160,320,640,1280,2560]:
         #Print result
         print(f"\t{name}: {int(accuracy*100*100)/100}%")
         #Plot result
-        line(name,[sL],[accuracy],window='Sequence Length vs. Accuracy',xlabel="Sequence Length")
+        line(name,[sL],[accuracy],window=f'Sequence Length vs. Accuracy | {SUBTITLE}',xlabel="Sequence Length")
 
     #Save results to a .csv
     with open(CSV_FILE_PATH, 'a+', newline='') as write_obj:
