@@ -198,9 +198,9 @@ def GenerateMergedSpecificDatasets(amount_dictionary,model_dictionary,sequenceLe
         datasets = None
         m = settings['m']
         if m == 'JC':
-            datasets = GenerateDatasets(amount_dictionary,sequenceLength=sequenceLength)
+            datasets = GenerateDatasets(amount_dictionary,sequenceLength=sequenceLength,pop_size=pop_size)
         else:
-            datasets = GenerateDatasets(amount_dictionary,sequenceLength=sequenceLength,model=m,r_matrix=settings['r'],f_matrix=settings['f'])
+            datasets = GenerateDatasets(amount_dictionary,sequenceLength=sequenceLength,model=m,r_matrix=settings['r'],f_matrix=settings['f'],pop_size=pop_size)
         for key, dataset in datasets.items():
             if key in mergedData:
                 mergedData[key] += dataset
