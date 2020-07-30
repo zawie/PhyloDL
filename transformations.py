@@ -1,3 +1,6 @@
+import torch
+toTensor = lambda sequence: torch.tensor(sequence,dtype=torch.float)
+
 #Alpha conveteres
 def alphaToBeta(alphaSeqeunces):
     """
@@ -47,10 +50,18 @@ def gammaToBeta(gammaSequences):
 def transformAlpha(alphaSequences):
     return [alphaSequences,alphaToBeta(alphaSequences),alphaToGamma(alphaSequences)]
 def transformBeta(betaSequences):
-    return [betaToAlpha(betaSequences),betaSequences,betaeToGamma(betaSequences)]
+    return [betaToAlpha(betaSequences),betaSequences,betaToGamma(betaSequences)]
 def transformGamma(gammaSequences):
     return [gammaToAlpha(gammaSequences),gammaToBeta(gammaSequences),gammaSequences]
 
-def transformSequences(sequences,label):
+def transformSequences(tensorSequences,label):
+    #Tensor -> List
+    sequenceSet = tensorSequences.tolist()
+    #Perform switch
     switch = {0:transformAlpha,1:transformBeta,2:transformGamma}
-    return switch[label](sequences)
+    listOfSequenceSets = switch[label](sequenceSet)
+    #List -> tensor
+    tensorSequenceSets = list()
+    for sequenceSet in listOfSequenceSets:
+        tensorSequenceSets.append(toTensor(sequenceSet))
+    return tensorSequenceSets

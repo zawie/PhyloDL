@@ -76,8 +76,9 @@ class SequenceDataset(Dataset):
             self.X_data = list()
             self.Y_data = list()
             for (sequences,label) in zip(sequenceSets,treeLabels):
-                self.X_data.extend(transformSequences(sequences,labels))
-                self.Y_data.extend([0,1,2])
+                toTensor = lambda n: torch.tensor(n,dtype=torch.long)
+                self.X_data.extend(transformSequences(sequences,label.tolist()))
+                self.Y_data.extend([toTensor(0),toTensor(1),toTensor(2)])
         else:
             self.X_data = sequenceSets
             self.Y_data = treeLabels

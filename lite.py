@@ -14,7 +14,7 @@ sL = 200
 results = dict()
 
 #Angiosperm
-datasets = GenerateDatasets(amounts,sequenceLength=200,model="GTR",r_matrix=[1.61,3.82,0.27,1.56,4.99,1],f_matrix=[0.34,0.15,0.18,0.33],pop_size=1)
+datasets = GenerateDatasets(amounts,sequenceLength=sL,model="GTR",r_matrix=[1.61,3.82,0.27,1.56,4.99,1],f_matrix=[0.34,0.15,0.18,0.33],pop_size=1)
 
 #DL Models Train & Testing
 convnet = dnn3()

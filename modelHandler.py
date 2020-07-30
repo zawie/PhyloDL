@@ -108,7 +108,7 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False,doPlot=True
            doLoad (optional) - whether or not to load the model
     """
     #Create data loaders
-    train_loader = DataLoader(dataset=trainset, batch_size=32, shuffle=True)
+    train_loader = DataLoader(dataset=trainset, batch_size=32, shuffle=False)
     #Get model
     if doLoad:
         Load(model,f"{name}")
