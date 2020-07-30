@@ -50,3 +50,7 @@ def transformBeta(betaSequences):
     return [betaToAlpha(betaSequences),betaSequences,betaeToGamma(betaSequences)]
 def transformGamma(gammaSequences):
     return [gammaToAlpha(gammaSequences),gammaToBeta(gammaSequences),gammaSequences]
+
+def transformSequences(sequences,label):
+    switch = {0:transformAlpha,1:transformBeta,2:transformGamma}
+    return switch[label](sequences)
