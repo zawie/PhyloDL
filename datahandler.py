@@ -63,7 +63,7 @@ def getTreeLabels(file_path):
 
 #Datasets
 class SequenceDataset(Dataset):
-    def __init__(self,folderName,doTransform=True):
+    def __init__(self,folderName,doTransform=False):
         """
         Initializes the Dataset.
         This primarily entiles reading the generated sequeences into a python list
@@ -76,9 +76,9 @@ class SequenceDataset(Dataset):
             self.X_data = list()
             self.Y_data = list()
             for (sequences,label) in zip(sequenceSets,treeLabels):
-                toTensor = lambda n: torch.tensor(n,dtype=torch.long)
-                self.X_data.extend(transformSequences(sequences,label.tolist()))
-                self.Y_data.extend([toTensor(0),toTensor(1),toTensor(2)])
+                (transformedSequences,labels) = transformSequences(sequences,label)
+                self.X_data.extend(transformedSequences)
+                self.Y_data.extend(labels)
         else:
             self.X_data = sequenceSets
             self.Y_data = treeLabels

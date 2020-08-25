@@ -1,5 +1,6 @@
 import torch
-toTensor = lambda sequence: torch.tensor(sequence,dtype=torch.float)
+toXTensor = lambda sequence: torch.tensor(sequence,dtype=torch.float)
+toYTensor = lambda n: torch.tensor(n,dtype=torch.long)
 
 #Alpha conveteres
 def alphaToBeta(alphaSeqeunces):
@@ -57,11 +58,14 @@ def transformGamma(gammaSequences):
 def transformSequences(tensorSequences,label):
     #Tensor -> List
     sequenceSet = tensorSequences.tolist()
+    label = label.tolist()
     #Perform switch
     switch = {0:transformAlpha,1:transformBeta,2:transformGamma}
     listOfSequenceSets = switch[label](sequenceSet)
     #List -> tensor
     tensorSequenceSets = list()
     for sequenceSet in listOfSequenceSets:
-        tensorSequenceSets.append(toTensor(sequenceSet))
-    return tensorSequenceSets
+        tensorSequenceSets.append(toXTensor(sequenceSet))
+    #Labels
+    labels = [toYTensor(0),toYTensor(1),toYTensor(2)]
+    return (tensorSequenceSets,labels)

@@ -108,13 +108,13 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False,doPlot=True
            doLoad (optional) - whether or not to load the model
     """
     #Create data loaders
-    train_loader = DataLoader(dataset=trainset, batch_size=32, shuffle=False)
+    train_loader = DataLoader(dataset=trainset, batch_size=16, shuffle=True)
     #Get model
     if doLoad:
         Load(model,f"{name}")
     # Loss and optimizer
-    criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=1e-5)
+    criterion = nn.CrossEntropyLoss(reduction='sum')
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-5)
     # Train the model
     total_step = len(train_loader)
     loss_list = []
