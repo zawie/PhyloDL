@@ -63,7 +63,7 @@ def getTreeLabels(file_path):
 
 #Datasets
 class SequenceDataset(Dataset):
-    def __init__(self,folderName,doTransform=False):
+    def __init__(self,folderName,doTransform=True):
         """
         Initializes the Dataset.
         This primarily entiles reading the generated sequeences into a python list
