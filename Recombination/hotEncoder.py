@@ -1,6 +1,6 @@
 def encode(sequence):
     """
-        Hot encodes inputted sequnce
+        Hot encodes input sequnce
         "ATGC" -> [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
     """
     code_map = {"A":[1,0,0,0],
@@ -14,7 +14,7 @@ def encode(sequence):
 
 def decode(sequence):
     """
-        Hot encodes inputted sequnce
+        Hot encodes input sequence
         "ATGC" -> [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
     """
     code_map = {(1,0,0,0):"A",

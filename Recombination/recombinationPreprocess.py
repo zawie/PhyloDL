@@ -2,6 +2,7 @@ import os
 import random
 import numpy as np
 import shutil
+import hotEncoder
 
 #This script assumes that you have already run main.py to generate data from
 #ms and INDELible
@@ -13,6 +14,7 @@ def preprocess_data(data_directory, label, data_path="recombinant_data.npy"):
 
     Input:
     data_directory - path to output of main.py
+    label - data label
     data_path - path to output of preprocessed data
     """
     #remove executables
@@ -20,7 +22,9 @@ def preprocess_data(data_directory, label, data_path="recombinant_data.npy"):
     os.remove(data_directory + "/indelible")
 
     #collect data
-    data = []
+    data = [] # list of the quartet sequences
+    labels = [] # list of the labels
+
     for trial in os.scandir(data_directory): #os.scandir returns some class type
         if not trial.path.endswith(".DS_Store"): #ignore hidden .DS_Store files
             for filename in os.listdir(trial.path): #os.lsitdir returns file names
@@ -46,59 +50,18 @@ def preprocess_data(data_directory, label, data_path="recombinant_data.npy"):
                     #hot encode sequences
                     hot_encode_seq = []
                     for sequence in sequences:
-                        hot_encode_seq.append(_hot_encode(sequence))
+                        hot_encode_seq.append(hotEncoder.encode(sequence))
 
-                    #place datapoint into data with labels
-                    datapoint = (hot_encode_seq, label)
-                    data.append(datapoint)
-
-    #shuffle data
-    random.shuffle(data)
+                    #form data and labels lists
+                    data.append(hot_encode_seq)
+                    labels.append(label)
 
     #save data
-    np.save(data_path, data)
+    np.save(data_path[:-1] + "data" + data_path[-1], data) #quartet tree data save
+    np.save(data_path[:-1] + "labels" + data_path[-1], labels) #labels data save
 
     #remove data folder
     shutil.rmtree(data_directory)
-
-def _hot_encode(dna_seq):
-    """
-    Hot encodes a singular DNA sequence as follows:
-
-    A --> [1, 0, 0, 0]
-    C --> [0, 1, 0, 0]
-    T --> [0, 0, 1, 0]
-    G --> [0, 0, 0, 1]
-    """
-
-    hot_encoding = {"A":[1, 0, 0, 0],
-                    "C":[0, 1, 0, 0],
-                    "T": [0, 0, 1, 0],
-                    "G": [0, 0, 0, 1]}
-
-    hot_encode_seq = []
-    for position in dna_seq:
-        hot_encode_seq.append(hot_encoding[position])
-
-    return hot_encode_seq
-
-# def tree_classifier(tree_structure):
-#     """
-#     Given a list of taxon integers - returns the corresponding tree label
-#     Ex: [4, 2, 3, 1] --> Beta tree --> 1
-#     *Assumes quartet phylogeny tree
-      # **Not necessary/wrong function becuase .dat file no work this way
-#     """
-#     #tree structure mapping to labels
-#     tree_structure_mapping = {frozenset([frozenset([1,2]), frozenset([3,4])]) : 0,
-#                               frozenset([frozenset([1,3]), frozenset([2,4])]) : 1,
-#                               frozenset([frozenset([1,4]), frozenset([2,3])]) : 2
-#                               }
-#     #convert input to sets
-#     input_set = frozenset([frozenset([tree_structure[0], tree_structure[1]]),
-#                            frozenset([tree_structure[2], tree_structure[3]])])
-#
-#     return tree_structure_mapping[input_set]
 
 
 if __name__ == "__main__":

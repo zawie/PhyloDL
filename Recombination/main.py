@@ -7,7 +7,7 @@ import statistics
 
 import datetime
 import recombinationPreprocess
-import recombinationMerge
+import RecombinationMerge
 
 
 def run(speciesTree, recombFactor, seqLen, trialIndex, output):
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     begin_time = datetime.datetime.now()
 
     #Change these values:
-    num_datapoints = 2604 #make num_datapoints divisible by num_trials
+    num_datapoints = 6#2604 #make num_datapoints divisible by num_trials
     label = 2
     output_path = "recombination_data/gamma1_fact5_sl10000"
 
@@ -76,20 +76,13 @@ if __name__ == "__main__":
     for i in range(iterations):
         #generate data
         print("generating")
-        data_directory = main(speciesTree="HCG", recombFactor=5, seqLen=10000, numTrial=num_trials)
-        #recombFactor=1
-        #seqLen: 5000000
+        data_directory = main(speciesTree="HCG", recombFactor=5, seqLen=5, numTrial=num_trials)
+        #recombFactor=1, seqLen: 5000000
 
         #preprocess data
         print("preprocessing")
-        data_path = f"{directory}/recombinant_data{i}.npy"
+        data_path = f"{directory}/recombinant_{i}_"
         recombinationPreprocess.preprocess_data(data_directory, label, data_path)
 
-    #merging data
-    recombinationMerge.save_data(directory, output_path)
-
-    # directory = "recombination_data" #"recombination_data"#"preprocessed_data"
-    # output_path = "recombination_data/beta2"
-    # recombinationMerge.generate_standardized_datasets(directory, dev_percentage, output_path)
 
     print("Total Execution Time: ", datetime.datetime.now() - begin_time)
