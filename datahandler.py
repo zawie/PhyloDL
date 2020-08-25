@@ -63,7 +63,7 @@ def getTreeLabels(file_path):
 
 #Datasets
 class SequenceDataset(Dataset):
-    def __init__(self,folderName,doTransform=True):
+    def __init__(self,folderName,doTransform=False):
         """
         Initializes the Dataset.
         This primarily entiles reading the generated sequeences into a python list
@@ -87,6 +87,7 @@ class SequenceDataset(Dataset):
         """
         Gets a certain tree across all three trees (alpha,beta,charlie)
         """
+        print("Y DATA:",self.Y_data[index])
         return self.X_data[index],self.Y_data[index]
 
     def __len__(self):
@@ -155,7 +156,7 @@ def PureKingmanTreeConstructor(tre_path,amount,pop_size=1,minimum=0.1,maximum=1)
         #Remove if tree has too short branch Length
         invalid = False
         for edge in tree.edges():
-            if (edge.length < minimum and edge.length > 0) or (edge.length > maximum):
+            if (edge.length < minimum and edge.length != 0) or (edge.length > maximum):
                 invalid = True
                 break
         if not invalid:
