@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-def _getDatapaths(directory):
+def _getdataPaths(directory):
     """
     Given a directory, returns a list of the paths of all .npy datasets that are
     data files and labels files
@@ -22,14 +22,14 @@ def _getDatapaths(directory):
 
     return dataPaths, labelsPaths
 
-def _loadDatasets(datapaths):
+def _loadDatasets(dataPaths):
     """
-    Given a set of datapaths, returns a list of loaded and appended data
+    Given a set of dataPaths, returns a list of loaded and appended data
     ~Also deletes datasets
     """
     #load data
     load_data = []
-    for dataset in datapaths:
+    for dataset in dataPaths:
         data = np.load(dataset, allow_pickle=True)
         load_data.append(data)
         os.remove(dataset) #remove data file
@@ -86,20 +86,35 @@ def _loadDatasets(datapaths):
 #
 #     return dp_val, new_all_data, lost_datapoints
 
-def saveData(directory, outputPathPrefix):
+def saveData(directory, outputPath):
     """
-    Given a directory and an outputPathPrefix, saves all the data in the directory to
+    Given a directory and an outputPath, saves all the data in the directory to
     the outputPathPrefix + either "data" or "labels" with numpy.save()
     """
-    datapaths, labelsPaths = _getDatapaths(directory)
-    data = _loadDatasets(datapaths)
+    dataPaths, labelsPaths = _getdataPaths(directory)
+    data = _loadDatasets(dataPaths)
     labels = _loadDatasets(labelsPaths)
 
-    np.save(outputPathPrefix + "data", data)
-    np.save(outputPathPrefix + "labels", labels)
+    #find largest path index
+    i = -1 #so plus one later will make indices start at 0
+    for datafile in os.scandir(outputPath):
+        print(datafile)
+        if datafile.path.endswith(".npy"):
+            j = int(datafile.path[-5])
+            print("i:", i, "j:", j)
+            if j > i:
+                i = j
+
+    #use next path index
+    i += 1
+    dataOutputPath = outputPath + f"/recombination_data{i}"
+    labelsOutputPath = outputPath + f"/recombination_labels{i}"
+
+    np.save(dataOutputPath, data)
+    np.save(labelsOutputPath, labels)
 
 if __name__ == "__main__":
-    directory = "preprocessed_data" #"recombination_data"#"preprocessed_data"
-    outputPathPrefix = "preprocessed_data/recombination_"
+    directory = "preprocessedData" #"recombination_data"#"preprocessed_data"
+    outputPath = "dataClassData"
 
     saveData(directory, outputPathPrefix)

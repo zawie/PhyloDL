@@ -7,7 +7,7 @@ import statistics
 
 import datetime
 import recombinationPreprocess
-import RecombinationMerge
+import recombinationMerge
 
 
 def run(speciesTree, recombFactor, seqLen, trialIndex, output):
@@ -62,14 +62,10 @@ if __name__ == "__main__":
 
     begin_time = datetime.datetime.now()
 
-    #Change these values:
-    num_datapoints = 6#2604 #make num_datapoints divisible by num_trials
+    num_datapoints = 18#2604 #make num_datapoints divisible by num_trials
     label = 2
-    output_path = "recombination_data/gamma1_fact5_sl10000"
-
     num_trials = 6 #dont make bigger than number of cores (parallel processing)
-    directory = "preprocessed_data" #"recombination_data"#"preprocessed_data"
-    dev_percentage = 0.3
+    preprocessDirectory = "preprocessedData"
 
     iterations = int(num_datapoints / num_trials)
 
@@ -81,8 +77,12 @@ if __name__ == "__main__":
 
         #preprocess data
         print("preprocessing")
-        data_path = f"{directory}/recombinant_{i}_"
+        data_path = f"{preprocessDirectory}/recombinant_{i}_"
         recombinationPreprocess.preprocess_data(data_directory, label, data_path)
+
+    #merge preprocessed data
+    outputPath = "dataClassData"
+    recombinationMerge.saveData(preprocessDirectory, outputPath)
 
 
     print("Total Execution Time: ", datetime.datetime.now() - begin_time)

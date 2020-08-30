@@ -101,8 +101,8 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False,doPlot=True
     """
     Trains a given model
     Inputs model - the model to be trained
-           trainset - the dataset to be trianed with
-           valet - a validation set
+           trainset - the dataset to be trained with
+           valset - a validation set
            num_epochs - number of times to go over trainset
            name (optional) - what to save/label model as
            doLoad (optional) - whether or not to load the model
