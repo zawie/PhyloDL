@@ -1,4 +1,4 @@
-branch_stuff = set([":",".","0","1","2","3","4","5","6","7","8","9","e","-"])
+branch_stuff = set([":",".","0","1","2","3","4","5","6","7","8","9","e","-","(",")"])
 
 def getDeepestPair(tree,open_threshold=2):
     open_count = 0
@@ -18,17 +18,16 @@ def getDeepestPair(tree,open_threshold=2):
                     B += char
         elif char == "(":
             open_count += 1
-    return set((A,B))
+    return frozenset((A,B))
 
 def getClass(tree):
     #Double parathesis
     for open_threshold in [2,3]:
         pair = getDeepestPair(tree,open_threshold=open_threshold)
-        partition = {0: [set(("A","B")),set(("C","D"))],
-                     1: [set(("A","D")),set(("B","C"))],
-                     2: [set(("A","C")),set(("D","B"))]}
-        for label,p in partition.items():
-            if pair in p:
-                return label
-    print("uhhh\n\t",tree,"\n\t",pair)
-    return None
+        parition = {frozenset(("A","B")):0,
+                    frozenset(("C","D")):0,
+                    frozenset(("A","D")):1,
+                    frozenset(("B","C")):1,
+                    frozenset(("A","C")):2,
+                    frozenset(("D",'B')):2}
+        return parition[pair]
