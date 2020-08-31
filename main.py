@@ -1,43 +1,17 @@
 from modelHandler import TrainAndTest
 from models import dnn3,dnn3NoRes
 from ML.IQRAX import runRAxML,runIQTREE,runRAxMLClassification
+from Recombination.API import getRecombinationDatasets
 from util.plotter import line
-
-import datasetClass
-import numpy as np
-
-def getDataSets(dataPath, labelsPath):
-    """
-    1. Reads path files
-    2. Forms SimpleDataset class
-    3. Returns train, dev, test datasets in dictionary format
-        {"train":trainSet, "dev":devSet, "test":testSet}
-    """
-
-    data = np.load(dataPath)
-    labels = np.load(labelsPath)
-
-    X_Data = data.tolist()
-    Y_Data = labels.tolist()
-
-    initialDataSet = datasetClass.SimpleDataset(X_Data, Y_Data)
-
-    trainSet, devSet, testSet = initialDataSet.formDatasets()
-
-    datasets = {"train":trainSet, "dev":devSet, "test":testSet}
-
-    return datasets
-
 
 #Run Sequence Length vs. Accuracy Test
 NUM_EPOCHS = 3
 
-dataPath = "/Users/rhuck/Downloads/DL_Phylogeny/Recombination/dataClassData/recombination_data0.npy"
-labelsPath = "/Users/rhuck/Downloads/DL_Phylogeny/Recombination/dataClassData/recombination_labels0.npy"
-datasets = getDataSets(dataPath, labelsPath)
-
 #Define results dictionary
 results = dict()
+
+#Get data
+datasets = getRecombinationDatasets(0)
 
 #DL Models Train & Testing
 # convnet = dnn3()
