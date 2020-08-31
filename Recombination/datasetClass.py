@@ -43,7 +43,7 @@ class SimpleDataset(Dataset):
         """
         return SimpleDataset(self.X_data+other.X_data, self.Y_data+other.Y_data)
 
-    def formDatasets(self, setProbabilities = [0.7, 0.3, 0.0]):
+    def formDatasets(self, setProbabilities = [70, 20, 10]):
         """
         Forms SimpleDataset class datasets with the correct probabilities
 
@@ -53,7 +53,7 @@ class SimpleDataset(Dataset):
         Output:
         newSets - [trainSet, devSet, testSet]
         """
-        assert sum(setProbabilities) == 1 #is a probability distribution
+        assert sum(setProbabilities) == 100 #is a probability distribution
 
         numAllDatapoints = len(self.Y_data)
         newSets = []
