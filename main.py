@@ -1,7 +1,7 @@
 from modelHandler import TrainAndTest
 from models import dnn3,dnn3NoRes
 from ML.IQRAX import runRAxML,runIQTREE,runRAxMLClassification
-from plotter import line
+from util.plotter import line
 
 import datasetClass
 import numpy as np
