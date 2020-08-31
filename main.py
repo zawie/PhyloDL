@@ -1,9 +1,7 @@
 from modelHandler import TrainAndTest
-from dataHandler import GenerateDatasets,GenerateMergedGTRDatasets,GenerateMergedSpecificDatasets
 from models import dnn3,dnn3NoRes
-from IQRAX import runRAxML,runIQTREE,runRAxMLClassification
+from ML.IQRAX import runRAxML,runIQTREE,runRAxMLClassification
 from plotter import line
-from evomodels import GTR as getRandomGTRValues
 
 import datasetClass
 import numpy as np
