@@ -71,7 +71,7 @@ class SimpleDataset(Dataset):
 
             indexCounter += numDatapoints
 
-        return newSets
+        return tuple(newSets)
 
     def saveData(self, pathPrefix):
         """
@@ -97,7 +97,7 @@ if __name__ == "__main__":
     print("length: ", len(dataset))
 
     print("=======================\n")
-    trainSet, devSet, testSet = dataset.formDatasets()
+    (trainSet, devSet, testSet) = dataset.formDatasets()
     print("training set: ", trainSet.getData())
     print("dev set: ", devSet.getData())
     print("test set: ", testSet.getData())

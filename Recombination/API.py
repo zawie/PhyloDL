@@ -18,7 +18,7 @@ def _getDatasets(dataPath, labelsPath):
 
     initialDataSet = SimpleDataset(X_Data, Y_Data)
 
-    trainSet, devSet, testSet = initialDataSet.formDatasets()
+    (trainSet, devSet, testSet) = initialDataSet.formDatasets()
 
     datasets = {"train":trainSet, "dev":devSet, "test":testSet}
 
