@@ -1,5 +1,4 @@
 import torch
-import dataHandler
 from torch.utils.data import DataLoader
 import torch.nn as nn
 import sys
