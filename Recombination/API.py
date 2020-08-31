@@ -1,5 +1,6 @@
 from Recombination.datasetClass import SimpleDataset
 import numpy as np
+import torch
 
 #Helpder Functions
 def _getDatasets(dataPath, labelsPath):
@@ -16,8 +17,15 @@ def _getDatasets(dataPath, labelsPath):
     X_Data = data.tolist()
     Y_Data = labels.tolist()
 
-    initialDataSet = SimpleDataset(X_Data, Y_Data)
+    #Y and X should contain same amount of data
+    assert(len(X_Data) == len(Y_Data))
+    amount = len(X_Data)
+    #Convert elements to tensors
+    for i in range(amount):
+        X_Data[i] = torch.tensor(X_Data[i],dtype=torch.float)
+        Y_Data[i] = torch.tensor(Y_Data[i],dtype=torch.long)
 
+    initialDataSet = SimpleDataset(X_Data, Y_Data)
     (trainSet, devSet, testSet) = initialDataSet.formDatasets()
 
     datasets = {"train":trainSet, "dev":devSet, "test":testSet}
