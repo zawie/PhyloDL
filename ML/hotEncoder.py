@@ -1,4 +1,4 @@
-#DO NOT MODIFY WITHOUT MODIFING ML HOTENCODER AS WELL
+#DO NOT MODIFY WITHOUT MODIFING RECOMBO HOTENCODER AS WELL
 def encode(sequence):
     """
         Hot encodes input sequnce

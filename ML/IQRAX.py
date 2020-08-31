@@ -4,7 +4,6 @@ import shutil
 import os
 import re
 import treeClassifier
-import dataHandler
 import numpy as np
 import hotEncoder
 from torch.utils.data import DataLoader
