@@ -3,14 +3,14 @@
 import shutil
 import os
 import re
-import treeClassifier
+import util.treeClassifier as treeClassifier
 import numpy as np
-import hotEncoder
+import util.hotEncoder as hotEncoder
 from torch.utils.data import DataLoader
 import time
 
-IQTREE_PATH = "executables/iqtree"
-RAXML_PATH = "executables/raxml"
+IQTREE_PATH = "ML/executables/iqtree"
+RAXML_PATH = "ML/executables/raxml"
 ML_PATH = "WORKING_DIRECTORY" #directory name and write write files to
 
 if os.path.exists(ML_PATH):

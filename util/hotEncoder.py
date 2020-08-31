@@ -1,4 +1,3 @@
-#DO NOT MODIFY WITHOUT MODIFING ML HOTENCODER AS WELL
 def encode(sequence):
     """
         Hot encodes input sequnce

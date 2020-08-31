@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader
 import torch.nn as nn
 import sys
 import os
-import plotter
+import util.plotter as plotter
 
 def Save(model,name,doPrint=True):
     """

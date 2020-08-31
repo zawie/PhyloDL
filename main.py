@@ -1,8 +1,9 @@
 from modelHandler import TrainAndTest
 from models import dnn3,dnn3NoRes
 from ML.IQRAX import runRAxML,runIQTREE,runRAxMLClassification
-from Recombination.API import getRecombinationDatasets
-from util.plotter import line
+import Recombination.API as Recombo
+getRecombinationDatasets = Recombo.getRecombinationDatasets
+import util.plotter as plotter
 
 #Run Sequence Length vs. Accuracy Test
 NUM_EPOCHS = 3

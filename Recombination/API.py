@@ -1,4 +1,4 @@
-from datasetClass import SimpleDataset
+from Recombination.datasetClass import SimpleDataset
 import numpy as np
 
 #Helpder Functions
@@ -30,6 +30,6 @@ def generateData():
     pass
 
 def getRecombinationDatasets(int):
-    dataPath = f"/dataClassData/recombination_data{int}.npy"
-    labelsPath = f"/dataClassData/recombination_labels{int}.npy"
+    dataPath = f"Recombination/dataClassData/recombination_data{int}.npy"
+    labelsPath = f"Recombination/dataClassData/recombination_labels{int}.npy"
     return _getDatasets(dataPath, labelsPath)
