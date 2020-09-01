@@ -1,4 +1,5 @@
 from Recombination.datasetClass import SimpleDataset
+from Recombination.main import generate as main_generate
 import numpy as np
 import torch
 
@@ -35,6 +36,7 @@ def _getDatasets(dataPath, labelsPath):
 #Public funcitons
 def generateData():
     #In the future this needs to take parameters and generate data
+    main_generate()
     pass
 
 def getRecombinationDatasets(int):

@@ -3,6 +3,7 @@ from models import dnn3,dnn3NoRes
 from ML.IQRAX import runRAxML,runIQTREE,runRAxMLClassification
 import Recombination.API as Recombo
 getRecombinationDatasets = Recombo.getRecombinationDatasets
+generateData = Recombo.generateData
 import util.plotter as plotter
 
 #Run Sequence Length vs. Accuracy Test
@@ -12,6 +13,7 @@ NUM_EPOCHS = 3
 results = dict()
 
 #Get data
+generateData()
 datasets = getRecombinationDatasets(0)
 
 for key,dataset in datasets.items():

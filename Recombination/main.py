@@ -1,5 +1,5 @@
 import Recombination.ctrlGenPar as ctrlGen
-import Recombination.runINDELible as Recombination
+import Recombination.runINDELible as runINDELible
 import os
 import shutil
 import multiprocessing as mp
@@ -7,7 +7,7 @@ import statistics
 
 import datetime
 import Recombination.recombinationPreprocess as recombinationPreprocess
-import Recombination.recombinationMerge as recombinationMerge
+import Recombination.RecombinationMerge as recombinationMerge
 
 
 def run(speciesTree, recombFactor, seqLen, trialIndex, output):
@@ -58,7 +58,7 @@ def main(speciesTree, recombFactor, seqLen, numTrial):
 
     return folderName #required to run recombinationPreprocess
 
-if __name__ == "__main__":
+def generate():
 
     begin_time = datetime.datetime.now()
 
