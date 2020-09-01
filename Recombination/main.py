@@ -1,13 +1,13 @@
-import ctrlGenPar as ctrlGen
-import runINDELible
+import Recombination.ctrlGenPar as ctrlGen
+import Recombination.runINDELible
 import os
 import shutil
 import multiprocessing as mp
 import statistics
 
 import datetime
-import recombinationPreprocess
-import recombinationMerge
+import Recombination.recombinationPreprocess
+import Recombination.recombinationMerge
 
 
 def run(speciesTree, recombFactor, seqLen, trialIndex, output):

@@ -2,7 +2,7 @@ import os
 import random
 import numpy as np
 import shutil
-import hotEncoder
+import util.hotEncoder
 
 #This script assumes that you have already run main.py to generate data from
 #ms and INDELible
