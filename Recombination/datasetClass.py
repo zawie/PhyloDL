@@ -59,7 +59,7 @@ class SimpleDataset(Dataset):
         newSets = []
         indexCounter = 0
         for setProbability in setProbabilities:
-            numDatapoints = int(setProbability * numAllDatapoints)
+            numDatapoints = int(setProbability/100 * numAllDatapoints)
             print(numDatapoints)
 
             #check for mutation??
