@@ -2,13 +2,15 @@ from torch.utils.data import Dataset
 import numpy as np
 import torch
 
-def getDataSets(dataPath, labelsPath):
+def getDataSets(int):
     """
     1. Reads path files
     2. Forms SimpleDataset class
     3. Returns train, dev, test datasets in dictionary format
         {"train":trainSet, "dev":devSet, "test":testSet}
     """
+    dataPath = f"Recombination/dataClassData/recombination_data{int}.npy"
+    labelsPath = f"Recombination/dataClassData/recombination_labels{int}.npy"
 
     data = np.load(dataPath)
     labels = np.load(labelsPath)

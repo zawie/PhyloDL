@@ -58,14 +58,12 @@ def main(speciesTree, recombFactor, seqLen, numTrial):
 
     return folderName #required to run recombinationPreprocess
 
-def generate():
+def generate(num_datapoints,tree_label):
 
     begin_time = datetime.datetime.now()
-
-    num_datapoints = 18#2604 #make num_datapoints divisible by num_trials
-    label = 2
     num_trials = 6 #dont make bigger than number of cores (parallel processing)
     preprocessDirectory = "preprocessedData"
+    outputPath = "dataClassData"
 
     iterations = int(num_datapoints / num_trials)
 
@@ -78,10 +76,9 @@ def generate():
         #preprocess data
         print("preprocessing")
         data_path = f"{preprocessDirectory}/recombinant_{i}_"
-        recombinationPreprocess.preprocess_data(data_directory, label, data_path)
+        recombinationPreprocess.preprocess_data(data_directory, tree_label, data_path)
 
     #merge preprocessed data
-    outputPath = "dataClassData"
     recombinationMerge.saveData(preprocessDirectory, outputPath)
 
 
