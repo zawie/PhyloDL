@@ -7,7 +7,7 @@ import statistics
 
 import datetime
 import Recombination.recombinationPreprocess as recombinationPreprocess
-import Recombination.RecombinationMerge as recombinationMerge
+import Recombination.recombinationMerge as recombinationMerge
 
 
 def run(speciesTree, recombFactor, seqLen, trialIndex, output):
