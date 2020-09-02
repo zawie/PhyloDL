@@ -26,7 +26,7 @@ def main(speciesTree, recombFactor, seqLen, numTrial):
     print("[LOG] speciesTree = " + speciesTree + "; recombFactor = " + str(recombFactor) + "; seqLen = " + str(
         seqLen) + "; numTrial = " + str(numTrial))
 
-    folderName = speciesTree + "_" + str(seqLen) + "_" + str(recombFactor) + "_" + str(numTrial)
+    folderName = "Recombination/" + speciesTree + "_" + str(seqLen) + "_" + str(recombFactor) + "_" + str(numTrial)
     try:
         os.mkdir(folderName)
     except OSError:
@@ -35,8 +35,8 @@ def main(speciesTree, recombFactor, seqLen, numTrial):
     else:
         print("[LOG] Successfully created directory: %s" % folderName)
 
-    shutil.copy("ms", folderName)
-    shutil.copy("indelible", folderName)
+    shutil.copy("Recombination/ms", folderName)
+    shutil.copy("Recombination/indelible", folderName)
     os.chdir(folderName)
 
     # Spawn numTrial processes. Each process runs one trial.
@@ -62,8 +62,8 @@ def generate(num_datapoints,tree_label):
 
     begin_time = datetime.datetime.now()
     num_trials = 6 #dont make bigger than number of cores (parallel processing)
-    preprocessDirectory = "preprocessedData"
-    outputPath = "dataClassData"
+    preprocessDirectory = "Recombination/preprocessedData"
+    outputPath = "Recombination/dataClassData"
 
     iterations = int(num_datapoints / num_trials)
 
@@ -75,7 +75,8 @@ def generate(num_datapoints,tree_label):
 
         #preprocess data
         print("preprocessing")
-        data_path = f"{preprocessDirectory}/recombinant_{i}_"
+        print("DATA DIRECTORY",data_directory)
+        data_path = f"Recombination/{preprocessDirectory}/recombinant_{i}_"
         recombinationPreprocess.preprocess_data(data_directory, tree_label, data_path)
 
     #merge preprocessed data
