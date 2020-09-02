@@ -27,6 +27,7 @@ def main(speciesTree, recombFactor, seqLen, numTrial):
         seqLen) + "; numTrial = " + str(numTrial))
 
     folderName = speciesTree + "_" + str(seqLen) + "_" + str(recombFactor) + "_" + str(numTrial)
+
     try:
         os.mkdir(folderName)
     except OSError:
