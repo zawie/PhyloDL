@@ -1,5 +1,28 @@
 from torch.utils.data import Dataset
 import numpy as np
+import torch
+
+def getDataSets(dataPath, labelsPath):
+    """
+    1. Reads path files
+    2. Forms SimpleDataset class
+    3. Returns train, dev, test datasets in dictionary format
+        {"train":trainSet, "dev":devSet, "test":testSet}
+    """
+
+    data = np.load(dataPath)
+    labels = np.load(labelsPath)
+
+    X_Data = data.tolist()
+    Y_Data = labels.tolist()
+
+    initialDataSet = SimpleDataset(X_Data, Y_Data)
+
+    trainSet, devSet, testSet = initialDataSet.formDatasets()
+
+    datasets = {"train":trainSet, "dev":devSet, "test":testSet}
+
+    return datasets
 
 class SimpleDataset(Dataset):
     def __init__(self, data, labels):
@@ -66,7 +89,8 @@ class SimpleDataset(Dataset):
             newData = self.X_data[indexCounter:indexCounter+numDatapoints]
             newLabels = self.Y_data[indexCounter:indexCounter+numDatapoints]
 
-            newSet = SimpleDataset(newData, newLabels)
+            newSet = SimpleDataset(torch.tensor(newData,dtype=torch.float),
+                                   torch.tensor(newLabels, dtype=torch.long))
             newSets.append(newSet)
 
             indexCounter += numDatapoints
