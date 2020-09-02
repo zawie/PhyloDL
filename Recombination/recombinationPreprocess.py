@@ -57,8 +57,8 @@ def preprocess_data(data_directory, label, data_path="recombinant_data.npy"):
                     labels.append(label)
 
     #save data
-    np.save(data_path[:-1] + "data" + data_path[-1], data) #quartet tree data save
-    np.save(data_path[:-1] + "labels" + data_path[-1], labels) #labels data save
+    np.save("preprocessedData/recombinant_0data_.npy", data) #quartet tree data save
+    np.save("preprocessedData/recombinant_0data_.npy", labels) #labels data save
 
     #remove data folder
     shutil.rmtree(data_directory)

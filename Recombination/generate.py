@@ -27,6 +27,7 @@ def main(speciesTree, recombFactor, seqLen, numTrial):
         seqLen) + "; numTrial = " + str(numTrial))
 
     folderName = "Recombination/" + speciesTree + "_" + str(seqLen) + "_" + str(recombFactor) + "_" + str(numTrial)
+    print("F2:",folderName)
     try:
         os.mkdir(folderName)
     except OSError:
@@ -55,7 +56,7 @@ def main(speciesTree, recombFactor, seqLen, numTrial):
     allLogs = [output.get() for p in processes]
 
     os.chdir("..")
-
+    print("FOLDER: ", folderName)
     return folderName[14:] #required to run recombinationPreprocess
 
 def generate(num_datapoints,tree_label):
@@ -74,7 +75,9 @@ def generate(num_datapoints,tree_label):
         #recombFactor=1, seqLen: 5000000
 
         #preprocess data
-        data_path = f"{preprocessDirectory}/recombinant_{i}_"
+        print("preprocessing")
+        print("DATA DIRECTORY", data_directory)
+        data_path = f"Recombination/{preprocessDirectory}/recombinant_{i}_"
         recombinationPreprocess.preprocess_data(data_directory, tree_label, data_path)
 
     #merge preprocessed data
