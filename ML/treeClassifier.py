@@ -26,8 +26,8 @@ def getClass(tree):
         pair = getDeepestPair(tree,open_threshold=open_threshold)
         parition = {frozenset(("A","B")):0,
                     frozenset(("C","D")):0,
-                    frozenset(("A","D")):1,
-                    frozenset(("B","C")):1,
-                    frozenset(("A","C")):2,
-                    frozenset(("D",'B')):2}
+                    frozenset(("A","D")):2,
+                    frozenset(("B","C")):2,
+                    frozenset(("A","C")):1,
+                    frozenset(("D",'B')):1}
         return parition[pair]
