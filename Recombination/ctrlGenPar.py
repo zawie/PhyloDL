@@ -19,7 +19,7 @@ class SpeciesTreeInfo(NamedTuple):
 
 # HCGInfo = SpeciesTreeInfo(mutationRate=2.5e-8, indelRate=0, defaultRecombRate=1.5e-8, popSize=10000, taxaCount=3,
 #                           postR="-I 3 1 1 1 -n 2 1.0 -n 3 1.0 -n 1 1.0 -ej 4.0 1 2 -en 4.0 2 4.0 -ej 5.5 2 3 -en 5.5 3 4.0")
-HCGInfo = SpeciesTreeInfo(mutationRate=2.5e-8, indelRate=0, defaultRecombRate=1.5e-8, popSize=10000, taxaCount=4,
+HCGInfo = SpeciesTreeInfo(mutationRate=2.5e-6, indelRate=0, defaultRecombRate=1.5e-8, popSize=10000, taxaCount=4,
                           postR="-I 4 1 1 1 1 -n 1 1.0 -n 2 1.0 -n 3 1.0 -n 4 1.0 -ej 0.5 1 4 -ej 0.5 2 3 -ej 1.0 4 3")
 
 speciesTreeMapping = {"HCG": HCGInfo}

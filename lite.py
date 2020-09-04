@@ -7,13 +7,13 @@ from ML.IQRAX import runIQTREE, runRAxML, runRAxMLClassification
 NUM_EPOCHS = 3
 
 #Generate and get data
-#generate(1000,2)
+generate(200,2)
 datasets = getDataSets(0)
 
 #Train and test model
-resnet = dnn3NoRes()
-accuracy = TrainAndTest(resnet,datasets,NUM_EPOCHS,f"Recombination_ResNet",doPlot=True)
-print("MODEL ACCURACY:",accuracy)
+# resnet = dnn3NoRes()
+# accuracy = TrainAndTest(resnet,datasets,NUM_EPOCHS,f"Recombination_ResNet",doPlot=True)
+# print("MODEL ACCURACY:",accuracy)
 
 
 print("IQTREE ACCURACY:",runIQTREE(datasets['train']))
