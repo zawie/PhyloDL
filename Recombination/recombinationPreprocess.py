@@ -2,12 +2,12 @@ import os
 import random
 import numpy as np
 import shutil
-import util.hotEncoder as hotEncoder
+import hotEncoder
 
 #This script assumes that you have already run main.py to generate data from
 #ms and INDELible
 
-def preprocess_data(data_directory, label, data_path="recombinant_data.npy"):
+def preprocess_data(data_directory,label, preprocessDirectory,fileFormat):
     """
     Takes in ouput path from main.py (ms & INDELible generation) and preprocesses
     it so it can be run by the neural network
@@ -57,15 +57,8 @@ def preprocess_data(data_directory, label, data_path="recombinant_data.npy"):
                     labels.append(label)
 
     #save data
-    np.save("preprocessedData/recombinant_0data_.npy", data) #quartet tree data save
-    np.save("preprocessedData/recombinant_0data_.npy", labels) #labels data save
+    np.save(f"{preprocessDirectory}/{fileFormat}_data.npy", data) #quartet tree data save
+    np.save(f"{preprocessDirectory}/{fileFormat}_labels.npy", labels) #labels data save
 
     #remove data folder
     shutil.rmtree(data_directory)
-
-
-if __name__ == "__main__":
-    data_directory = "/Users/rhuck/Downloads/DL_Phylo/Recombination/data_generation/recombination_data/HCG_200_1_6"#path to output of main.py
-    data_path = "recombinant_data.npy"#path to output of preprocessed data
-
-    preprocess_data(data_directory, data_path)

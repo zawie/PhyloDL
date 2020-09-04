@@ -92,6 +92,7 @@ def saveData(directory, outputPath):
     the outputPathPrefix + either "data" or "labels" with numpy.save()
     """
     dataPaths, labelsPaths = _getdataPaths(directory)
+    print("AHHH",dataPaths)
     data = _loadDatasets(dataPaths)
     labels = _loadDatasets(labelsPaths)
 
@@ -112,9 +113,3 @@ def saveData(directory, outputPath):
 
     np.save(dataOutputPath, data)
     np.save(labelsOutputPath, labels)
-
-if __name__ == "__main__":
-    directory = "preprocessedData" #"recombination_data"#"preprocessed_data"
-    outputPath = "dataClassData"
-
-    saveData(directory, outputPathPrefix)

@@ -7,10 +7,10 @@ from Recombination.generate import generate
 NUM_EPOCHS = 3
 
 #Generate and get data
-generate(100,2)
-datasets = getDataSets(0)
+generate(20,2)
+#datasets = getDataSets(0)
 
 #Train and test model
-resnet = dnn3NoRes()
-accuracy = TrainAndTest(resnet,datasets,NUM_EPOCHS,f"Recombination_ResNet",doPlot=True)
-print(accuracy)
+#resnet = dnn3NoRes()
+#accuracy = TrainAndTest(resnet,datasets,NUM_EPOCHS,f"Recombination_ResNet",doPlot=True)
+#print(accuracy)

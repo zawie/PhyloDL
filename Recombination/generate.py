@@ -6,8 +6,8 @@ import multiprocessing as mp
 import statistics
 
 import datetime
-import Recombination.recombinationPreprocess as recombinationPreprocess
-import Recombination.recombinationMerge as recombinationMerge
+import recombinationPreprocess as recombinationPreprocess
+import recombinationMerge as recombinationMerge
 
 
 def run(speciesTree, recombFactor, seqLen, trialIndex, output):
@@ -26,7 +26,7 @@ def main(speciesTree, recombFactor, seqLen, numTrial):
     print("[LOG] speciesTree = " + speciesTree + "; recombFactor = " + str(recombFactor) + "; seqLen = " + str(
         seqLen) + "; numTrial = " + str(numTrial))
 
-    folderName = "Recombination/" + speciesTree + "_" + str(seqLen) + "_" + str(recombFactor) + "_" + str(numTrial)
+    folderName = speciesTree + "_" + str(seqLen) + "_" + str(recombFactor) + "_" + str(numTrial)
     print("F2:",folderName)
     try:
         os.mkdir(folderName)
@@ -56,15 +56,14 @@ def main(speciesTree, recombFactor, seqLen, numTrial):
     allLogs = [output.get() for p in processes]
 
     os.chdir("..")
-    print("FOLDER: ", folderName)
-    return folderName[14:] #required to run recombinationPreprocess
+    return folderName #required to run recombinationPreprocess
 
 def generate(num_datapoints,tree_label):
 
     begin_time = datetime.datetime.now()
     num_trials = 6 #dont make bigger than number of cores (parallel processing)
-    preprocessDirectory = "Recombination/preprocessedData"
-    outputPath = "Recombination/dataClassData"
+    preprocessDirectory = "preprocessedData"
+    outputPath = "data"
 
     iterations = int(num_datapoints / num_trials)
 
@@ -77,8 +76,7 @@ def generate(num_datapoints,tree_label):
         #preprocess data
         print("preprocessing")
         print("DATA DIRECTORY", data_directory)
-        data_path = f"Recombination/{preprocessDirectory}/recombinant_{i}_"
-        recombinationPreprocess.preprocess_data(data_directory, tree_label, data_path)
+        recombinationPreprocess.preprocess_data(data_directory, tree_label, preprocessDirectory,f"/recombinant_{i}")
 
     #merge preprocessed data
     recombinationMerge.saveData(preprocessDirectory, outputPath)

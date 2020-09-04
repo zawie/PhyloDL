@@ -9,8 +9,8 @@ def getDataSets(int):
     3. Returns train, dev, test datasets in dictionary format
         {"train":trainSet, "dev":devSet, "test":testSet}
     """
-    dataPath = f"Recombination/dataClassData/recombination_data{int}.npy"
-    labelsPath = f"Recombination/dataClassData/recombination_labels{int}.npy"
+    dataPath = f"dataClassData/recombination_data{int}.npy"
+    labelsPath = f"dataClassData/recombination_labels{int}.npy"
 
     data = np.load(dataPath)
     labels = np.load(labelsPath)
