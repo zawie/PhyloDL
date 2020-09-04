@@ -7,7 +7,7 @@ from ML.IQRAX import runIQTREE, runRAxML, runRAxMLClassification
 NUM_EPOCHS = 3
 
 #Generate and get data
-generate(200,2)
+generate(numDatapoints=200,treeLabel=2,sequenceLength=1000)
 datasets = getDataSets(0)
 
 #Train and test model

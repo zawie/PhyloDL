@@ -59,22 +59,22 @@ def main(speciesTree, recombFactor, seqLen, numTrial,doPrint=False):
     os.chdir("..")
     return folderName #required to run recombinationPreprocess
 
-def generate(num_datapoints,tree_label):
+def generate(numDatapoints=1000,treeLabel=2,sequenceLength=1000,recombFactor=1,speciesTree="HCG"):
 
     begin_time = datetime.datetime.now()
     num_trials = 6 #dont make bigger than number of cores (parallel processing)
     preprocessDirectory = "preprocessedData"
     outputPath = "data"
 
-    iterations = int(num_datapoints / num_trials)
+    iterations = int(numDatapoints / num_trials)
 
     for i in range(iterations):
         #generate data
-        data_directory = main(speciesTree="HCG", recombFactor=1, seqLen=1000, numTrial=num_trials)
+        data_directory = main(speciesTree=speciesTree, recombFactor=recombFactor, seqLen=sequenceLength, numTrial=num_trials)
         #recombFactor=1, seqLen: 5000000
 
         #preprocess data
-        recombinationPreprocess.preprocess_data(data_directory, tree_label, preprocessDirectory,f"/recombinant_{i}")
+        recombinationPreprocess.preprocess_data(data_directory, treeLabel, preprocessDirectory,f"/recombinant_{i}")
 
     #merge preprocessed data
     recombinationMerge.saveData(preprocessDirectory, outputPath)
