@@ -3,9 +3,9 @@
 import shutil
 import os
 import re
-import util.treeClassifier as treeClassifier
+import treeClassifier as treeClassifier
 import numpy as np
-import util.hotEncoder as hotEncoder
+import hotEncoder as hotEncoder
 from torch.utils.data import DataLoader
 import time
 
@@ -29,7 +29,7 @@ def run(dataset,cmd,name=None):
     WRITE_FILE_PATH = ML_PATH + WRITE_FILE
     write_f = open(WRITE_FILE_PATH, "x")
     if name:
-        final_path = f'ML_results/{name}_results.txt'
+        final_path = f'ML/Results/{name}_results.txt'
         final_f = open(final_path, "w")
         final_f = open(final_path, "a")
         final_f.write('(Label,Guess)\t<NewickTree>\n')
