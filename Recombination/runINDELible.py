@@ -54,7 +54,7 @@ def concatenateAligned(numTrees):
         f.write("\n")
 
 
-def main(subFolderName, log):
+def main(subFolderName, log, doPrint=False):
     # copy INDELible into sub folder
     shutil.copy("indelible", subFolderName)
     os.chdir(subFolderName)
@@ -63,9 +63,11 @@ def main(subFolderName, log):
         firstLine = ctrlFile.readline()
         numTrees = int(firstLine[3:])
 
-    print("[LOG] Calling INDELible...")
+    if doPrint:
+        print("[LOG] Calling INDELible...")
     subprocess.check_call(["./indelible"])  # Run INDELible
-    print("[LOG] Processing " + subFolderName + "...")
+    if doPrint:
+        print("[LOG] Processing " + subFolderName + "...")
 
     # concatenateUnaligned(numTrees)
     alignment = concatenateAligned(numTrees)

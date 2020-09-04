@@ -92,17 +92,15 @@ def saveData(directory, outputPath):
     the outputPathPrefix + either "data" or "labels" with numpy.save()
     """
     dataPaths, labelsPaths = _getdataPaths(directory)
-    print("AHHH",dataPaths)
     data = _loadDatasets(dataPaths)
     labels = _loadDatasets(labelsPaths)
 
     #find largest path index
     i = -1 #so plus one later will make indices start at 0
     for datafile in os.scandir(outputPath):
-        print(datafile)
         if datafile.path.endswith(".npy"):
             j = int(datafile.path[-5])
-            print("i:", i, "j:", j)
+            #print("i:", i, "j:", j)
             if j > i:
                 i = j
 

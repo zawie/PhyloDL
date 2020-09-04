@@ -286,10 +286,12 @@ def generateINDELibleCtrl(speciesTree, trial, fileDirectory, zeroRecomb, seqLen)
 # print(trialRecombStat(["[1](A:1,(B:2,C:3));","[1](A:2,(B:1,C:3));","[1](B:1,(A:2,C:3));","[3](A:2,(B:1,C:3));"], 6))
 
 
-def main(speciesTree, seqLen, recombFactor, trialIndex):
-    print("[LOG] Generating control file for trial " + str(trialIndex) + "...")
+def main(speciesTree, seqLen, recombFactor, trialIndex, doPrint=True):
+    if doPrint:
+        print("[LOG] Generating control file for trial " + str(trialIndex) + "...")
     msCommand = generateMSCommand(speciesTree, seqLen, recombFactor, 1)
-    print("[LOG] Generated MS command is", msCommand)
+    if doPrint:
+        print("[LOG] Generated MS command is", msCommand)
     commandList = msCommand.split()
     trial = str(subprocess.check_output(commandList)).split("\\n")[4:]
     del trial[-1]

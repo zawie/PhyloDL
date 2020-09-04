@@ -9,8 +9,8 @@ def getDataSets(int):
     3. Returns train, dev, test datasets in dictionary format
         {"train":trainSet, "dev":devSet, "test":testSet}
     """
-    dataPath = f"dataClassData/recombination_data{int}.npy"
-    labelsPath = f"dataClassData/recombination_labels{int}.npy"
+    dataPath = f"data/recombination_data{int}.npy"
+    labelsPath = f"data/recombination_labels{int}.npy"
 
     data = np.load(dataPath)
     labels = np.load(labelsPath)
@@ -68,7 +68,7 @@ class SimpleDataset(Dataset):
         """
         return SimpleDataset(self.X_data+other.X_data, self.Y_data+other.Y_data)
 
-    def formDatasets(self, setProbabilities = [50, 25, 25]):
+    def formDatasets(self, setProbabilities = [90, 5, 5]):
         """
         Forms SimpleDataset class datasets with the correct probabilities
 
@@ -107,23 +107,23 @@ class SimpleDataset(Dataset):
         np.save(pathPrefix + "_labels", self.Y_data)
 
 
-if __name__ == "__main__":
-    dataPath = "/Users/rhuck/Downloads/DL_Phylogeny/Recombination/dataClassData/recombination_data0.npy"
-    labelsPath = "/Users/rhuck/Downloads/DL_Phylogeny/Recombination/dataClassData/recombination_labels0.npy"
+# if __name__ == "__main__":
+#     dataPath = "/Users/rhuck/Downloads/DL_Phylogeny/Recombination/dataClassData/recombination_data0.npy"
+#     labelsPath = "/Users/rhuck/Downloads/DL_Phylogeny/Recombination/dataClassData/recombination_labels0.npy"
 
 
-    X_data = np.load(dataPath, allow_pickle=True)
-    Y_data = np.load(labelsPath, allow_pickle=True)
-    data = X_data.tolist()
-    labels = Y_data.tolist()
-    dataset = SimpleDataset(data, labels)
-    data, labels = dataset.getData()
-    print("data: ", data)
-    print("labels: ", labels)
-    print("length: ", len(dataset))
+#     X_data = np.load(dataPath, allow_pickle=True)
+#     Y_data = np.load(labelsPath, allow_pickle=True)
+#     data = X_data.tolist()
+#     labels = Y_data.tolist()
+#     dataset = SimpleDataset(data, labels)
+#     data, labels = dataset.getData()
+#     print("data: ", data)
+#     print("labels: ", labels)
+#     print("length: ", len(dataset))
 
-    print("=======================\n")
-    (trainSet, devSet, testSet) = dataset.formDatasets()
-    print("training set: ", trainSet.getData())
-    print("dev set: ", devSet.getData())
-    print("test set: ", testSet.getData())
+#     print("=======================\n")
+#     (trainSet, devSet, testSet) = dataset.formDatasets()
+#     print("training set: ", trainSet.getData())
+#     print("dev set: ", devSet.getData())
+#     print("test set: ", testSet.getData())
