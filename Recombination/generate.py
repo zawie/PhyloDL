@@ -9,7 +9,7 @@ import statistics
 import datetime
 import recombinationPreprocess as recombinationPreprocess
 import recombinationMerge as recombinationMerge
-
+from Recombination.dataHandler import getDataSets
 
 def run(speciesTreeInfo, recombFactor, seqLen, trialIndex, output):
     print("RUN INPUT:",speciesTreeInfo, recombFactor, seqLen, trialIndex, output)
@@ -86,3 +86,8 @@ def generate(numDatapoints=1000,treeLabel=2,sequenceLength=1000,recombFactor=1,s
 
 
     print("Total Execution Time: ", datetime.datetime.now() - begin_time)
+
+
+def generateAndGet(numDatapoints=1000,treeLabel=2,sequenceLength=1000,recombFactor=1,speciesTreeInfo=HCGInfo):
+    generate(numDatapoints,treeLabel,sequenceLength,recombFactor,speciesTreeInfo)
+    return getDataSets()
