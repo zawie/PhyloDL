@@ -1,16 +1,32 @@
 from torch.utils.data import Dataset
 import numpy as np
 import torch
+import os
 
-def getDataSets(int):
+def getLatestInt():
+    latestInt = 0
+    for filename in os.listdir("data"):
+        if filename.endswith(".npy"):
+            numeric_tag = ""
+            for char in filename:
+                if char.isdigit():
+                    numeric_tag += char
+            num = int(numeric_tag)
+            if num > latestInt:
+                latestInt = num
+    return latestInt
+
+def getDataSets(int_tag=-1):
     """
     1. Reads path files
     2. Forms SimpleDataset class
     3. Returns train, dev, test datasets in dictionary format
         {"train":trainSet, "dev":devSet, "test":testSet}
     """
-    dataPath = f"data/recombination_data{int}.npy"
-    labelsPath = f"data/recombination_labels{int}.npy"
+    if int_tag < 0:
+        int_tag = getLatestInt()
+    dataPath = f"data/recombination_data{int_tag}.npy"
+    labelsPath = f"data/recombination_labels{int_tag}.npy"
 
     data = np.load(dataPath)
     labels = np.load(labelsPath)
