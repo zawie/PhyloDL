@@ -84,7 +84,7 @@ class SimpleDataset(Dataset):
         """
         return SimpleDataset(self.X_data+other.X_data, self.Y_data+other.Y_data)
 
-    def formDatasets(self, setProbabilities = [90, 5, 5]):
+    def formDatasets(self, setProbabilities = [100, 0, 0]):
         """
         Forms SimpleDataset class datasets with the correct probabilities
 
