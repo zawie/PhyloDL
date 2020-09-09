@@ -70,7 +70,7 @@ def generate(num_datapoints,tree_label):
 
     for i in range(iterations):
         #generate data
-        data_directory = main(speciesTree="HCG", recombFactor=1, seqLen=1000, numTrial=num_trials)
+        data_directory = main(speciesTree="HCG", recombFactor=100, seqLen=1000, numTrial=num_trials)
         #recombFactor=1, seqLen: 5000000
 
         #preprocess data
