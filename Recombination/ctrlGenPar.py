@@ -9,6 +9,7 @@ import random
 
 
 class SpeciesTreeInfo(NamedTuple):
+    name: str
     mutationRate: float
     indelRate: float
     defaultRecombRate: float  # in unit of per site per generation
@@ -19,11 +20,8 @@ class SpeciesTreeInfo(NamedTuple):
 
 # HCGInfo = SpeciesTreeInfo(mutationRate=2.5e-8, indelRate=0, defaultRecombRate=1.5e-8, popSize=10000, taxaCount=3,
 #                           postR="-I 3 1 1 1 -n 2 1.0 -n 3 1.0 -n 1 1.0 -ej 4.0 1 2 -en 4.0 2 4.0 -ej 5.5 2 3 -en 5.5 3 4.0")
-HCGInfo = SpeciesTreeInfo(mutationRate=2.5e-8, indelRate=0, defaultRecombRate=1.5e-8, popSize=10000, taxaCount=4,
-                          postR="-I 4 1 1 1 1 -n 1 1.0 -n 2 1.0 -n 3 1.0 -n 4 1.0 -ej 0.5 1 4 -ej 0.5 2 3 -ej 1.0 4 3")
-
-speciesTreeMapping = {"HCG": HCGInfo}
-
+# HCGInfo = SpeciesTreeInfo(name="HCG",mutationRate=2.5e-6, indelRate=0, defaultRecombRate=1.5e-8, popSize=10000, taxaCount=4,
+#                           postR="-I 4 1 1 1 1 -n 1 1.0 -n 2 1.0 -n 3 1.0 -n 4 1.0 -ej 0.5 1 4 -ej 0.5 2 3 -ej 1.0 4 3")
 
 # def generateTreeFromMS(speciesTree):
 #     info = speciesTreeMapping[speciesTree]
@@ -64,14 +62,13 @@ speciesTreeMapping = {"HCG": HCGInfo}
 # # generateTreeFromMS("sim3")
 
 
-def generateMSCommand(speciesTree, seqLen, recombFactor, numTrial):
-    info = speciesTreeMapping[speciesTree]
-    rho = 4 * info.popSize * info.defaultRecombRate * recombFactor * seqLen
+def generateMSCommand(speciesTreeInfo, seqLen, recombFactor, numTrial):
+    rho = 4 * speciesTreeInfo.popSize * speciesTreeInfo.defaultRecombRate * recombFactor * seqLen
     seed1 = str(random.randint(5000, 50000))
     seed2 = str(random.randint(5000, 50000))
     seed3 = str(random.randint(5000, 50000))
-    command = "mspms " + str(info.taxaCount) + " " + str(numTrial) + " -T -r" + " " + str(rho) + " " + str(
-        seqLen) + " " + info.postR + " -seeds " + seed1 + " " + seed2 + " " + seed3
+    command = "mspms " + str(speciesTreeInfo.taxaCount) + " " + str(numTrial) + " -T -r" + " " + str(rho) + " " + str(
+        seqLen) + " " + speciesTreeInfo.postR + " -seeds " + seed1 + " " + seed2 + " " + seed3
     return command
 
 # print(generateMSCommand("TrueHCGO", 1000, 1, 1))
@@ -109,7 +106,7 @@ def condenseGT(trial):
     return condensed, per_ancestral
 
 
-def generateINDELibleCtrl(speciesTree, trial, fileDirectory, zeroRecomb, seqLen):
+def generateINDELibleCtrl(speciesTreeInfo, trial, fileDirectory, zeroRecomb, seqLen):
     """
     Generate an INDELible control file for the input trial at the input file directory
     :param speciesTree: Name of species tree
@@ -143,11 +140,11 @@ def generateINDELibleCtrl(speciesTree, trial, fileDirectory, zeroRecomb, seqLen)
             tree = dendropy.Tree.get(data=segment[1], schema='newick')
             coalescentTreeLength = tree.length()
             # print("[LOG] coalescent tree length is %f" % coalescentTreeLength)
-            generationTreeLength = coalescentTreeLength * 4 * speciesTreeMapping[speciesTree].popSize
+            generationTreeLength = coalescentTreeLength * 4 * speciesTreeInfo.popSize
             # print("[LOG] generation tree length is %f" % generationTreeLength)
             # yearTreeLength = generationTreeLength * speciesTreeMapping[speciesTree].generationTime
             # print("year tree length is %f" % yearTreeLength)
-            treeLength = generationTreeLength * speciesTreeMapping[speciesTree].mutationRate
+            treeLength = generationTreeLength * speciesTreeInfo.mutationRate
             # file.write("[TREE] t" + str(i) + "  " + tree.as_string(schema='newick'))
             file.write("[TREE] t" + str(i) + "  " + segment[1] + "\n")
             file.write("[treelength] " + str(treeLength) + "\n\n")
@@ -286,10 +283,10 @@ def generateINDELibleCtrl(speciesTree, trial, fileDirectory, zeroRecomb, seqLen)
 # print(trialRecombStat(["[1](A:1,(B:2,C:3));","[1](A:2,(B:1,C:3));","[1](B:1,(A:2,C:3));","[3](A:2,(B:1,C:3));"], 6))
 
 
-def main(speciesTree, seqLen, recombFactor, trialIndex, doPrint=True):
+def main(speciesTreeInfo, seqLen, recombFactor, trialIndex, doPrint=True):
     if doPrint:
         print("[LOG] Generating control file for trial " + str(trialIndex) + "...")
-    msCommand = generateMSCommand(speciesTree, seqLen, recombFactor, 1)
+    msCommand = generateMSCommand(speciesTreeInfo, seqLen, recombFactor, 1)
     if doPrint:
         print("[LOG] Generated MS command is", msCommand)
     commandList = msCommand.split()
@@ -308,13 +305,13 @@ def main(speciesTree, seqLen, recombFactor, trialIndex, doPrint=True):
         # Get trial statistics
         # numRecombBreakpoints, percentRecombBreakpoints, percentTopologyChange, avgTreeLength, numTopologies, perILS = trialRecombStat(trial, seqLen, True, speciesTree)
         fileDirectory = subFolderName + "/" + "control.txt"
-        percentAncestralBreakpoints = generateINDELibleCtrl(speciesTree=speciesTree, trial=trial,
+        percentAncestralBreakpoints = generateINDELibleCtrl(speciesTreeInfo=speciesTreeInfo, trial=trial,
                                                             fileDirectory=fileDirectory, zeroRecomb=True, seqLen=seqLen)
     else:
         # Get trial statistics
         # numRecombBreakpoints, percentRecombBreakpoints, percentTopologyChange, avgTreeLength, numTopologies, perILS = trialRecombStat(trial, seqLen, False, speciesTree)
         fileDirectory = subFolderName + "/" + "control.txt"
-        percentAncestralBreakpoints = generateINDELibleCtrl(speciesTree=speciesTree, trial=trial,
+        percentAncestralBreakpoints = generateINDELibleCtrl(speciesTreeInfo=speciesTreeInfo, trial=trial,
                                                             fileDirectory=fileDirectory, zeroRecomb=False, seqLen=-1)
         log = {}
     return subFolderName, log
