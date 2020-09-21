@@ -116,7 +116,8 @@ def generateINDELibleCtrl(speciesTreeInfo, trial, fileDirectory, zeroRecomb, seq
     :param seqLen: total length of sequence
     """
     if (zeroRecomb):
-        condensedSegments = [(seqLen, trial[0])]
+        condensedSegments = [(seqLen, trial[0].split("]")[-1])]
+        # condensedSegments = [(seqLen, trial[0])]
         percentAncestral = 0.0
     else:
         condensedSegments, percentAncestral = condenseGT(trial=trial)
@@ -313,7 +314,7 @@ def main(speciesTreeInfo, seqLen, recombFactor, trialIndex, doPrint=True):
         fileDirectory = subFolderName + "/" + "control.txt"
         percentAncestralBreakpoints = generateINDELibleCtrl(speciesTreeInfo=speciesTreeInfo, trial=trial,
                                                             fileDirectory=fileDirectory, zeroRecomb=False, seqLen=-1)
-        log = {}
+    log = {}
     return subFolderName, log
 
 
