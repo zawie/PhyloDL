@@ -145,9 +145,19 @@ def generateINDELibleCtrl(speciesTreeInfo, trial, fileDirectory, zeroRecomb, seq
             # print("[LOG] generation tree length is %f" % generationTreeLength)
             # yearTreeLength = generationTreeLength * speciesTreeMapping[speciesTree].generationTime
             # print("year tree length is %f" % yearTreeLength)
-            treeLength = generationTreeLength * speciesTreeInfo.mutationRate
+            treeLength = float()
+            treeStr = str()
+            if zeroRecomb:
+                """
+                HARDCODED TREESTR FOR ZERORECOMB
+                """
+                treeStr = "(4:11.25,(3:4.0,(1:2.5,2:2.5):1.5):7.25);"
+                treeLength = 1160000 * speciesTreeInfo.mutationRate
+            else:
+                treeStr = segment[1]
+                treeLength = generationTreeLength * speciesTreeInfo.mutationRate
             # file.write("[TREE] t" + str(i) + "  " + tree.as_string(schema='newick'))
-            file.write("[TREE] t" + str(i) + "  " + segment[1] + "\n")
+            file.write("[TREE] t" + str(i) + "  " + treeStr + "\n")
             file.write("[treelength] " + str(treeLength) + "\n\n")
 
         # Generate a PARTITIONS block for each segment
