@@ -3,6 +3,8 @@ import numpy as np
 import torch
 import os
 
+from transformations import transformSequences
+
 def getLatestInt():
     latestInt = 0
     for filename in os.listdir("data"):
@@ -43,7 +45,7 @@ def getDataSets(int_tag=-1):
     return datasets
 
 class SimpleDataset(Dataset):
-    def __init__(self, data, labels):
+    def __init__(self, data, labels, doTransform=False):
         """
         Initializes the Dataset.
         This primarily entiles reading the generated sequeences into a python list
@@ -52,11 +54,24 @@ class SimpleDataset(Dataset):
         data - list of quartet sequeences
         labels - list of corresponding labesl
         """
+        #Validate input
         assert len(data) == len(labels)
+        #Create data fields
+        self.X_data = []
+        self.Y_data = []
 
-        self.X_data = data
-        self.Y_data = labels
+        if doTransform:
+            #Transform data
+            for datapoint in zip(data,labels):
+                (sequences,label) = datapoint
+                (transX,transY) = transformSequences(sequences,label)
+                self.X_data += transX
+                self.Y_data += transY
+        else:
+            self.X_data = data
+            self.Y_data = labels
 
+        #Validate output
         assert len(self.X_data) == len(self.Y_data)
 
     def __getitem__(self, index):
@@ -75,14 +90,13 @@ class SimpleDataset(Dataset):
         """
         Returns the number of entries in this dataset
         """
-        assert len(self.X_data) == len(self.Y_data)
         return len(self.X_data)
 
     def __add__(self, other):
         """
         Merges to datasets
         """
-        return SimpleDataset(self.X_data+other.X_data, self.Y_data+other.Y_data)
+        return SimpleDataset(self.X_data+other.X_data, self.Y_data+other.Y_data, doTransform=False)
 
     def formDatasets(self, setProbabilities = [100, 0, 0]):
         """
