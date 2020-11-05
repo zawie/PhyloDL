@@ -30,7 +30,9 @@ def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0.1,maximum=1):
     return trees
 
 def newickToStructure(newickTree):
-    (a,b,c) = tuple(newickTree.coalescence_intervals()[4:])
+    intervals = newickTree.coalescence_intervals()[4:]
+    intervals.sort()
+    (a,b,c) = tuple(intervals)
     return f"-I 4 1 1 1 1 -n 2 1.0 -n 3 1.0 -n 1 1.0 -n 4 1.0 -ej {a} 1 2 -en {a} 2 {b} -ej {b} 2 3 -en {b} 3 {b} -ej {c} 3 4 -en {c} 4 {b}"
 
 def generate(amount):
