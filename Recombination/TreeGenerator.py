@@ -1,6 +1,5 @@
 
 import dendropy
-from ML.treeClassifier import getClass
 
 def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0.1,maximum=1):
     """

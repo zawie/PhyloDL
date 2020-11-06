@@ -5,6 +5,9 @@ import os
 
 from transformations import transformSequences
 
+toXTensor = lambda x: torch.tensor(x,dtype=torch.float)
+toYTensor = lambda y: torch.tensor(y, dtype=torch.long)
+
 def getLatestInt():
     latestInt = 0
     for filename in os.listdir("data"):
@@ -30,19 +33,45 @@ def getDataSets(int_tag=-1):
     dataPath = f"data/recombination_data{int_tag}.npy"
     labelsPath = f"data/recombination_labels{int_tag}.npy"
 
-    data = np.load(dataPath)
-    labels = np.load(labelsPath)
-
-    X_Data = data.tolist()
-    Y_Data = labels.tolist()
+    X_Data = np.load(dataPath)
+    Y_Data = np.load(labelsPath)
 
     initialDataSet = SimpleDataset(X_Data, Y_Data)
 
-    trainSet, devSet, testSet = initialDataSet.formDatasets()
+    trainSet, devSet, testSet = formDatasets(initialDataSet)
 
     datasets = {"train":trainSet, "dev":devSet, "test":testSet}
 
     return datasets
+
+def formDatasets(initialDatset, setProbabilities = [100, 0, 0]):
+    """
+    Forms SimpleDataset class datasets with the correct probabilities
+
+    Input:
+    setProbabilities - list of probabilities: [trainProb, devProb, testProb]
+
+    Output:
+    newSets - [trainSet, devSet, testSet]
+    """
+    assert sum(setProbabilities) == 100 #is a probability distribution
+
+    numAllDatapoints = len(initialDatset.Y_data)
+    newSets = list()
+    indexCounter = 0
+    for setProbability in setProbabilities:
+        numDatapoints = int(setProbability/100 * numAllDatapoints)
+        print(numDatapoints)
+
+        #check for mutation??
+        newData = initialDatset.X_data.tolist()[indexCounter:indexCounter+numDatapoints]
+        newLabels = initialDatset.Y_data.tolist()[indexCounter:indexCounter+numDatapoints]
+
+        newSets.append(SimpleDataset(toXTensor(newData), toYTensor(newLabels)))
+
+        indexCounter += numDatapoints
+
+    return tuple(newSets)
 
 class SimpleDataset(Dataset):
     def __init__(self, data, labels, doTransform=False):
@@ -96,38 +125,11 @@ class SimpleDataset(Dataset):
         """
         Merges to datasets
         """
-        return SimpleDataset(self.X_data+other.X_data, self.Y_data+other.Y_data, doTransform=False)
-
-    def formDatasets(self, setProbabilities = [100, 0, 0]):
-        """
-        Forms SimpleDataset class datasets with the correct probabilities
-
-        Input:
-        setProbabilities - list of probabilities: [trainProb, devProb, testProb]
-
-        Output:
-        newSets - [trainSet, devSet, testSet]
-        """
-        assert sum(setProbabilities) == 100 #is a probability distribution
-
-        numAllDatapoints = len(self.Y_data)
-        newSets = []
-        indexCounter = 0
-        for setProbability in setProbabilities:
-            numDatapoints = int(setProbability/100 * numAllDatapoints)
-            print(numDatapoints)
-
-            #check for mutation??
-            newData = self.X_data[indexCounter:indexCounter+numDatapoints]
-            newLabels = self.Y_data[indexCounter:indexCounter+numDatapoints]
-
-            newSet = SimpleDataset(torch.tensor(newData,dtype=torch.float),
-                                   torch.tensor(newLabels, dtype=torch.long))
-            newSets.append(newSet)
-
-            indexCounter += numDatapoints
-
-        return tuple(newSets)
+        (X_self,Y_self) = self.getData()
+        (X_other,Y_other) = other.getData()
+        X_new = X_self.tolist()+X_other.tolist()
+        Y_new = Y_self.tolist()+Y_other.tolist()
+        return SimpleDataset(toXTensor(X_new), toYTensor(Y_new), doTransform=False)
 
     def saveData(self, pathPrefix):
         """
