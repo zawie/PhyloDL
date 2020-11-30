@@ -2,7 +2,7 @@ from generate import generateAndGet
 from ctrlGenPar import SpeciesTreeInfo
 from TreeGenerator import generate as generateTrees
 
-def generateData(amountOfTrees=10,sequenceLength = 100, numTrials = 10, rF=10, mR=1.25e-6):
+def generateData(amountOfTrees=10,sequenceLength = 1000, numTrials = 10, rF=10, mR=1.25e-6):
     data = list()
     i = 0
     for prStr in generateTrees(amountOfTrees):

@@ -3,10 +3,7 @@ import numpy as np
 import torch
 import os
 
-from transformations import transformSequences
-
-toXTensor = lambda x: torch.tensor(x,dtype=torch.float)
-toYTensor = lambda y: torch.tensor(y, dtype=torch.long)
+from transformations import transformData, toYTensor
 
 def getLatestInt():
     latestInt = 0
@@ -36,6 +33,9 @@ def getDataSets(int_tag=-1):
     X_Data = np.load(dataPath)
     Y_Data = np.load(labelsPath)
 
+    print("Y_Data, type:",type(Y_Data))
+    print("X_Data, type:",type(X_Data))
+
     initialDataSet = SimpleDataset(X_Data, Y_Data)
 
     trainSet, devSet, testSet = formDatasets(initialDataSet)
@@ -44,7 +44,7 @@ def getDataSets(int_tag=-1):
 
     return datasets
 
-def formDatasets(initialDatset, setProbabilities = [100, 0, 0]):
+def formDatasets(initialDatset, setProbabilities = [80, 5, 15]):
     """
     Forms SimpleDataset class datasets with the correct probabilities
 
@@ -64,17 +64,17 @@ def formDatasets(initialDatset, setProbabilities = [100, 0, 0]):
         print(numDatapoints)
 
         #check for mutation??
-        newData = initialDatset.X_data.tolist()[indexCounter:indexCounter+numDatapoints]
-        newLabels = initialDatset.Y_data.tolist()[indexCounter:indexCounter+numDatapoints]
+        newData = initialDatset.X_data[indexCounter:indexCounter+numDatapoints]
+        newLabels = initialDatset.Y_data[indexCounter:indexCounter+numDatapoints]
 
-        newSets.append(SimpleDataset(toXTensor(newData), toYTensor(newLabels)))
+        newSets.append(SimpleDataset(newData, newLabels))
 
         indexCounter += numDatapoints
 
     return tuple(newSets)
 
 class SimpleDataset(Dataset):
-    def __init__(self, data, labels, doTransform=False):
+    def __init__(self, data, labels, doTransform=True):
         """
         Initializes the Dataset.
         This primarily entiles reading the generated sequeences into a python list
@@ -85,17 +85,16 @@ class SimpleDataset(Dataset):
         """
         #Validate input
         assert len(data) == len(labels)
+
         #Create data fields
         self.X_data = []
         self.Y_data = []
 
         if doTransform:
             #Transform data
-            for datapoint in zip(data,labels):
-                (sequences,label) = datapoint
-                (transX,transY) = transformSequences(sequences,label)
-                self.X_data += transX
-                self.Y_data += transY
+            (X,Y) = transformData(data,labels)
+            self.X_data = X
+            self.Y_data = Y
         else:
             self.X_data = data
             self.Y_data = labels
@@ -127,9 +126,7 @@ class SimpleDataset(Dataset):
         """
         (X_self,Y_self) = self.getData()
         (X_other,Y_other) = other.getData()
-        X_new = X_self.tolist()+X_other.tolist()
-        Y_new = Y_self.tolist()+Y_other.tolist()
-        return SimpleDataset(toXTensor(X_new), toYTensor(Y_new), doTransform=False)
+        return SimpleDataset(X_self + X_other, Y_self + Y_other, doTransform=False)
 
     def saveData(self, pathPrefix):
         """

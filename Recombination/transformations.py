@@ -55,9 +55,10 @@ def transformBeta(betaSequences):
 def transformGamma(gammaSequences):
     return [gammaToAlpha(gammaSequences),gammaToBeta(gammaSequences),gammaSequences]
 
-def transformSequences(tensorSequences,label):
+def transformSequences(sequenceSet,label):
     #Tensor -> List
     label = label.tolist()
+    sequenceSet = sequenceSet.tolist()
     #Perform switch
     switch = {0:transformAlpha,1:transformBeta,2:transformGamma}
     listOfSequenceSets = switch[label](sequenceSet)
@@ -68,3 +69,13 @@ def transformSequences(tensorSequences,label):
     #Labels
     labels = [toYTensor(0),toYTensor(1),toYTensor(2)]
     return (tensorSequenceSets,labels)
+
+def transformData(data,labels):
+    X = list()
+    Y = list()
+    for datapoint in zip(data,labels):
+        (sequences,label) = datapoint
+        (transX,transY) = transformSequences(sequences,label)
+        X += transX
+        Y += transY
+    return(X,Y)

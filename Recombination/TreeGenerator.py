@@ -13,7 +13,7 @@ def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0.1,maximum=1):
     Output: A set of tree strings
     """
     TaxonNamespace = dendropy.TaxonNamespace(["A","B","C","D"])
-    #Gemerate trees
+    #Generate trees
     trees = set()
     while len(trees) < amount:
         tree = dendropy.simulate.treesim.pure_kingman_tree(TaxonNamespace,pop_size)
