@@ -7,11 +7,12 @@ import time
 
 #Generate data
 datasets = generateData()
-#Compute accuray using DL
-DLaccuracy = TrainAndTest(dnn3(),datasets,10,f"ConvNet",doPlot=True)
 
 #Compute accuacy using ML
 MLaccuracy = runIQTREE(datasets['test'])
+
+#Compute accuray using DL
+DLaccuracy = TrainAndTest(dnn3(),datasets,5,f"ConvNet",doPlot=True)
 
 #Compute and print
 print("-"*100+"\n ML Accuracy:")
