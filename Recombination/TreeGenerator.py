@@ -34,7 +34,7 @@ def newickToStructure(newickTree):
     (a,b,c) = tuple(intervals)
     # outputCommand += " -ej " + coalescentHeight + " " + population1 + " " + population2;
     # outputCommand += " -en " + coalescentHeight + " " + population2 + " " + relativePopsize;
-    return f"-I 4 1 1 1 1 -n 2 1.0 -n 3 1.0 -n 1 1.0 -n 4 1.0 -ej {a} 1 2 -en {a} 2 1.0 -ej {b} 2 3 -en {b} 3 1.0 -ej {c} 3 4 -en {c} 4 1.0"
+    return f"-I 4 1 1 1 1 -n 1 1.0 -n 2 1.0 -n 3 1.0 -n 4 1.0 -ej {a} 1 2 -en {a} 2 1.0 -ej {b} 2 3 -en {b} 3 1.0 -ej {c} 3 4 -en {c} 4 1.0"
 
 # def generateMSCommand(tree,N0 = 100000):
 #     speciesName2MSName = dict()
@@ -55,10 +55,10 @@ def newickToStructure(newickTree):
 
 #     for node in tree.leaf_nodes():
 #         popIndex = speciesName2MSName.get(node.label)
-#         popSize = 10000 #suppose to be per 
+#         popSize = 10000 #suppose to be per
 #         ratio = popSize / N0
 #         outputCommand += " -n" + popIndex + " " + ratio
-    
+
 #     edge2population = dict()
 
 #     for bundle in nodeTimePopsizeList:
@@ -71,14 +71,14 @@ def newickToStructure(newickTree):
 #         if node.is_leaf():
 #             populationIndex = leafIndex
 #             leafIndex += 1
-#             nodeName = node.label #node.taxon 
+#             nodeName = node.label #node.taxon
 #             speciesName2MSName[nodeName] = populationIndex
 #             msName2SpeciesName[populationIndex] = nodeName
 
 #     for node in tree.postorder_node_iter():
 #         generationHeight = node.distance_from_root() #node.distance_from_tip()
 #         coalescentHeight = generationHeight / (4 * N0)
-#         popSize = 10000 #suppose to be per 
+#         popSize = 10000 #suppose to be per
 #         relativePopSize = popSize/N0
 #         nodeTimePopsizeList.add((node, coalescentHeight, relativePopsize))
 
