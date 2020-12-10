@@ -1,6 +1,23 @@
 
+# """
+# Checks if input tree (recombination string) is an anomoly tree
+# """
+# def isAnomolyTree(islandModelString):
+#     x,y,z = parseIslandModelString(islandModelString)
+#     return isAnomolyBL(x, y, z)
+#
+#
+# """
+# Parses Island Model String into its x, y, z branch lengths (in coalescent units)
+# """
+# def parseIslandModelString():
+#     return 1,2,3
+
+
 """
 Checks whether the input branch lengths are in the anomoly zone
+Input: x, y, z branch lengths in coalescent
+Output: True if in anomoly zone; False otherwise
 """
 def isAnomolyBL(x, y, z=0):
     #x branch length bounds
