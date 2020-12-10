@@ -34,6 +34,52 @@ def newickToStructure(newickTree):
     (a,b,c) = tuple(intervals)
     return f"-I 4 1 1 1 1 -n 2 1.0 -n 3 1.0 -n 1 1.0 -n 4 1.0 -ej {a} 1 2 -en {a} 2 {b} -ej {b} 2 3 -en {b} 3 {b} -ej {c} 3 4 -en {c} 4 {b}"
 
+# def generateMSCommand(tree,N0 = 100000):
+#     speciesName2MSName = dict()
+#     msName2SpeciesName = dict()
+#     nodeTimePopsizeList = list()
+#     processTree(tree, N0, speciesName2MSName, msName2SpeciesName, nodeTimePopsizeList)
+
+#     nsam = len(tree.leaf_nodes())
+#     nraps = 1
+#     npop = len(tree.leaf_nodes())
+
+#     outputCommand = "ms" + " " + nsam + " " + " " + nreps + " -T"
+
+#     rho = 4 * N0 * recombRate * sequenceLength
+#     outputCommand += " -r "+rho+" "+sequenceLength
+
+#     outputCommand += " -I " + " 1"*npop
+
+#     for node in tree.leaf_nodes():
+#         popIndex = speciesName2MSName.get(node.label)
+#         popSize = 10000 #suppose to be per 
+#         ratio = popSize / N0
+#         outputCommand += " -n" + popIndex + " " + ratio
+    
+#     edge2population = dict()
+
+#     for bundle in nodeTimePopsizeList:
+#         node = bundle.
+
+# def processTree(tree,N0 = 100000,speciesName2MSName,msName2SpeciesName,nodeTimePopsizeList):
+#     nodeIndex = 0
+#     leafIndex = 1
+#     for node in tree.postorder_node_iter():
+#         if node.is_leaf():
+#             populationIndex = leafIndex
+#             leafIndex += 1
+#             nodeName = node.label #node.taxon 
+#             speciesName2MSName[nodeName] = populationIndex
+#             msName2SpeciesName[populationIndex] = nodeName
+
+#     for node in tree.postorder_node_iter():
+#         generationHeight = node.distance_from_root() #node.distance_from_tip()
+#         coalescentHeight = generationHeight / (4 * N0)
+#         popSize = 10000 #suppose to be per 
+#         relativePopSize = popSize/N0
+#         nodeTimePopsizeList.add((node, coalescentHeight, relativePopsize))
+
 def generate(amount):
     """
     Inputs: amount of trees
