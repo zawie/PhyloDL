@@ -32,7 +32,9 @@ def newickToStructure(newickTree):
     intervals = newickTree.coalescence_intervals()[4:]
     intervals.sort()
     (a,b,c) = tuple(intervals)
-    return f"-I 4 1 1 1 1 -n 2 1.0 -n 3 1.0 -n 1 1.0 -n 4 1.0 -ej {a} 1 2 -en {a} 2 {b} -ej {b} 2 3 -en {b} 3 {b} -ej {c} 3 4 -en {c} 4 {b}"
+    # outputCommand += " -ej " + coalescentHeight + " " + population1 + " " + population2;
+    # outputCommand += " -en " + coalescentHeight + " " + population2 + " " + relativePopsize;
+    return f"-I 4 1 1 1 1 -n 2 1.0 -n 3 1.0 -n 1 1.0 -n 4 1.0 -ej {a} 1 2 -en {a} 2 1.0 -ej {b} 2 3 -en {b} 3 1.0 -ej {c} 3 4 -en {c} 4 1.0"
 
 # def generateMSCommand(tree,N0 = 100000):
 #     speciesName2MSName = dict()
