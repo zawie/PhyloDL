@@ -6,7 +6,7 @@ from ML.IQRAX import runIQTREE, runRAxML, runRAxMLClassification
 import time
 
 #Generate data
-datasets = generateData()
+datasets = generateData(1000, 50)
 
 #Compute accuacy using ML
 MLaccuracy = runIQTREE(datasets['test'])

@@ -170,7 +170,7 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False,doPlot=True
                         plotter.line("Training Loss",[i/total_step+epoch],[sum(loss_list)/len(loss_list)],window=name)
                     loss_list = list()
                 #Mid-Save
-                Save(model,f"{name}",doPrint=False)
+                Save(model,f"{name}Epoch{epoch+1}",doPrint=False)
                 #Print
                 print(f'\tEpoch [{epoch+1}/{num_epochs}], Batch [{i+1}/{total_step}], {val_results}')
 
