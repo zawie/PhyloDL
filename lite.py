@@ -10,6 +10,8 @@ datasets = generateData()
 
 #Compute accuacy using ML
 MLaccuracy = runIQTREE(datasets['test'])
+print("-"*100+"\n ML Accuracy:")
+print(MLaccuracy)
 
 #Compute accuray using DL
 DLaccuracy = TrainAndTest(dnn3(),datasets,5,f"ConvNet",doPlot=True)

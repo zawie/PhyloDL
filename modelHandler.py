@@ -180,8 +180,10 @@ def Train(model,trainset,valset,num_epochs,name="Model",doLoad=False,doPlot=True
 def TrainAndTest(model,datasets,num_epochs,name="Model",doLoad=False,doPlot=True):
     #Fetch val set if it exists
     valset = None
-    if 'dev' in datasets:
+    if 'dev' in datasets.keys():
         valset = datasets['dev']
+    else:
+        print("No val set provided :(")
     #Train model
     Train(model,datasets['train'],valset,num_epochs,name=name,doLoad=doLoad,doPlot=doPlot)
     #Do test & return accuracy

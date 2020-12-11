@@ -18,7 +18,7 @@ def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0.1,maximum=1):
     while len(trees) < amount:
         tree = dendropy.simulate.treesim.pure_kingman_tree(TaxonNamespace,pop_size)
         #if getClass(str(tree)) == 0:
-        #Remove if tree has too short branch Length
+        #Remove if tree has too shor`t branch Length
         invalid = False
         for edge in tree.edges():
             if (edge.length < minimum and edge.length != 0) or (edge.length > maximum):
@@ -30,6 +30,7 @@ def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0.1,maximum=1):
 
 def newickToStructure(newickTree):
     intervals = newickTree.coalescence_intervals()[4:]
+    #print(intervals)
     intervals.sort()
     (a,b,c) = tuple(intervals)
     # outputCommand += " -ej " + coalescentHeight + " " + population1 + " " + population2;
