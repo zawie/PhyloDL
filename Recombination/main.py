@@ -20,6 +20,13 @@ def generateData(name="Alpha",amountOfTrees=10, numTrials=10, sequenceLength = 1
     for i in range(1,len(data)):
         final = final.__add__(data[i])
 
-    #Sae the data
+    #write meta data
+    final.writeToMetadata("amountOfTrees",amountOfTrees)
+    final.writeToMetadata("numTrials",numTrials)
+    final.writeToMetadata("sequenceLength",sequenceLength)
+    final.writeToMetadata("recombFactor",rF)
+    final.writeToMetadata("mutationRate",mR)
+
+    #Save the data
     saveDataset(name,final)
     return final

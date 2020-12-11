@@ -4,6 +4,7 @@ import torch
 import os
 import pickle
 from transformations import transformData, toYTensor
+from datetime import datetime
 
 def saveDataset(name,dataset):
     pickle.dump(dataset,open("data/"+name+".p","wb"))
@@ -55,7 +56,8 @@ class SimpleDataset(Dataset):
         #Create data fields
         self.X_data = []
         self.Y_data = []
-
+        self.metadata = dict()
+        self.writeToMetadata("Creation Date",datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
         if doTransform:
             #Transform data
             (X,Y) = transformData(data,labels)
@@ -67,6 +69,12 @@ class SimpleDataset(Dataset):
 
         #Validate output
         assert len(self.X_data) == len(self.Y_data)
+
+    def getMetadata(self):
+        return self.metadata.copy()
+
+    def writeToMetadata(self,key,value):
+        self.metadata[key] = value
 
     def __getitem__(self, index):
         """
