@@ -1,9 +1,10 @@
-from generate import generateAndGet
+from generate import generateSequences
 from ctrlGenPar import SpeciesTreeInfo
 from TreeGenerator import generate as generateTrees
+from dataHandler import saveDataset
 
 #def generateData(amountOfTrees=1000, sequenceLength = 1000, numTrials = 10, rF=10, mR=1.25e-6): -> 0.553 ML, 0.56966666667 DL
-def generateData(amountOfTrees, numTrials, sequenceLength = 1000, rF=10, mR=1.25e-6):
+def generateData(name="Alpha",amountOfTrees=10, numTrials=10, sequenceLength = 1000, rF=10, mR=1.25e-6):
     data = list()
     i = 0
     for prStr in generateTrees(amountOfTrees):
@@ -12,15 +13,13 @@ def generateData(amountOfTrees, numTrials, sequenceLength = 1000, rF=10, mR=1.25
         label = 0
         TreeInfo = SpeciesTreeInfo(name = structureName, mutationRate=mR, indelRate=0, defaultRecombRate=1.5e-7, popSize=10000, taxaCount=4,postR = prStr)
         #Generate data
-        data.append(generateAndGet(numDatapoints=numTrials,treeLabel=label,sequenceLength=sequenceLength,recombFactor=rF,speciesTreeInfo=TreeInfo))
+        data.append(generateSequences(numDatapoints=numTrials,treeLabel=label,sequenceLength=sequenceLength,recombFactor=rF,speciesTreeInfo=TreeInfo))
         i += 1
-    #Merge all like keys
-    final = dict()
-    for datasets in data:
-        for key,dataset in datasets.items():
-            if key in final:
-                final[key] += dataset
-            else:
-                final[key] = dataset
-    print(final)
+    #Merge all the datasets
+    final = data[0]
+    for i in range(1,len(data)):
+        final = final.__add__(data[i])
+
+    #Sae the data
+    saveDataset(name,final)
     return final

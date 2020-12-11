@@ -2,49 +2,16 @@ from torch.utils.data import Dataset
 import numpy as np
 import torch
 import os
-
+import pickle
 from transformations import transformData, toYTensor
 
-def getLatestInt():
-    latestInt = 0
-    for filename in os.listdir("data"):
-        if filename.endswith(".npy"):
-            numeric_tag = ""
-            for char in filename:
-                if char.isdigit():
-                    numeric_tag += char
-            num = int(numeric_tag)
-            if num > latestInt:
-                latestInt = num
-    return latestInt
+def saveDataset(name,dataset):
+    pickle.dump(dataset,open("data/"+name+".p","wb"))
 
-def getDataSets(int_tag=-1):
-    """
-    1. Reads path files
-    2. Forms SimpleDataset class
-    3. Returns train, dev, test datasets in dictionary format
-        {"train":trainSet, "dev":devSet, "test":testSet}
-    """
-    if int_tag < 0:
-        int_tag = getLatestInt()
-    dataPath = f"data/recombination_data{int_tag}.npy"
-    labelsPath = f"data/recombination_labels{int_tag}.npy"
+def loadDataset(name):
+    return  pickle.load(open("data/"+name+".p","rb"))
 
-    X_Data = np.load(dataPath)
-    Y_Data = np.load(labelsPath)
-
-    print("Y_Data, type:",type(Y_Data))
-    print("X_Data, type:",type(X_Data))
-
-    initialDataSet = SimpleDataset(X_Data, Y_Data)
-
-    trainSet, devSet, testSet = formDatasets(initialDataSet)
-
-    datasets = {"train":trainSet, "dev":devSet, "test":testSet}
-
-    return datasets
-
-def formDatasets(initialDatset, setProbabilities = [80, 5, 15]):
+def splitDatasets(initialDatset, setProbabilities = [80, 5, 15]):
     """
     Forms SimpleDataset class datasets with the correct probabilities
 
@@ -61,9 +28,7 @@ def formDatasets(initialDatset, setProbabilities = [80, 5, 15]):
     indexCounter = 0
     for setProbability in setProbabilities:
         numDatapoints = int(setProbability/100 * numAllDatapoints)
-        print(numDatapoints)
 
-        #check for mutation??
         newData = initialDatset.X_data[indexCounter:indexCounter+numDatapoints]
         newLabels = initialDatset.Y_data[indexCounter:indexCounter+numDatapoints]
 
@@ -71,7 +36,8 @@ def formDatasets(initialDatset, setProbabilities = [80, 5, 15]):
 
         indexCounter += numDatapoints
 
-    return tuple(newSets)
+    (trainSet, devSet, testSet) = tuple(newSets)
+    return  {"train":trainSet, "dev":devSet, "test":testSet}
 
 class SimpleDataset(Dataset):
     def __init__(self, data, labels, doTransform=True):
@@ -127,14 +93,6 @@ class SimpleDataset(Dataset):
         (X_self,Y_self) = self.getData()
         (X_other,Y_other) = other.getData()
         return SimpleDataset(X_self + X_other, Y_self + Y_other, doTransform=False)
-
-    def saveData(self, pathPrefix):
-        """
-        Saves the datasets data and labels
-        """
-        np.save(pathPrefix + "_data", self.X_data)
-        np.save(pathPrefix + "_labels", self.Y_data)
-
 
 # if __name__ == "__main__":
 #     dataPath = "/Users/rhuck/Downloads/DL_Phylogeny/Recombination/dataClassData/recombination_data0.npy"

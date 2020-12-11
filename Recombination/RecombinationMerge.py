@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from dataHandler import SimpleDataset
 
 def _getdataPaths(directory):
     """
@@ -86,7 +87,7 @@ def _loadDatasets(dataPaths):
 #
 #     return dp_val, new_all_data, lost_datapoints
 
-def saveData(directory, outputPath):
+def getDataset(directory):
     """
     Given a directory and an outputPath, saves all the data in the directory to
     the outputPathPrefix + either "data" or "labels" with numpy.save()
@@ -94,20 +95,6 @@ def saveData(directory, outputPath):
     dataPaths, labelsPaths = _getdataPaths(directory)
     data = _loadDatasets(dataPaths)
     labels = _loadDatasets(labelsPaths)
+    return SimpleDataset(data,labels)
 
-    #find largest path index
-    i = -1 #so plus one later will make indices start at 0
-    for datafile in os.scandir(outputPath):
-        if datafile.path.endswith(".npy"):
-            j = int(datafile.path[-5])
-            #print("i:", i, "j:", j)
-            if j > i:
-                i = j
-
-    #use next path index
-    i += 1
-    dataOutputPath = outputPath + f"/recombination_data{i}"
-    labelsOutputPath = outputPath + f"/recombination_labels{i}"
-
-    np.save(dataOutputPath, data)
-    np.save(labelsOutputPath, labels)
+    

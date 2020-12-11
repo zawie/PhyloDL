@@ -9,7 +9,6 @@ import statistics
 import datetime
 import recombinationPreprocess as recombinationPreprocess
 import recombinationMerge as recombinationMerge
-from Recombination.dataHandler import getDataSets
 
 def run(speciesTreeInfo, recombFactor, seqLen, trialIndex, output):
     print("RUN INPUT:",speciesTreeInfo, recombFactor, seqLen, trialIndex, output)
@@ -64,12 +63,11 @@ def main(speciesTreeInfo, recombFactor, seqLen, numTrial,doPrint=False):
 HCGInfo = SpeciesTreeInfo(name="HCG",mutationRate=2.5e-6, indelRate=0, defaultRecombRate=1.5e-8, popSize=10000, taxaCount=4,
                           postR="-I 4 1 1 1 1 -n 1 1.0 -n 2 1.0 -n 3 1.0 -n 4 1.0 -ej 0.5 1 4 -ej 0.5 2 3 -ej 1.0 4 3")
 
-def generate(numDatapoints=1000,treeLabel=2,sequenceLength=1000,recombFactor=1,speciesTreeInfo=HCGInfo):
+def generateSequences(numDatapoints=1000,treeLabel=2,sequenceLength=1000,recombFactor=1,speciesTreeInfo=HCGInfo):
 
     begin_time = datetime.datetime.now()
     num_trials = 6 #dont make bigger than number of cores (parallel processing)
     preprocessDirectory = "preprocessedData"
-    outputPath = "data"
 
     iterations = int(numDatapoints / num_trials)
 
@@ -82,12 +80,7 @@ def generate(numDatapoints=1000,treeLabel=2,sequenceLength=1000,recombFactor=1,s
         recombinationPreprocess.preprocess_data(data_directory, treeLabel, preprocessDirectory,f"/recombinant_{i}")
 
     #merge preprocessed data
-    recombinationMerge.saveData(preprocessDirectory, outputPath)
-
+    dataset = recombinationMerge.getDataset(preprocessDirectory)
 
     print("Total Execution Time: ", datetime.datetime.now() - begin_time)
-
-
-def generateAndGet(numDatapoints=1000,treeLabel=2,sequenceLength=1000,recombFactor=1,speciesTreeInfo=HCGInfo):
-    generate(numDatapoints,treeLabel,sequenceLength,recombFactor,speciesTreeInfo)
-    return getDataSets()
+    return dataset
