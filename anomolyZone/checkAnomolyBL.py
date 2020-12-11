@@ -14,12 +14,12 @@
 #     return 1,2,3
 
 
-"""
-Checks whether the input branch lengths are in the anomoly zone
-Input: x, y, z branch lengths in coalescent
-Output: True if in anomoly zone; False otherwise
-"""
 def isAnomolyBL(x, y, z=0):
+    """
+    Checks whether the input branch lengths are in the anomoly zone
+    Input: x, y, z branch lengths in coalescent
+    Output: True if in anomoly zone; False otherwise
+    """
     #x branch length bounds
     if (x > 0.27 or x <= 0):
         return False
