@@ -7,12 +7,15 @@ from ML.IQRAX import runIQTREE, runRAxML, runRAxMLClassification
 import time
 
 #Generate data
-#dataset = generateData(name="Alpha",amountOfTrees=100, numTrials=10)
-dataset = loadDataset("Alpha")
+# dataset = generateData(name="Alpha10k",amountOfTrees=1000, numTrials=10)
+# dataset = generateData(name="Alpha50k",amountOfTrees=2500, numTrials=20)
+# dataset = generateData(name="Alpha100k",amountOfTrees=5000, numTrials=40)
+
+dataset = loadDataset("Alpha50k")
 datasets = splitDatasets(dataset,setProbabilities = [80, 5, 15])
 
-#Compute accuacy using ML
-MLaccuracy = runIQTREE(datasets['test'])
+# #Compute accuacy using ML
+MLaccuracy = runIQTREE(datasets['tests'])
 print("-"*100+"\n ML Accuracy:")
 print(MLaccuracy)
 
