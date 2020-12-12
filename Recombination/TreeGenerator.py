@@ -1,5 +1,6 @@
 import dendropy
-from anomolyZone.checkAnomolyBL import isAnomlyTree 
+from anomolyZone.anomolyDist import anomolyDistTrees 
+from anomolyZone.checkAnomolyBL import isAnomolyTree 
 
 def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0,maximum=float("+inf"),anomolyOnly=False):
     """
@@ -18,7 +19,7 @@ def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0,maximum=float("+inf")
     while len(trees) < amount:
         tree = dendropy.simulate.treesim.pure_kingman_tree(TaxonNamespace,pop_size)
         invalid = False
-        if(anomolyOnly and not isAnomlyTree(tree)): #Anomly check
+        if(anomolyOnly and not isAnomolyTree(tree)): #Anomly check
             invalid = True
         if(not invalid and (minimum>0 or maximum < float("+inf"))):  #Check branch length constraints
             for edge in tree.edges():
@@ -38,12 +39,16 @@ def newickToStructure(newickTree):
     relativePopsize = 1.0 #1.0
     return f"-I 4 1 1 1 1 -n 1 1.0 -n 2 1.0 -n 3 1.0 -n 4 1.0 -ej {a} 1 2 -en {a} 2 {relativePopsize} -ej {b} 2 3 -en {b} 3 {relativePopsize} -ej {c} 3 4 -en {c} 4 {relativePopsize}"
 
-def generate(amount,anomolyOnly=False):
+def generate(amount,anomolyOnly=False,computeDist=True):
     """
     Inputs: amount of trees
     Output: a set of alpha tree structures
     """
-    return [newickToStructure(tree) for tree in PureKingmanTreeConstructor(amount,anomolyOnly=anomolyOnly)]
+    newicktrees = PureKingmanTreeConstructor(amount,anomolyOnly=anomolyOnly)
+    if computeDist:
+        print("Computing Newick x,y disitrbution...")
+        anomolyDistTrees(newicktrees)
+    return [newickToStructure(tree) for tree in newicktrees]
 
 # def generateMSCommand(tree,N0 = 100000):
 #     speciesName2MSName = dict()
