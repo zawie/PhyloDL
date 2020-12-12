@@ -39,6 +39,13 @@ def isAnomolyBL(x, y, z=0):
     else:
         return False
 
+def isAnomolyTree(tree):
+    """
+    Input: tree - a dendropy tree
+    Output: bool - whether or not the tree is in the anomoly zone
+    """
+    pass
+
 def anomolyApprox(x):
     """
     Anomoly zone approximation function

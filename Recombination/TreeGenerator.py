@@ -1,6 +1,7 @@
 import dendropy
+from anomolyZone.checkAnomolyBL import isAnomlyTree 
 
-def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0,maximum=float("+inf")):
+def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0,maximum=float("+inf"),anomolyOnly=False):
     """
     Generates trees under the unconstrained Kingman’s coalescent process.
 
@@ -16,13 +17,14 @@ def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0,maximum=float("+inf")
     trees = set()
     while len(trees) < amount:
         tree = dendropy.simulate.treesim.pure_kingman_tree(TaxonNamespace,pop_size)
-        #if getClass(str(tree)) == 0:
-        #Remove if tree has too shor`t branch Length
         invalid = False
-        for edge in tree.edges():
-            if (edge.length < minimum and edge.length != 0) or (edge.length > maximum):
-                invalid = True
-                break
+        if(anomolyOnly and not isAnomlyTree(tree)): #Anomly check
+            invalid = True
+        if(not invalid and (minimum>0 or maximum < float("+inf"))):  #Check branch length constraints
+            for edge in tree.edges():
+                if (edge.length < minimum and edge.length != 0) or (edge.length > maximum):
+                    invalid = True
+                    break
         if not invalid:
             trees.add(tree)
     return trees
@@ -35,6 +37,13 @@ def newickToStructure(newickTree):
     # outputCommand += " -en " + coalescentHeight + " " + population2 + " " + relativePopsize;
     relativePopsize = 1.0 #1.0
     return f"-I 4 1 1 1 1 -n 1 1.0 -n 2 1.0 -n 3 1.0 -n 4 1.0 -ej {a} 1 2 -en {a} 2 {relativePopsize} -ej {b} 2 3 -en {b} 3 {relativePopsize} -ej {c} 3 4 -en {c} 4 {relativePopsize}"
+
+def generate(amount,anomolyOnly=False):
+    """
+    Inputs: amount of trees
+    Output: a set of alpha tree structures
+    """
+    return [newickToStructure(tree) for tree in PureKingmanTreeConstructor(amount,anomolyOnly=anomolyOnly)]
 
 # def generateMSCommand(tree,N0 = 100000):
 #     speciesName2MSName = dict()
@@ -81,13 +90,6 @@ def newickToStructure(newickTree):
 #         popSize = 10000 #suppose to be per
 #         relativePopSize = popSize/N0
 #         nodeTimePopsizeList.add((node, coalescentHeight, relativePopsize))
-
-def generate(amount):
-    """
-    Inputs: amount of trees
-    Output: a set of alpha tree structures
-    """
-    return [newickToStructure(tree) for tree in PureKingmanTreeConstructor(amount)]
 
 # def generateStructure(x,y,z):
 #     a = z
