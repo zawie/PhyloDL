@@ -7,10 +7,14 @@ from transformations import transformData, toYTensor
 from datetime import datetime
 
 def saveDataset(name,dataset):
+    print("Saving dataset...")
     pickle.dump(dataset,open("data/"+name+".p","wb"))
+    print("Dataset saved!")
 
 def loadDataset(name):
-    return  pickle.load(open("data/"+name+".p","rb"))
+    print("Loading dataset...")
+    return pickle.load(open("data/"+name+".p","rb"))
+    print("Dataset loaded!")
 
 def splitDatasets(initialDatset, setProbabilities = [80, 5, 15]):
     """
