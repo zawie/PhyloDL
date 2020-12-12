@@ -47,7 +47,14 @@ def generate(amount,anomolyOnly=False,computeDist=True,name="Unknown"):
     newicktrees = PureKingmanTreeConstructor(amount,anomolyOnly=anomolyOnly)
     if computeDist:
         print("Computing Newick x,y disitrbution...")
-        anomolyDistTrees(newicktrees)
+
+        #Default Graph Names
+        if anomolyOnly: #anomoly zone distribution
+            name += " Anomoly Zone"
+        else:
+            name += " Total Distribution"
+        anomolyDistTrees(newicktrees, name)
+
     return [newickToStructure(tree) for tree in newicktrees]
 
 # def generateMSCommand(tree,N0 = 100000):

@@ -7,7 +7,7 @@ from ML.IQRAX import runIQTREE, runRAxML, runRAxMLClassification
 import time
 
 
-dataset = generateData(name="Ryan",amountOfTrees=10, numTrials=10, anomolyOnly=False)
+dataset = generateData(name="Ryan",amountOfTrees=10, numTrials=10, anomolyOnly=True)
 
 #Generate data
 # dataset = generateData(name="Alpha10k",amountOfTrees=1000, numTrials=10)

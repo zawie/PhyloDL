@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import checkAnomolyBL
 
-def anomolyDistTrees(newickTrees):
+def anomolyDistTrees(newickTrees, name="Anomoly Zone"):
     """
     Input: list of newickTrees - a dendropy tree
     Output: plt of x, y branch length (in coalescent units) distribution
@@ -16,7 +16,7 @@ def anomolyDistTrees(newickTrees):
         anomolyY.append(y)
 
     #plot x,y branch length distribution
-    anomolyDist(anomolyX, anomolyY)
+    anomolyDist(anomolyX, anomolyY, name)
 
 def anomolyDist(anomolyX, anomolyY, name="Anomoly Zone", anomolyApprox=checkAnomolyBL.anomolyApprox):
     """
