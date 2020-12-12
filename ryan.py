@@ -6,7 +6,7 @@ from Recombination.main import generateData
 from ML.IQRAX import runIQTREE, runRAxML, runRAxMLClassification
 import time
 
-dataset = generateData(name="RyanAnomaly",amountOfTrees=10, numTrials=10, anomolyOnly=True)
+dataset = generateData(name="RyanAnomaly",amountOfTrees=100, numTrials=10, anomolyOnly=True)
 IQAcc = runIQTREE(dataset)
 RaxAcc = runRAxML(dataset)
 RaxClassAcc = runRAxMLClassification(dataset)
