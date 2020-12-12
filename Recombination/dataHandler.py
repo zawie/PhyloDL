@@ -26,13 +26,12 @@ def splitDatasets(initialDatset, setProbabilities = [80, 5, 15]):
     Output:
     newSets - [trainSet, devSet, testSet]
     """
-    assert sum(setProbabilities) == 100 #is a probability distribution
 
     numAllDatapoints = len(initialDatset.Y_data)
     newSets = list()
     indexCounter = 0
     for setProbability in setProbabilities:
-        numDatapoints = int(setProbability/100 * numAllDatapoints)
+        numDatapoints = int(setProbability/sum(setProbabilities) * numAllDatapoints)
 
         newData = initialDatset.X_data[indexCounter:indexCounter+numDatapoints]
         newLabels = initialDatset.Y_data[indexCounter:indexCounter+numDatapoints]
