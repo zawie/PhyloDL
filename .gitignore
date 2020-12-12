@@ -9,3 +9,4 @@ tree.tre
 WORKING_DIRECTORY
 results
 preprocessedData
+[0-9]*_[0-9]*_[0-9]*_[0-9]*
