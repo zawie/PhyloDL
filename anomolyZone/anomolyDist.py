@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import checkAnomolyBL
 
-def anomolyDistTrees(newickTrees, name="Anomoly Zone"):
+def anomolyDistTrees(newickTrees, name="Anomaly Zone"):
     """
     Input: list of newickTrees - a dendropy tree
     Output: plt of x, y branch length (in coalescent units) distribution
@@ -19,7 +19,7 @@ def anomolyDistTrees(newickTrees, name="Anomoly Zone"):
     #plot x,y branch length distribution
     anomolyDist(anomolyX, anomolyY, name)
 
-def anomolyDist(anomolyX, anomolyY, name="Anomoly Zone", anomolyApprox=checkAnomolyBL.anomolyApprox):
+def anomolyDist(anomolyX, anomolyY, name="Anomaly Zone", anomolyApprox=checkAnomolyBL.anomolyApprox):
     """
     Graphs distribution of anomoly zone branch length
     Input:
@@ -54,11 +54,11 @@ def anomolyDist(anomolyX, anomolyY, name="Anomoly Zone", anomolyApprox=checkAnom
                     xaxis_range=x_range,yaxis_range=y_range)
 
     fig.add_trace(go.Scatter(x=x, y=y, mode='lines',fill='tozeroy',
-                            name = 'Anomoly Zone Approximation',
+                            name = 'Anomaly Zone Approximation',
                             line_color='DarkBlue',
                             fillcolor='LightBlue'))
     fig.add_trace(go.Scatter(x=anomolyX, y=anomolyY,
-                            mode='markers',name='Anomoly Datapoints',
+                            mode='markers',name='Anomaly Datapoints',
                             marker_color='DarkRed', marker_size=markersize))
 
     # fig.show()
