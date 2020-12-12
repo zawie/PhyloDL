@@ -96,5 +96,3 @@ def getDataset(directory):
     data = _loadDatasets(dataPaths)
     labels = _loadDatasets(labelsPaths)
     return SimpleDataset(data,labels)
-
-    

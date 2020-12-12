@@ -3,6 +3,22 @@ import matplotlib.pyplot as plt
 from checkAnomolyBL import anomolyApprox as anomolyFunc
 from checkAnomolyBL import isAnomolyBL
 
+def anomolyDistTrees(newickTrees):
+    """
+    Input: list of newickTrees - a dendropy tree
+    Output: plt of x, y branch length (in coalescent units) distribution
+    """
+    #get x, y branch lengths
+    anomolyX = []
+    anomolyY = []
+    for newickTree in newickTrees:
+        x, y, z = getNewickBL(newickTree)
+        anomolyX.append(x)
+        anomolyY.append(y)
+
+    #plot x,y branch length distribution
+    anomolyDist(anomolyX, anomolyY)
+
 def anomolyDist(anomolyX, anomolyY, anomolyApprox=anomolyFunc):
     """
     Graphs distribution of anomoly zone branch length
@@ -31,14 +47,7 @@ def anomolyDist(anomolyX, anomolyY, anomolyApprox=anomolyFunc):
 
     plt.show()
 
-
-def anomolyDistTrees(trees):
-    """
-    Takes in list of trees, creates plt of disitrbutions
-    """
-    pass
-
-if __name__ == "__main__": 
+if __name__ == "__main__":
     anomolyX = [0.26,0.025,0.05,0.1,0.2]
     anomolyY = [0,1,0.6,0.3,0.07]
 

@@ -1,6 +1,6 @@
 import dendropy
-from anomolyZone.anomolyDist import anomolyDistTrees 
-from anomolyZone.checkAnomolyBL import isAnomolyTree 
+from anomolyZone.anomolyDist import anomolyDistTrees
+from anomolyZone.checkAnomolyBL import isAnomolyTree
 
 def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0,maximum=float("+inf"),anomolyOnly=False):
     """
