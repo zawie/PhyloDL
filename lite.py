@@ -7,9 +7,9 @@ from ML.IQRAX import runIQTREE, runRAxML, runRAxMLClassification
 import time
 
 #Generate data
-#dataset = generateData(name="Alpha",amountOfTrees=100, numTrials=10)
-dataset = loadDataset("Alpha")
-datasets = splitDatasets(dataset,setProbabilities = [80, 5, 15])
+dataset = generateData(name="ryan",amountOfTrees=1, numTrials=10)
+# dataset = loadDataset("Alpha")
+# datasets = splitDatasets(dataset,setProbabilities = [80, 5, 15])
 
 #Compute accuacy using ML
 MLaccuracy = runIQTREE(datasets['test'])
