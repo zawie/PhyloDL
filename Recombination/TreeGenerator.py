@@ -39,7 +39,7 @@ def newickToStructure(newickTree):
     relativePopsize = 1.0 #1.0
     return f"-I 4 1 1 1 1 -n 1 1.0 -n 2 1.0 -n 3 1.0 -n 4 1.0 -ej {a} 1 2 -en {a} 2 {relativePopsize} -ej {b} 2 3 -en {b} 3 {relativePopsize} -ej {c} 3 4 -en {c} 4 {relativePopsize}"
 
-def generate(amount,anomolyOnly=False,computeDist=True):
+def generate(amount,anomolyOnly=False,computeDist=True,name="Unknown"):
     """
     Inputs: amount of trees
     Output: a set of alpha tree structures
