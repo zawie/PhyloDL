@@ -38,17 +38,18 @@ def anomolyDistTrees(trees):
     """
     pass
 
-# anomolyX = [0.26,0.025,0.05,0.1,0.2]
-# anomolyY = [0,1,0.6,0.3,0.07]
+if __name__ == "__main__": 
+    anomolyX = [0.26,0.025,0.05,0.1,0.2]
+    anomolyY = [0,1,0.6,0.3,0.07]
 
-# #generate more datapoints in anomolyzone
-# N = 5000
-# x = np.random.rand(N) * 0.27
-# y= np.random.rand(N)
+    #generate more datapoints in anomolyzone
+    N = 5000
+    x = np.random.rand(N) * 0.27
+    y= np.random.rand(N)
 
-# for i in range(len(x)):
-#     if isAnomolyBL(x[i], y[i]):
-#         anomolyX.append(x[i])
-#         anomolyY.append(y[i])
+    for i in range(len(x)):
+        if isAnomolyBL(x[i], y[i]):
+            anomolyX.append(x[i])
+            anomolyY.append(y[i])
 
-# anomolyDist(anomolyX, anomolyY)
+    anomolyDist(anomolyX, anomolyY)
