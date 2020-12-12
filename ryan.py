@@ -6,4 +6,4 @@ from Recombination.main import generateData
 from ML.IQRAX import runIQTREE, runRAxML, runRAxMLClassification
 import time
 
-dataset = generateData(name="Ryan",amountOfTrees=10, numTrials=10, anomolyOnly=False)
+dataset = generateData(name="Ryan",amountOfTrees=10, numTrials=10, anomolyOnly=True)

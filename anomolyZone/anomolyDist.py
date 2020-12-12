@@ -34,21 +34,34 @@ def anomolyDist(anomolyX, anomolyY, name="Anomoly Zone", anomolyApprox=checkAnom
     y = anomolyApprox(x)
 
     #graph range
-    x_range = [0, max(max(anomolyX), max(x))]
-    y_range = [0, max(max(anomolyY), max(y))]
+    x_range = [0, max(max(anomolyX), max(x), 0.28)]
+    y_range = [0, max(max(anomolyY), max(y),1.1)]
+
+    #markersize
+    num_points = len(anomolyX)
+    markersize = 2
+    if num_points <= 10000:
+        markersize=3
+    elif num_points <=30000:
+        markersize=2
+    else:
+        markersize =1
 
     #build figure
     fig = go.Figure()
-    fig.update_layout(title=name, title_x=0.25, title_y=0.85,
+    fig.update_layout(title=name, title_x=0.4,
                     xaxis_title="x Branch Length",yaxis_title="y Branch Length",
                     xaxis_range=x_range,yaxis_range=y_range)
 
     fig.add_trace(go.Scatter(x=x, y=y, mode='lines',fill='tozeroy',
-                            name = 'Anomoly Zone Approximation'))
+                            name = 'Anomoly Zone Approximation',
+                            line_color='DarkBlue',
+                            fillcolor='LightBlue'))
     fig.add_trace(go.Scatter(x=anomolyX, y=anomolyY,
-                            mode='markers',name='Anomoly Datapoints'))
+                            mode='markers',name='Anomoly Datapoints',
+                            marker_color='DarkRed', marker_size=markersize))
 
-    #fig.show()
+    # fig.show()
 
     #save figure
     fig.write_image("anomolyZone/distPlots/" + name + '.png')
@@ -76,17 +89,21 @@ def anomolyDist(anomolyX, anomolyY, name="Anomoly Zone", anomolyApprox=checkAnom
     # plt.close('all')
 
 if __name__ == "__main__":
-    anomolyX = [0.26,0.025,0.05,0.1,0.2]
-    anomolyY = [0,1,0.6,0.3,0.07]
+    # anomolyX = [0.26,0.025,0.05,0.1,0.2]
+    # anomolyY = [0,1,0.6,0.3,0.07]
+    anomolyX = []
+    anomolyY = []
 
-    #generate more datapoints in anomolyzone
-    N = 5000
-    x = np.random.rand(N) * 0.27
-    y= np.random.rand(N)
+    for N in range(10000, 50001, 10000):
+        print(N)
+        #generate more datapoints in anomolyzone
+        #N = 10000
+        x = np.random.rand(N) * 4
+        y= np.random.rand(N) * 3
 
-    for i in range(len(x)):
-        if checkAnomolyBL.isAnomolyBL(x[i], y[i]):
-            anomolyX.append(x[i])
-            anomolyY.append(y[i])
+        for x_val, y_val in zip(x,y):
+            if checkAnomolyBL.isAnomolyBL(x_val, y_val):
+                anomolyX.append(x_val)
+                anomolyY.append(y_val)
 
-    anomolyDist(anomolyX, anomolyY)
+        anomolyDist(anomolyX, anomolyY)
