@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from checkAnomolyBL import anomolyApprox as anomolyFunc
-from checkAnomolyBL import isAnomolyBL
+import checkAnomolyBL
 
 def anomolyDistTrees(newickTrees):
     """
@@ -12,14 +11,14 @@ def anomolyDistTrees(newickTrees):
     anomolyX = []
     anomolyY = []
     for newickTree in newickTrees:
-        x, y, z = getNewickBL(newickTree)
+        x, y, z = checkAnomolyBL.getNewickBL(newickTree)
         anomolyX.append(x)
         anomolyY.append(y)
 
     #plot x,y branch length distribution
     anomolyDist(anomolyX, anomolyY)
 
-def anomolyDist(anomolyX, anomolyY, anomolyApprox=anomolyFunc):
+def anomolyDist(anomolyX, anomolyY, name="Anomoly Zone", anomolyApprox=checkAnomolyBL.anomolyApprox):
     """
     Graphs distribution of anomoly zone branch length
     Input:
@@ -28,13 +27,13 @@ def anomolyDist(anomolyX, anomolyY, anomolyApprox=anomolyFunc):
     - anomolyApprox: function of anomoly approximation
     Ouput: Graph of distribution of anomoly zone data (x,y) branch lengths
     """
-
+    print("[PLOTTING]")
     #anomoly graph details
-    plt.title("Anomoly Zone")
+    plt.title(name)
     plt.xlabel("x Branch Length")
     plt.ylabel("y Branch Length")
-    plt.xlim(0, 0.27)
-    plt.ylim(0, 1.1)
+    # plt.xlim(0, 0.27)
+    # plt.ylim(0, 1.1)
 
     #anomoly zone function approximation plot
     x = np.linspace(start=0, stop = 0.27, num=1000)
@@ -45,7 +44,9 @@ def anomolyDist(anomolyX, anomolyY, anomolyApprox=anomolyFunc):
     #graph anomoly data points
     plt.scatter(anomolyX, anomolyY, c='red',marker=".", s=30)
 
-    plt.show()
+    #save figure
+    plt.savefig("anomolyZone/distPlots/" + name)
+    plt.close('all')
 
 if __name__ == "__main__":
     anomolyX = [0.26,0.025,0.05,0.1,0.2]
@@ -57,7 +58,7 @@ if __name__ == "__main__":
     y= np.random.rand(N)
 
     for i in range(len(x)):
-        if isAnomolyBL(x[i], y[i]):
+        if checkAnomolyBL.isAnomolyBL(x[i], y[i]):
             anomolyX.append(x[i])
             anomolyY.append(y[i])
 
