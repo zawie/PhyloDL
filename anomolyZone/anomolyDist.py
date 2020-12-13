@@ -9,6 +9,7 @@ def anomolyDistTrees(newickTrees, name="Anomaly Zone"):
     Output: plt of x, y branch length (in coalescent units) distribution
     """
     #get x, y branch lengths
+    anomalyPercent = checkAnomolyBL.percentAnomaly(newickTrees)
     anomolyX = []
     anomolyY = []
     for newickTree in newickTrees:
@@ -16,15 +17,18 @@ def anomolyDistTrees(newickTrees, name="Anomaly Zone"):
         anomolyX.append(x)
         anomolyY.append(y)
 
-    #plot x,y branch length distribution
-    anomolyDist(anomolyX, anomolyY, name)
 
-def anomolyDist(anomolyX, anomolyY, name="Anomaly Zone", anomolyApprox=checkAnomolyBL.anomolyApprox):
+    #plot x,y branch length distribution
+    anomolyDist(anomolyX, anomolyY, name, anomalyPercent)
+
+def anomolyDist(anomolyX, anomolyY, name="Anomaly Zone", anomalyPercent=None,
+                anomolyApprox=checkAnomolyBL.anomolyFunc):
     """
     Graphs distribution of anomoly zone branch length
     Input:
     - anomolyX: List of x branch lengths in coalescent units
     - anomolyY: List of y branch lengths in coalescent units
+    - anomalyPercent: Percent of list of trees that are in the anomaly zone
     - anomolyApprox: function of anomoly approximation
     Ouput: Graph of distribution of anomoly zone data (x,y) branch lengths
     """
@@ -34,18 +38,21 @@ def anomolyDist(anomolyX, anomolyY, name="Anomaly Zone", anomolyApprox=checkAnom
     y = anomolyApprox(x)
 
     #graph range
-    x_range = [0, max(max(anomolyX), max(x), 0.28)]
-    y_range = [0, max(max(anomolyY), max(y),1.1)]
+    x_range = [0, max(max(anomolyX), 0.28)]
+    y_range = [0, max(max(anomolyY), 1.1)]
+    # x_range = [0, 3]
+    # y_range = [0, 1]
 
     #markersize
-    num_points = len(anomolyX)
-    markersize = 2
-    if num_points <= 10000:
-        markersize=3
-    elif num_points <=30000:
-        markersize=2
-    else:
-        markersize =1
+    # num_points = len(anomolyX)
+    # print("[TOTAL] " + str(num_points))
+    # markersize = 2
+    # if num_points <= 10000:
+    #     markersize=3
+    # elif num_points <=30000:
+    #     markersize=2
+    # else:
+    #     markersize =1
 
     #build figure
     fig = go.Figure()
@@ -59,7 +66,11 @@ def anomolyDist(anomolyX, anomolyY, name="Anomaly Zone", anomolyApprox=checkAnom
                             fillcolor='LightBlue'))
     fig.add_trace(go.Scatter(x=anomolyX, y=anomolyY,
                             mode='markers',name='Anomaly Datapoints',
-                            marker_color='DarkRed', marker_size=markersize))
+                            marker_color='DarkRed', marker_size=1))
+    if anomalyPercent:
+        fig.add_annotation(text="<b>Anomaly Percent: " + str(anomalyPercent) + "</b>",
+                            xref='paper', yref='paper', x=0.5, y=1,
+                            showarrow=False)
 
     # fig.show()
 
@@ -94,16 +105,17 @@ if __name__ == "__main__":
     anomolyX = []
     anomolyY = []
 
-    for N in range(10000, 50001, 10000):
-        print(N)
-        #generate more datapoints in anomolyzone
-        #N = 10000
-        x = np.random.rand(N) * 4
-        y= np.random.rand(N) * 3
+    # for N in range(10000, 50001, 10000):
+        #print(N)
 
-        for x_val, y_val in zip(x,y):
-            if checkAnomolyBL.isAnomolyBL(x_val, y_val):
-                anomolyX.append(x_val)
-                anomolyY.append(y_val)
+    #generate more datapoints in anomolyzone
+    N = 10000
+    x = np.random.rand(N) * 4
+    y= np.random.rand(N) * 3
 
-        anomolyDist(anomolyX, anomolyY)
+    for x_val, y_val in zip(x,y):
+        if checkAnomolyBL.isAnomolyBL(x_val, y_val):
+            anomolyX.append(x_val)
+            anomolyY.append(y_val)
+
+    anomolyDist(anomolyX, anomolyY)
