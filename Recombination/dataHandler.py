@@ -26,7 +26,7 @@ def transformDataset(dataset):
     transformedDataset.writeToMetadata("isTransformed",True)
     return transformedDataset
 
-def splitDatasets(initialDatset, setProbabilities = [80, 5, 15]):
+def splitDataset(initialDatset, setProbabilities):
     """
     Forms SimpleDataset class datasets with the correct probabilities
 
@@ -67,8 +67,8 @@ class SimpleDataset(Dataset):
         assert len(data) == len(labels)
 
         #Create data fields
-        self.X_data = data
-        self.Y_data = labels
+        self.X_data = list(data)
+        self.Y_data = list(labels)
         self.metadata = dict()
         self.writeToMetadata("Creation Date",datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
 
@@ -105,7 +105,7 @@ class SimpleDataset(Dataset):
         """
         (X_self,Y_self) = self.getData()
         (X_other,Y_other) = other.getData()
-        return SimpleDataset(X_self + X_other, Y_self + Y_other, doTransform=False)
+        return SimpleDataset(X_self + X_other, Y_self + Y_other)
 
 # if __name__ == "__main__":
 #     dataPath = "/Users/rhuck/Downloads/DL_Phylogeny/Recombination/dataClassData/recombination_data0.npy"
