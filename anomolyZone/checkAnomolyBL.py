@@ -14,6 +14,18 @@ import numpy as np
 # def parseIslandModelString():
 #     return 1,2,3
 
+def percentAnomaly(newickTrees):
+    """
+    Input: list of newickTrees - dendropy trees
+    Output: percent of newickTrees that are in anomoly zone
+    """
+    total = len(newickTrees)
+    numAnomaly = 0
+    for newickTree in newickTrees:
+        if isAnomolyTree(newickTree):
+            numAnomaly += 1
+    return numAnomaly/total * 100
+
 def isAnomolyTree(newickTree):
     """
     Input: newickTree - a dendropy tree
@@ -57,16 +69,14 @@ def isAnomolyBL(x, y, z=0):
         return False
 
     #y branch length bounds in terms of x: anomoly zone function approximation
-    y_bound = anomolyApprox(x)
-
+    y_bound = anomolyFunc(x)
     if y_bound: #y_bound not false
         return y <= y_bound
     else:
         return False
 
-def anomolyApprox(x):
+def anomolyFunc(x):
     """
     Anomoly zone approximation function
     """
-    y = -0.63688 + (6836.2018888) /(1 + (x/(2.629884*(10**-11)))**0.4026)
-    return np.maximum(np.minimum(y, 1), 0)
+    return np.log(2/3 + (3*np.exp(2*x)-2)/(18*(np.exp(3*x)-np.exp(2*x))))

@@ -52,6 +52,7 @@ def run(dataset,cmd,name=None):
             #Run Test
             try:
                 line = cmd(WRITE_FILE_PATH)
+                print("[LINE] " + str(line))
                 treeClass = treeClassifier.getClass(line)
                 if name:
                     final_f.write(f'({label},{treeClass})\t {line}')

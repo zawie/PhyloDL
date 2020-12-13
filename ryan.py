@@ -6,14 +6,15 @@ from Recombination.main import generateData
 from ML.IQRAX import runIQTREE, runRAxML, runRAxMLClassification
 import time
 
-dataset = generateData(name="RyanAnomaly",amountOfTrees=100, numTrials=10, anomolyOnly=True)
+dataset = generateData(name="Ryan",amountOfTrees=100, numTrials=10,
+                        sequenceLength=1000, anomolyOnly=False)
 IQAcc = runIQTREE(dataset)
-RaxAcc = runRAxML(dataset)
-RaxClassAcc = runRAxMLClassification(dataset)
+# RaxAcc = runRAxML(dataset)
+# RaxClassAcc = runRAxMLClassification(dataset)
 
-print("-"*100+"\n IQ Accuracy:\n")
+print("[IQ ACCURACY] " + "-"*100+"\n IQ Accuracy:\n")
 print(IQAcc)
-print("-"*100+"\n RAxML Accuracy:\n")
-print(RaxAcc)
-print("-"*100+"\n RAxML Accuracy:\n")
-print(RaxClassAcc)
+# print("-"*100+"\n RAxML Accuracy:\n")
+# print(RaxAcc)
+# print("-"*100+"\n RAxML Accuracy:\n")
+# print(RaxClassAcc)
