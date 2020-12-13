@@ -50,7 +50,7 @@ def generate(amount,anomolyOnly=False,computeDist=True,name="Unknown"):
 
         #Default Graph Names
         if anomolyOnly: #anomoly zone distribution
-            name += " Anomoly Zone"
+            name += " Anomaly Zone"
         else:
             name += " Total Distribution"
         anomolyDistTrees(newicktrees, name)
