@@ -16,6 +16,16 @@ def loadDataset(name):
     return pickle.load(open("data/"+name+".p","rb"))
     print("Dataset loaded!")
 
+def transformDataset(dataset):
+    metadata = dataset.metadata
+    assert 'isTransformed' in metadata.keys() and metadata['isTransformed'] == False, "Dataset has already been transformed!"
+    (X,Y) = transformData(dataset.X_data,dataset.Y_data)
+    transformedDataset = SimpleDataset(X,Y)
+    transformedDataset.metadata = metadata
+    transformedDataset.writeToMetadata("Transform Date",datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+    transformedDataset.writeToMetadata("isTransformed",True)
+    return transformedDataset
+
 def splitDatasets(initialDatset, setProbabilities = [80, 5, 15]):
     """
     Forms SimpleDataset class datasets with the correct probabilities
@@ -44,7 +54,7 @@ def splitDatasets(initialDatset, setProbabilities = [80, 5, 15]):
     return  {"train":trainSet, "dev":devSet, "test":testSet}
 
 class SimpleDataset(Dataset):
-    def __init__(self, data, labels, doTransform=True):
+    def __init__(self, data, labels):
         """
         Initializes the Dataset.
         This primarily entiles reading the generated sequeences into a python list
@@ -57,18 +67,10 @@ class SimpleDataset(Dataset):
         assert len(data) == len(labels)
 
         #Create data fields
-        self.X_data = []
-        self.Y_data = []
+        self.X_data = data
+        self.Y_data = labels
         self.metadata = dict()
         self.writeToMetadata("Creation Date",datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
-        if doTransform:
-            #Transform data
-            (X,Y) = transformData(data,labels)
-            self.X_data = X
-            self.Y_data = Y
-        else:
-            self.X_data = data
-            self.Y_data = labels
 
         #Validate output
         assert len(self.X_data) == len(self.Y_data)
