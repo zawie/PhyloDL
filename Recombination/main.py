@@ -17,7 +17,7 @@ def generateData(name="Unnamed",amountOfTrees=10, numTrials=10, sequenceLength =
     #Merge all the datasets
     final = data[0]
     for i in range(1,len(data)):
-        final = final.__add__(data[i])
+        final = final + data[i]
 
     #write meta data
     final.writeToMetadata("amountOfTrees",amountOfTrees)
