@@ -6,12 +6,15 @@ from Recombination.main import generateData
 from ML.IQRAX import runIQTREE, runRAxML, runRAxMLClassification
 import time
 
-dataset = generateData(name="Anomaly10k",amountOfTrees=1000, numTrials=10, anomolyOnly=True)
+#dataset = generateData(name="Anomaly10k",amountOfTrees=1000, numTrials=10, anomolyOnly=True)
+dataset = loadDataset("Anomaly10k")
 
 # Compute accuray using DL
-model = dnn3()
-Load(model,"-ConvNet-Epoch2",doPrint=True)
-DLaccuracy = Test(model,dataset)
+# model = dnn3()
+# Load(model,"-ConvNet-Epoch2",doPrint=True)
+# DLaccuracy = Test(model,dataset)
+# print("\n DL Accuracy:")
+# print(DLaccuracy)
 
 # Computer accuracy using ML
 MLaccuracy = runIQTREE(dataset)

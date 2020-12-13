@@ -1,8 +1,8 @@
 import dendropy
 from anomolyZone.anomolyDist import anomolyDistTrees
-from anomolyZone.checkAnomolyBL import isAnomolyTree
+from anomolyZone.checkAnomolyBL import isAnomolyTree, isConstrainedTree
 
-def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0,maximum=float("+inf"),anomolyOnly=False):
+def PureKingmanTreeConstructor(amount,pop_size=1,anomolyOnly=False,constrainTrees=False):
     """
     Generates trees under the unconstrained Kingman’s coalescent process.
 
@@ -18,15 +18,11 @@ def PureKingmanTreeConstructor(amount,pop_size=1,minimum=0,maximum=float("+inf")
     trees = set()
     while len(trees) < amount:
         tree = dendropy.simulate.treesim.pure_kingman_tree(TaxonNamespace,pop_size)
-        invalid = False
         if(anomolyOnly and not isAnomolyTree(tree)): #Anomly check
-            invalid = True
-        if(not invalid and (minimum>0 or maximum < float("+inf"))):  #Check branch length constraints
-            for edge in tree.edges():
-                if (edge.length < minimum and edge.length != 0) or (edge.length > maximum):
-                    invalid = True
-                    break
-        if not invalid:
+            pass
+        elif(constrainTrees and isConstrainedTree(tree)): #Constraint check
+            pass
+        else:
             trees.add(tree)
     return trees
 
@@ -42,12 +38,12 @@ def newickToStructure(newickTree):
             -ej {b} 2 3 -en {b} 3 {relativePopsize} \
             -ej {c} 3 4 -en {c} 4 {relativePopsize}"
 
-def generate(amount,anomolyOnly=False,computeDist=True,name="Unknown"):
+def generate(amount,anomolyOnly=False,constrainTrees=False,computeDist=True,name="Unknown"):
     """
     Inputs: amount of trees
     Output: a set of alpha tree structures
     """
-    newicktrees = PureKingmanTreeConstructor(amount,anomolyOnly=anomolyOnly)
+    newicktrees = PureKingmanTreeConstructor(amount,anomolyOnly=anomolyOnly,constrainTrees=constrainTrees)
     if computeDist:
         print("Computing Newick x,y disitrbution...")
 

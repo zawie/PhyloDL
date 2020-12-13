@@ -80,3 +80,8 @@ def anomolyFunc(x):
     Anomoly zone approximation function
     """
     return np.log(2/3 + (3*np.exp(2*x)-2)/(18*(np.exp(3*x)-np.exp(2*x))))
+
+def isConstrainedTree(newickTree):
+    x,y,z = getNewickBL(newickTree)
+    assert x >= 0 and y >= 0 and z >= 0   #valid branch lengths (can't be negative)
+    return x <= 1.0  and y <= 1.0 and z <= 1.0
