@@ -3,8 +3,7 @@ from ctrlGenPar import SpeciesTreeInfo
 from TreeGenerator import generate as generateTrees
 from dataHandler import saveDataset
 
-#def generateData(amountOfTrees=1000, sequenceLength = 1000, numTrials = 10, rF=10, mR=1.25e-6): -> 0.553 ML, 0.56966666667 DL
-def generateData(name="Alpha",amountOfTrees=10, numTrials=10, sequenceLength = 1000, rF=10, mR=1.25e-6,anomolyOnly=False,constrainTrees=False):
+def generateData(name="Unnamed",amountOfTrees=10, numTrials=10, sequenceLength = 1000, rF=10, mR=1.25e-6,anomolyOnly=False,constrainTrees=False):
     data = list()
     i = 0
     for prStr in generateTrees(amountOfTrees,anomolyOnly=anomolyOnly,constrainTrees=constrainTrees,name=name):
