@@ -53,9 +53,9 @@ def generate(amount,anomolyOnly=False,computeDist=True,name="Unknown"):
 
         #Default Graph Names
         if anomolyOnly: #anomoly zone distribution
-            name += " Anomaly Zone"
+            name = "Anomaly Zone: " + name
         else:
-            name += " Total Distribution"
+            name = "Total Distribution: " + name
         anomolyDistTrees(newicktrees, name)
 
     return [newickToStructure(tree) for tree in newicktrees]

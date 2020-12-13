@@ -6,8 +6,8 @@ from Recombination.main import generateData
 from ML.IQRAX import runIQTREE, runRAxML, runRAxMLClassification
 import time
 
-dataset = generateData(name="Ryan",amountOfTrees=100, numTrials=10,
-                        sequenceLength=1000, anomolyOnly=False)
+dataset = generateData(name="1k Trees 10k SL",amountOfTrees=1000, numTrials=10,
+                        sequenceLength=10000, anomolyOnly=False)
 IQAcc = runIQTREE(dataset)
 # RaxAcc = runRAxML(dataset)
 # RaxClassAcc = runRAxMLClassification(dataset)
