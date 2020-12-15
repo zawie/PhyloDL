@@ -71,6 +71,7 @@ class SimpleDataset(Dataset):
         self.Y_data = list(labels)
         self.metadata = dict()
         self.writeToMetadata("Creation Date",datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+        self.writeToMetadata("isTransformed",False)
 
         #Validate output
         assert len(self.X_data) == len(self.Y_data)
