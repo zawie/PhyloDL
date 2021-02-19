@@ -6,7 +6,7 @@ from dataHandler import saveDataset
 def generateData(name="Unnamed",amountOfTrees=10, numTrials=10, sequenceLength = 1000, rF=10, mR=1.25e-6):
     data = list()
     i = 0
-    for prStr in generateTrees(amountOfTrees,name=name):
+    for prStr in generateTrees(amountOfTrees):
         #SpeciesTree info
         structureName = str(i)
         label = 0

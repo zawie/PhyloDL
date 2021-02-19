@@ -12,7 +12,7 @@ def generate(amount,symmetricPrecent=0.4):
     Output: a set of alpha tree structures
     """
     symCount = int(symmetricPrecent*amount)
-    asymmCount = amount - symCount
+    asymCount = amount - symCount
     trees = set()
     for _ in range(symCount):
         trees.add(createSymmetricTree())
