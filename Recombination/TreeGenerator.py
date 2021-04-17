@@ -35,5 +35,4 @@ def generate(amount,name="Unknown"):
     Output: a set of alpha tree structures
     """
     newicktrees = PureKingmanTreeConstructor(amount)
-    iStrings = [newickToStructure(tree) for tree in newicktrees]
-    return iStrings
+    return [newickToStructure(tree) for tree in newicktrees]

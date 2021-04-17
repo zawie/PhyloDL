@@ -6,7 +6,7 @@ from ML.IQRAX import runIQTREE, runRAxML, runRAxMLClassification
 import time
 
 #Generate Data
-dataset = generateData("Alpha",amountOfTrees=1000, numTrials=10, sequenceLength = 10000)
+dataset = generateData("Alpha",amountOfTrees=100, numTrials=10, sequenceLength = 1000)
 #Augment the data
 transformedData = transformDataset(dataset)
 #Split into train, dev, test
