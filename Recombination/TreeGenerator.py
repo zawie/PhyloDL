@@ -1,4 +1,4 @@
-mport dendropy
+import dendropy
 
 def PureKingmanTreeConstructor(amount,pop_size=1):
     """
@@ -35,4 +35,5 @@ def generate(amount,name="Unknown"):
     Output: a set of alpha tree structures
     """
     newicktrees = PureKingmanTreeConstructor(amount)
-    return [newickToStructure(tree) for tree in newicktrees]
+    iStrings = [newickToStructure(tree) for tree in newicktrees]
+    return iStrings
